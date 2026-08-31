@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ossobo.gestaoDepIt.controllers.gestao.toners.AddEditTonerController"
+            prefHeight="650.0" prefWidth="800.0" style="-fx-background-color: #f8f9fa;">
+
+    <ScrollPane fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER"
+                AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+        <VBox spacing="20.0">
+            <!-- Cabeçalho -->
+            <Label fx:id="tituloLabel" text="Nova Instalação de Toner"
+                   style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;">
+                <padding>
+                    <Insets bottom="10.0" left="20.0" right="20.0" top="20.0" />
+                </padding>
+            </Label>
+
+            <!-- Seleção de Equipamento -->
+            <VBox spacing="10.0" style="-fx-background-color: #e8f4f8; -fx-border-color: #3498db; -fx-border-radius: 8; -fx-background-radius: 8;">
+                <padding>
+                    <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+                </padding>
+                <Label text="Equipamento de Destino"
+                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2980b9;" />
+                <Label fx:id="equipamentoInfoLabel" text="Nenhum equipamento selecionado"
+                       style="-fx-text-fill: #2c3e50; -fx-wrap-text: true;" />
+                <Label fx:id="tonerAtualLabel" text="Toner atual: Nenhum"
+                       style="-fx-text-fill: #e67e22; -fx-font-size: 12px;" />
+                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                    <Button fx:id="selecionarEquipamentoButton" text="Selecionar Equipamento"
+                            style="-fx-background-color: #3498db; -fx-text-fill: white;"
+                            onAction="#handleSelecionarEquipamento" />
+                    <Button fx:id="limparEquipamentoButton" text="Limpar Seleção"
+                            style="-fx-background-color: #95a5a6; -fx-text-fill: white;"
+                            onAction="#handleLimparEquipamento" />
+                </HBox>
+            </VBox>
+
+            <!-- Seleção de Toner -->
+            <VBox spacing="10.0" style="-fx-background-color: #fff9e6; -fx-border-color: #f39c12; -fx-border-radius: 8; -fx-background-radius: 8;">
+                <padding>
+                    <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+                </padding>
+                <Label text="Toner para Instalação"
+                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #f39c12;" />
+                <Label fx:id="tonerInfoLabel" text="Nenhum toner selecionado"
+                       style="-fx-text-fill: #2c3e50; -fx-wrap-text: true;" />
+                <Label fx:id="estoqueTonerLabel" text="Estoque disponível: -"
+                       style="-fx-text-fill: #27ae60; -fx-font-size: 12px;" />
+                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                    <Button fx:id="selecionarTonerButton" text="Selecionar Toner"
+                            style="-fx-background-color: #f39c12; -fx-text-fill: white;"
+                            onAction="#handleSelecionarToner" />
+                    <Button fx:id="limparTonerButton" text="Limpar Seleção"
+                            style="-fx-background-color: #95a5a6; -fx-text-fill: white;"
+                            onAction="#handleLimparToner" />
+                </HBox>
+            </VBox>
+
+            <!-- Formulário Principal -->
+            <GridPane hgap="15.0" vgap="15.0"
+                      style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8;">
+                <padding>
+                    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                </padding>
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="180.0" prefWidth="180.0" />
+                    <ColumnConstraints hgrow="ALWAYS" minWidth="250.0" prefWidth="250.0" />
+                </columnConstraints>
+
+                <!-- Linha 1: Data de Instalação -->
+                <Label text="Data de Instalação *"
+                       style="-fx-font-weight: bold; -fx-text-fill: #34495e;"
+                       GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                <DatePicker fx:id="dataInstalacaoPicker"
+                            GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+                <!-- Linha 2: Percentagem Restante -->
+                <Label text="Percentagem Restante *"
+                       style="-fx-font-weight: bold; -fx-text-fill: #34495e;"
+                       GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                <HBox spacing="10.0" GridPane.rowIndex="1" GridPane.columnIndex="1">
+                    <Slider fx:id="percentagemSlider" min="0" max="100" value="100"
+                            showTickLabels="true" showTickMarks="true" majorTickUnit="25"
+                            HBox.hgrow="ALWAYS" />
+                    <Label fx:id="percentagemLabel" text="100%"
+                           style="-fx-font-weight: bold; -fx-text-fill: #27ae60; -fx-min-width: 50;" />
+                </HBox>
+
+                <!-- Linha 3: Ciclos de Impressão -->
+                <Label text="Ciclos de Impressão"
+                       style="-fx-font-weight: bold; -fx-text-fill: #34495e;"
+                       GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                <TextField fx:id="ciclosImpressaoField" text="0"
+                           GridPane.rowIndex="2" GridPane.columnIndex="1" />
+
+                <!-- Linha 4: Observações -->
+                <Label text="Observações"
+                       style="-fx-font-weight: bold; -fx-text-fill: #34495e;"
+                       GridPane.rowIndex="3" GridPane.columnIndex="0" />
+                <TextArea fx:id="observacoesField" promptText="Observações sobre a instalação"
+                          wrapText="true" prefRowCount="3"
+                          GridPane.rowIndex="3" GridPane.columnIndex="1" />
+            </GridPane>
+
+            <!-- Informações de Compatibilidade -->
+            <VBox spacing="10.0" style="-fx-background-color: #e8f6f3; -fx-border-color: #1abc9c; -fx-border-radius: 8; -fx-background-radius: 8;">
+                <padding>
+                    <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+                </padding>
+                <Label text="Verificação de Compatibilidade"
+                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #16a085;" />
+
+                <VBox spacing="8.0">
+                    <Label fx:id="compatibilidadeLabel" text="Selecione equipamento e toner para verificar compatibilidade"
+                           style="-fx-text-fill: #34495e;" />
+                    <Label fx:id="vidaUtilLabel" text="Vida útil estimada: -"
+                           style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;" />
+                </VBox>
+            </VBox>
+
+            <!-- Mensagens de Erro -->
+            <Label fx:id="mensagemErroLabel" textFill="RED"
+                   style="-fx-font-size: 12px; -fx-wrap-text: true;"
+                   visible="false" managed="false"
+                   maxWidth="1.7976931348623157E308">
+                <padding>
+                    <Insets left="20.0" right="20.0" />
+                </padding>
+            </Label>
+
+            <!-- Botões de Ação -->
+            <HBox spacing="15.0" alignment="CENTER_RIGHT">
+                <padding>
+                    <Insets bottom="20.0" left="20.0" right="20.0" top="10.0" />
+                </padding>
+                <Button fx:id="cancelarButton" text="Cancelar"
+                        style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-weight: bold;"
+                        onAction="#handleCancelar" />
+                <Button fx:id="salvarButton" text="Registrar Instalação"
+                        style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold;"
+                        onAction="#handleSalvar" />
+            </HBox>
+        </VBox>
+    </ScrollPane>
+</AnchorPane>

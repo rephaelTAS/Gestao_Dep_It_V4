@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<!--
+    Login.fxml v1.0
+    Estrutura da tela de login do sistema.
+    Responsabilidades: Layout 40/60 (sidebar + formulário), hierarquia de containers.
+    Estilização visual delegada ao CSS externo via styleClass semânticas.
+-->
+<AnchorPane maxHeight="600.0" maxWidth="850.0" minHeight="600.0" minWidth="850.0"
+            prefHeight="600.0" prefWidth="850.0"
+            styleClass="login-root"
+            xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ossobo.gestaoDepIt.controllers.login.LoginController">
+
+    <!-- Container principal 40%/60% -->
+    <HBox prefHeight="600.0" prefWidth="850.0" spacing="0"
+          AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+        <!-- ========== SIDEBAR ESQUERDA (340px) ========== -->
+        <StackPane maxWidth="340.0" minWidth="340.0"
+                   prefHeight="600.0" prefWidth="340.0"
+                   styleClass="login-sidebar">
+
+            <VBox alignment="CENTER" maxWidth="340.0" minWidth="340.0"
+                  prefHeight="600.0" prefWidth="340.0" spacing="32.0">
+
+                <!-- Logo -->
+                <ImageView fitHeight="80.0" fitWidth="80.0"
+                           pickOnBounds="true" preserveRatio="true"
+                           styleClass="login-logo" />
+
+                <!-- Título e Subtítulo -->
+                <VBox alignment="CENTER" prefWidth="280.0" spacing="4.0">
+                    <Label maxWidth="250.0"
+                           styleClass="login-sidebar-title" text="Packt Inventário"
+                           textAlignment="CENTER" wrapText="true" />
+                    <Label maxWidth="250.0"
+                           styleClass="login-sidebar-subtitle" text="Gestão Inteligente"
+                           textAlignment="CENTER" wrapText="true" />
+                </VBox>
+
+                <!-- Lista de Features -->
+                <VBox alignment="TOP_LEFT" prefWidth="280.0" spacing="12.0">
+                    <HBox alignment="CENTER_LEFT" spacing="8.0">
+                        <Label minWidth="20.0" prefWidth="20.0"
+                               styleClass="login-feature-check" text="✓" />
+                        <Label maxWidth="240.0"
+                               styleClass="login-feature-text" text="Controle em tempo real"
+                               wrapText="true" />
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="8.0">
+                        <Label minWidth="20.0" prefWidth="20.0"
+                               styleClass="login-feature-check" text="✓" />
+                        <Label maxWidth="240.0"
+                               styleClass="login-feature-text" text="Relatórios avançados"
+                               wrapText="true" />
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="8.0">
+                        <Label minWidth="20.0" prefWidth="20.0"
+                               styleClass="login-feature-check" text="✓" />
+                        <Label maxWidth="240.0"
+                               styleClass="login-feature-text" text="Interface moderna"
+                               wrapText="true" />
+                    </HBox>
+                </VBox>
+
+                <!-- Badge de versão -->
+                <Label styleClass="login-version-badge" text="v2.4.1" />
+            </VBox>
+        </StackPane>
+
+        <!-- ========== FORMULÁRIO DIREITO (510px) ========== -->
+        <StackPane maxWidth="510.0" minWidth="510.0"
+                   prefHeight="600.0" prefWidth="510.0"
+                   styleClass="login-form-area">
+
+            <!-- Card do formulário -->
+            <VBox alignment="TOP_CENTER" prefHeight="520.0" prefWidth="420.0"
+                  spacing="0.0"
+                  styleClass="login-form-card">
+
+                <padding>
+                    <Insets top="30" bottom="30" left="25" right="25"/>
+                </padding>
+
+                <!-- Cabeçalho -->
+                <VBox alignment="CENTER" prefHeight="80.0" prefWidth="420.0"
+                      spacing="8.0">
+                    <Label maxWidth="300.0"
+                           styleClass="login-form-title" text="Bem-vindo de volta"
+                           textAlignment="CENTER" wrapText="true" />
+                    <Label maxWidth="300.0"
+                           styleClass="login-form-subtitle" text="Entre para gerenciar seu inventário"
+                           textAlignment="CENTER" wrapText="true" />
+                </VBox>
+
+                <!-- Campos do formulário -->
+                <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="420.0"
+                      spacing="20.0" VBox.vgrow="ALWAYS">
+
+                    <!-- Usuário -->
+                    <VBox alignment="TOP_LEFT" spacing="6.0" prefWidth="Infinity">
+                        <Label styleClass="login-field-label" text="Usuário" />
+                        <TextField fx:id="usuario"
+                                   promptText="nome@empresa.com"
+                                   styleClass="login-input-field"
+                                   prefWidth="Infinity">
+                            <padding>
+                                <Insets top="12" bottom="12" left="15" right="15" />
+                            </padding>
+                        </TextField>
+                    </VBox>
+
+                    <!-- Senha -->
+                    <VBox alignment="TOP_LEFT" spacing="6.0" prefWidth="Infinity">
+                        <Label styleClass="login-field-label" text="Senha" />
+                        <PasswordField fx:id="senha"
+                                       promptText="Sua senha"
+                                       styleClass="login-input-field"
+                                       prefWidth="Infinity">
+                            <padding>
+                                <Insets top="12" bottom="12" left="15" right="15" />
+                            </padding>
+                        </PasswordField>
+
+                        <!-- Link de recuperação -->
+                        <HBox alignment="CENTER_RIGHT" prefWidth="Infinity">
+                            <Hyperlink styleClass="login-link-forgot" text="Esqueceu a senha?" />
+                        </HBox>
+                    </VBox>
+
+                    <!-- Checkbox -->
+                    <CheckBox fx:id="cb_lembrar"
+                              styleClass="login-checkbox"
+                              text="Manter conectado" />
+                </VBox>
+
+                <!-- Botões -->
+                <VBox alignment="CENTER" prefHeight="100.0" prefWidth="420.0"
+                      spacing="15.0">
+
+                    <Button fx:id="btn_login"
+                            onAction="#handleLogin"
+                            prefHeight="45.0" prefWidth="280.0"
+                            styleClass="login-btn-primary"
+                            text="Entrar no Sistema" />
+
+                    <Button fx:id="btn_cancelar"
+                            onAction="#closetBtn"
+                            prefHeight="40.0" prefWidth="120.0"
+                            styleClass="login-btn-cancelar"
+                            text="Cancelar" />
+                </VBox>
+
+                <!-- Rodapé -->
+                <VBox alignment="CENTER" prefHeight="60.0" prefWidth="420.0"
+                      spacing="2.0">
+                    <Label styleClass="login-footer-text" text="Packt Inventário v2.4.1" />
+                    <Label styleClass="login-footer-text" text="© 2024 Todos os direitos reservados" />
+                </VBox>
+
+            </VBox>
+        </StackPane>
+
+    </HBox>
+</AnchorPane>

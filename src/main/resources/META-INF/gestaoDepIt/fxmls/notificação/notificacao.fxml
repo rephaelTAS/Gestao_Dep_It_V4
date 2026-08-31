@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="800.0" prefWidth="320.0"
+            minWidth="280.0" maxWidth="400.0"
+            xmlns="http://javafx.com/javafx/23.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ossobo.gestaoDepIt.controllers.main.sidebar.NotificacoesController">
+
+    <!-- 🎨 Container Principal com Efeito Glass -->
+    <BorderPane AnchorPane.topAnchor="0.0"
+                AnchorPane.bottomAnchor="0.0"
+                AnchorPane.leftAnchor="0.0"
+                AnchorPane.rightAnchor="0.0"
+                styleClass="glass-pane">
+
+        <!-- 🆕 Header Moderno com Ícone e Estatísticas -->
+        <top>
+            <VBox spacing="8" styleClass="header-container">
+                <padding>
+                    <Insets top="20" right="20" bottom="15" left="20"/>
+                </padding>
+
+                <!-- 🔔 Título com Ícone -->
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <Label text="🔔" styleClass="icon-label"/>
+                    <VBox spacing="2">
+                        <Label text="Notificações" styleClass="title-label"/>
+                        <Label fx:id="lblContador" text="0 novas" styleClass="subtitle-label"/>
+                    </VBox>
+                </HBox>
+
+                <!-- 🎯 Filtros Rápidos -->
+                <HBox spacing="8" styleClass="filter-container">
+                    <Button text="Todas" styleClass="filter-button active"
+                            onAction="#filtrarTodas"/>
+                    <Button text="Não Lidas" styleClass="filter-button"
+                            onAction="#filtrarNaoLidas"/>
+                    <Button text="Críticas" styleClass="filter-button"
+                            onAction="#filtrarCriticas"/>
+                </HBox>
+            </VBox>
+        </top>
+
+        <!-- 🎪 Área Central com ListView Customizada -->
+        <center>
+            <VBox spacing="0" BorderPane.margin="$x10">
+                <!-- 📊 Estado Vazio -->
+                <StackPane fx:id="paneVazio" visible="false" styleClass="empty-state">
+                    <VBox alignment="CENTER" spacing="12">
+                        <Label text="📨" styleClass="empty-icon"/>
+                        <Label text="Nenhuma Notificação" styleClass="empty-title"/>
+                        <Label text="Você está atualizado!" styleClass="empty-subtitle"/>
+                    </VBox>
+                </StackPane>
+
+                <!-- 🎨 ListView Moderna -->
+                <ListView fx:id="listaNotificacoes"
+                          styleClass="modern-listview"
+                          VBox.vgrow="ALWAYS">
+                    <placeholder>
+                        <Label text="Carregando notificações..." styleClass="loading-label"/>
+                    </placeholder>
+                </ListView>
+            </VBox>
+        </center>
+
+        <!-- 🎪 Footer com Ações Flutuantes -->
+        <bottom>
+            <VBox spacing="12" styleClass="footer-container">
+                <!-- 📈 Barra de Estatísticas -->
+                <HBox spacing="15" alignment="CENTER" styleClass="stats-bar">
+                    <HBox spacing="5" alignment="CENTER_LEFT">
+                        <Rectangle width="8" height="8" styleClass="stat-critical"/>
+                        <Label fx:id="lblCriticas" text="0" styleClass="stat-count"/>
+                    </HBox>
+                    <HBox spacing="5" alignment="CENTER_LEFT">
+                        <Rectangle width="8" height="8" styleClass="stat-warning"/>
+                        <Label fx:id="lblAvisos" text="0" styleClass="stat-count"/>
+                    </HBox>
+                    <HBox spacing="5" alignment="CENTER_LEFT">
+                        <Rectangle width="8" height="8" styleClass="stat-info"/>
+                        <Label fx:id="lblInformacoes" text="0" styleClass="stat-count"/>
+                    </HBox>
+                </HBox>
+
+                <!-- 🎯 Botões de Ação -->
+                <HBox spacing="10" alignment="CENTER" styleClass="actions-container">
+                    <Button fx:id="btnMarcarTodasLidas"
+                            text="📋 Marcar Todas"
+                            onAction="#marcarTodasComoLidas"
+                            styleClass="action-button secondary"/>
+
+                    <Button fx:id="btnLimparTodas"
+                            text="🗑️ Limpar Todas"
+                            onAction="#limparTodas"
+                            styleClass="action-button primary"/>
+                </HBox>
+            </VBox>
+        </bottom>
+
+    </BorderPane>
+</AnchorPane>

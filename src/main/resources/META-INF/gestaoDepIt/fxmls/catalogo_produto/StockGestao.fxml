@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!--
+    GIA.fxml v1.0
+    Estrutura do dashboard de Gestão Inteligente de Ativos.
+    Responsabilidades: Hierarquia de containers, dimensões base e constraints de layout.
+    Estilização visual delegada ao CSS externo via styleClass semânticas.
+-->
+<ScrollPane fitToWidth="true" prefHeight="900" prefWidth="1400" vbarPolicy="ALWAYS"
+            styleClass="dashboard-scroll"
+            xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ossobo.gestaoDepIt.controllers.gestao.gia.GIAController">
+
+    <VBox spacing="12" styleClass="dashboard-root">
+        <padding><Insets bottom="15" left="12" right="12" top="12" /></padding>
+
+        <!-- ========== HEADER ========== -->
+        <HBox alignment="CENTER_LEFT" spacing="15" styleClass="dashboard-header">
+            <padding><Insets bottom="10" left="15" right="15" top="10" /></padding>
+            <Label text="📊 Gestão Inteligente de Ativos" styleClass="dashboard-title" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="btnAtualizar" text="⟳ Atualizar Análises"
+                    styleClass="btn-primary" onAction="#handleAtualizar" />
+            <Button fx:id="btnExportarRelatorio" text="📄 Exportar Relatório"
+                    styleClass="btn-secondary" onAction="#handleExportarRelatorio" />
+        </HBox>
+
+        <!-- ========== FILTROS ========== -->
+        <VBox spacing="8" styleClass="dashboard-card">
+            <padding><Insets bottom="12" left="15" right="15" top="12" /></padding>
+            <Label text="Filtros de Análise" styleClass="dashboard-card-header" />
+
+            <GridPane hgap="12" vgap="8">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="16" />
+                    <ColumnConstraints percentWidth="16" />
+                    <ColumnConstraints percentWidth="16" />
+                    <ColumnConstraints percentWidth="16" />
+                    <ColumnConstraints percentWidth="16" />
+                    <ColumnConstraints percentWidth="20" />
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints />
+                    <RowConstraints />
+                </rowConstraints>
+
+                <!-- Linha 0 -->
+                <Label text="Tipo de Produto:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <ComboBox fx:id="cbTipoProduto" prefWidth="160" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                <Label text="Status:" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                <ComboBox fx:id="cbStatus" prefWidth="160" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+
+                <Label text="Localização:" GridPane.columnIndex="4" GridPane.rowIndex="0" />
+                <ComboBox fx:id="cbLocalizacao" prefWidth="160" GridPane.columnIndex="5" GridPane.rowIndex="0" />
+
+                <!-- Linha 1 -->
+                <Label text="Condição:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <ComboBox fx:id="cbCondicao" prefWidth="160" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                <Label text="Departamento:" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                <ComboBox fx:id="cbDepartamento" prefWidth="160" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+
+                <HBox spacing="10" alignment="CENTER_RIGHT" GridPane.columnIndex="4" GridPane.rowIndex="1"
+                      GridPane.columnSpan="2">
+                    <CheckBox fx:id="ckApenasDefeito" text="Apenas com Defeito" />
+                    <Button fx:id="btnAplicarFiltros" text="Aplicar Filtros"
+                            styleClass="btn-success" onAction="#handleAplicarFiltros" />
+                    <Button fx:id="btnLimparFiltros" text="Limpar"
+                            styleClass="btn-danger" onAction="#handleLimparFiltros" />
+                </HBox>
+            </GridPane>
+        </VBox>
+
+        <!-- ========== INDICADORES PRINCIPAIS (GAUGES) ========== -->
+        <HBox spacing="12" styleClass="dashboard-gauges-row">
+            <VBox spacing="6" styleClass="dashboard-gauge-card" HBox.hgrow="ALWAYS">
+                <Label text="Saúde Geral" styleClass="gauge-title" />
+                <Label fx:id="gaugeSaudeGeral" text="--" styleClass="gauge-value-green" />
+                <ProgressBar fx:id="barSaudeGeral" progress="0.0" prefWidth="180" />
+                <Label fx:id="labelSaudeDetalhe" text="Carregando..." styleClass="gauge-detail" />
+            </VBox>
+
+            <VBox spacing="6" styleClass="dashboard-gauge-card" HBox.hgrow="ALWAYS">
+                <Label text="Valor Total" styleClass="gauge-title" />
+                <Label fx:id="gaugeValorTotal" text="€ 0" styleClass="gauge-value-blue" />
+                <Label fx:id="labelValorDetalhe" text="Carregando..." styleClass="gauge-detail" />
+            </VBox>
+
+            <VBox spacing="6" styleClass="dashboard-gauge-card" HBox.hgrow="ALWAYS">
+                <Label text="Em Manutenção" styleClass="gauge-title" />
+                <Label fx:id="lblEmManutencao" text="0" styleClass="gauge-value-orange" />
+                <Label fx:id="labelManutencaoDetalhe" text="Carregando..." styleClass="gauge-detail" />
+            </VBox>
+
+            <VBox spacing="6" styleClass="dashboard-gauge-card" HBox.hgrow="ALWAYS">
+                <Label text="Críticos" styleClass="gauge-title" />
+                <Label fx:id="gaugeCriticos" text="0" styleClass="gauge-value-red" />
+                <Label fx:id="labelCriticosDetalhe" text="Carregando..." styleClass="gauge-detail" />
+            </VBox>
+
+            <VBox spacing="6" styleClass="dashboard-gauge-card" HBox.hgrow="ALWAYS">
+                <Label text="Previsão Subst. 12m" styleClass="gauge-title" />
+                <Label fx:id="gaugePrevisaoSubstituicao" text="€ 0" styleClass="gauge-value-orange" />
+                <Label fx:id="labelPrevisaoDetalhe" text="Carregando..." styleClass="gauge-detail" />
+            </VBox>
+        </HBox>
+
+        <!-- ========== LINHA 1: Gráficos de Distribuição ========== -->
+        <HBox spacing="12" HBox.hgrow="ALWAYS">
+            <VBox spacing="8" styleClass="dashboard-chart-card" HBox.hgrow="ALWAYS" prefWidth="380">
+                <Label text="Distribuição por Status" styleClass="chart-title" />
+                <PieChart fx:id="pieChartStatus" prefHeight="280" legendVisible="true" labelsVisible="true" />
+            </VBox>
+
+            <VBox spacing="8" styleClass="dashboard-chart-card" HBox.hgrow="ALWAYS" prefWidth="500">
+                <Label text="Equipamentos por Departamento" styleClass="chart-title" />
+                <BarChart fx:id="barChartDepartamento" prefHeight="280" animated="true" barGap="5.0" categoryGap="30.0">
+                    <xAxis><CategoryAxis label="Departamento" /></xAxis>
+                    <yAxis><NumberAxis label="Quantidade" /></yAxis>
+                </BarChart>
+            </VBox>
+
+            <VBox spacing="8" styleClass="dashboard-chart-card" HBox.hgrow="ALWAYS" prefWidth="400">
+                <Label text="Por Condição" styleClass="chart-title" />
+                <BarChart fx:id="graficoCondicao" prefHeight="280" animated="true" legendVisible="false"
+                          barGap="8.0" categoryGap="40.0">
+                    <xAxis><CategoryAxis fx:id="eixoXCategoria" label="Condição" /></xAxis>
+                    <yAxis><NumberAxis fx:id="eixoYQuantidade" label="Quantidade" /></yAxis>
+                </BarChart>
+            </VBox>
+        </HBox>
+
+        <!-- ========== LINHA 2: Gráficos Analíticos ========== -->
+        <HBox spacing="12" HBox.hgrow="ALWAYS">
+            <VBox spacing="8" styleClass="dashboard-chart-card" HBox.hgrow="ALWAYS" prefWidth="650">
+                <Label text="Projeção de Substituição (5 anos)" styleClass="chart-title" />
+                <LineChart fx:id="lineChartProjecao" prefHeight="280" animated="true" createSymbols="true">
+                    <xAxis><CategoryAxis label="Ano" /></xAxis>
+                    <yAxis><NumberAxis label="€ (milhares)" /></yAxis>
+                </LineChart>
+            </VBox>
+
+            <VBox spacing="8" styleClass="dashboard-chart-card" HBox.hgrow="ALWAYS" prefWidth="650">
+                <Label text="Desbalanceamento por Funcionário (Top 10)" styleClass="chart-title" />
+                <BarChart fx:id="barChartBalanceamento" prefHeight="280" animated="true" barGap="3.0" categoryGap="20.0">
+                    <xAxis><CategoryAxis label="Funcionário" /></xAxis>
+                    <yAxis><NumberAxis label="Equipamentos" /></yAxis>
+                </BarChart>
+            </VBox>
+        </HBox>
+
+        <!-- ========== LINHA 3: Tabela de Inventário + Localização ========== -->
+        <HBox spacing="12" HBox.hgrow="ALWAYS">
+            <VBox spacing="8" styleClass="dashboard-table-card" HBox.hgrow="ALWAYS" prefWidth="900">
+                <Label text="📋 Itens do Inventário" styleClass="chart-title" />
+                <TableView fx:id="tblInventario" prefHeight="250" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colInvSKU"          text="SKU"           prefWidth="90" />
+                        <TableColumn fx:id="colInvTipo"         text="Tipo"          prefWidth="90" />
+                        <TableColumn fx:id="colInvMarca"        text="Marca/Modelo"  prefWidth="160" />
+                        <TableColumn fx:id="colInvNumSerie"     text="Nº Série"      prefWidth="110" />
+                        <TableColumn fx:id="colInvLocalizacao"  text="Localização"   prefWidth="110" />
+                        <TableColumn fx:id="colInvStatus"       text="Status"        prefWidth="80" />
+                        <TableColumn fx:id="colInvCondicao"     text="Condição"      prefWidth="80" />
+                        <TableColumn fx:id="colInvDataAquisicao" text="Aquisição"    prefWidth="100" />
+                        <TableColumn fx:id="colInvAcoes"        text="Ações"         prefWidth="160" />
+                    </columns>
+                </TableView>
+                <HBox alignment="CENTER_RIGHT" spacing="10">
+                    <Label text="Total:" />
+                    <Label fx:id="lblTotalItens" text="0" styleClass="table-total-label" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button fx:id="btnDetalhesItem"       text="Detalhes"           styleClass="btn-primary"  onAction="#handleDetalhesItem" />
+                    <Button fx:id="btnRelatorioDefeitos"  text="Relatório Defeitos" styleClass="btn-danger"   onAction="#handleRelatorioDefeitos" />
+                    <Button fx:id="btnGestaoToners"       text="Gestão de Toners"   styleClass="btn-dark"     onAction="#handleGestaoToners" />
+                </HBox>
+            </VBox>
+
+            <VBox spacing="8" styleClass="dashboard-table-card" HBox.hgrow="ALWAYS" prefWidth="420">
+                <Label text="📍 Distribuição por Localização" styleClass="chart-title" />
+                <TableView fx:id="tblLocalizacao" prefHeight="250" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colLocNome"       text="Localização" prefWidth="180" />
+                        <TableColumn fx:id="colLocQuantidade" text="Qtd"         prefWidth="80" />
+                        <TableColumn fx:id="colLocValor"      text="Valor"       prefWidth="120" />
+                    </columns>
+                </TableView>
+            </VBox>
+        </HBox>
+
+        <!-- ========== LINHA 4: Tabelas de Análise Crítica ========== -->
+        <HBox spacing="12" HBox.hgrow="ALWAYS">
+            <VBox spacing="8" styleClass="dashboard-table-card" HBox.hgrow="ALWAYS" prefWidth="680">
+                <Label text="⚠ Top 10 — Equipamentos Críticos" styleClass="chart-title" />
+                <TableView fx:id="tabelaCriticos" prefHeight="210" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colCriticoSKU"           text="SKU"          prefWidth="90" />
+                        <TableColumn fx:id="colCriticoNome"          text="Nome"         prefWidth="180" />
+                        <TableColumn fx:id="colCriticoIdade"         text="Idade"        prefWidth="70" />
+                        <TableColumn fx:id="colCriticoStatus"        text="Status"       prefWidth="70" />
+                        <TableColumn fx:id="colCriticoRecomendacao"  text="Recomendação" prefWidth="270" />
+                        <TableColumn fx:id="colCriticoAcoes"         text="Ações"        prefWidth="80" />
+                    </columns>
+                </TableView>
+            </VBox>
+
+            <VBox spacing="8" styleClass="dashboard-table-card" HBox.hgrow="ALWAYS" prefWidth="680">
+                <Label text="📋 Recomendações de Ação" styleClass="chart-title" />
+                <TableView fx:id="tabelaRecomendacoes" prefHeight="210" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colRecPrioridade" text="!"       prefWidth="35" />
+                        <TableColumn fx:id="colRecAcao"       text="Ação"    prefWidth="110" />
+                        <TableColumn fx:id="colRecItem"       text="Item"    prefWidth="200" />
+                        <TableColumn fx:id="colRecImpacto"    text="Impacto" prefWidth="150" />
+                        <TableColumn fx:id="colRecPrazo"      text="Prazo"   prefWidth="120" />
+                    </columns>
+                </TableView>
+            </VBox>
+        </HBox>
+
+        <!-- ========== LINHA 5: Custo-Benefício + Estoque Inteligente ========== -->
+        <HBox spacing="12" HBox.hgrow="ALWAYS">
+            <VBox spacing="8" styleClass="dashboard-table-card" HBox.hgrow="ALWAYS" prefWidth="680">
+                <Label text="🔍 Melhor Custo-Benefício" styleClass="chart-title" />
+                <TableView fx:id="tabelaCustoBeneficio" prefHeight="190" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colCBSKU"         text="SKU"         prefWidth="90" />
+                        <TableColumn fx:id="colCBNome"        text="Modelo"      prefWidth="160" />
+                        <TableColumn fx:id="colCBProcessador" text="Processador" prefWidth="140" />
+                        <TableColumn fx:id="colCBRAM"         text="RAM"         prefWidth="60" />
+                        <TableColumn fx:id="colCBPreco"       text="Preço"       prefWidth="80" />
+                        <TableColumn fx:id="colCBCustoAno"    text="Custo/Ano"   prefWidth="80" />
+                        <TableColumn fx:id="colCBPontuacao"   text="Score"       prefWidth="60" />
+                    </columns>
+                </TableView>
+            </VBox>
+
+            <VBox spacing="8" styleClass="dashboard-table-card" HBox.hgrow="ALWAYS" prefWidth="680">
+                <Label text="📦 Estoque Inteligente — Alertas" styleClass="chart-title" />
+                <TableView fx:id="tabelaEstoqueAlertas" prefHeight="190" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colEstSKU"      text="SKU"      prefWidth="90" />
+                        <TableColumn fx:id="colEstNome"     text="Produto"  prefWidth="180" />
+                        <TableColumn fx:id="colEstAtual"    text="Estoque"  prefWidth="70" />
+                        <TableColumn fx:id="colEstMinimo"   text="Mínimo"   prefWidth="70" />
+                        <TableColumn fx:id="colEstExcesso"  text="Excesso"  prefWidth="70" />
+                        <TableColumn fx:id="colEstSugestao" text="Sugestão" prefWidth="180" />
+                    </columns>
+                </TableView>
+            </VBox>
+        </HBox>
+
+        <!-- ========== LINHA 6: Itens Parados ========== -->
+        <HBox spacing="12" HBox.hgrow="ALWAYS">
+            <VBox spacing="8" styleClass="dashboard-table-card" HBox.hgrow="ALWAYS">
+                <Label text="🕐 Itens Parados (sem movimentação > 90 dias)" styleClass="chart-title" />
+                <TableView fx:id="tabelaItensParados" prefHeight="180" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colParadoSKU"   text="SKU"               prefWidth="100" />
+                        <TableColumn fx:id="colParadoNome"  text="Item"              prefWidth="250" />
+                        <TableColumn fx:id="colParadoDias"  text="Dias Parado"       prefWidth="110" />
+                        <TableColumn fx:id="colParadoValor" text="Valor Imobilizado" prefWidth="150" />
+                        <TableColumn fx:id="colParadoAcao"  text="Ação Sugerida"     prefWidth="250" />
+                    </columns>
+                </TableView>
+            </VBox>
+        </HBox>
+
+        <!-- ========== RODAPÉ ========== -->
+        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="dashboard-status-bar">
+            <padding><Insets bottom="8" left="15" right="15" top="8" /></padding>
+            <Label fx:id="labelUltimaAtualizacao" text="Última análise: --" styleClass="status-text" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Label fx:id="statusLabel" text="Sistema de Análise Ativo" styleClass="status-text" />
+            <ProgressIndicator fx:id="progressIndicator" progress="0.0" visible="false" prefWidth="18" prefHeight="18" />
+        </HBox>
+
+    </VBox>
+</ScrollPane>

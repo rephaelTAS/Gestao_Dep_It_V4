@@ -1,0 +1,176 @@
+/**
+ * funcionario-list.css v1.0
+ * Estilos visuais para FuncionarioList.fxml
+ * Responsabilidades: Cores, sombras, bordas, fontes, tabela, paginação.
+ * NÃO contém regras de layout estrutural.
+ * Prefixo "func-list-" para isolamento de namespaces.
+ */
+
+/* ========== ROOT ========== */
+.func-list-root {
+    -fx-background-color: #f5f6fa;
+}
+
+/* ========== TÍTULO ========== */
+.func-list-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+/* ========== CARD (FILTROS) ========== */
+.func-list-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 8px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 4, 0, 0, 1);
+    -fx-border-color: #e8e8e8;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+}
+
+.func-list-card-header {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #34495e;
+}
+
+/* ========== ESTATÍSTICAS ========== */
+.func-list-stats {
+    -fx-font-size: 13px;
+    -fx-text-fill: #7f8c8d;
+}
+
+/* ========== TABELA ========== */
+.table-view {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 4px;
+    -fx-table-cell-border-color: #f0f0f0;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 0 0 1 0;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-padding: 8 10 8 10;
+}
+
+.table-view .column-header .label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+    -fx-font-size: 12px;
+}
+
+.table-row-cell {
+    -fx-padding: 6 10 6 10;
+    -fx-font-size: 13px;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #fafbfc;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #eaf2fb;
+    -fx-text-fill: #2c3e50;
+}
+
+/* ========== PAGINAÇÃO ========== */
+.func-list-pagination {
+    -fx-background-color: #ffffff;
+    -fx-padding: 10 20 10 20;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1 0 0 0;
+}
+
+.func-list-pagination-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #7f8c8d;
+    -fx-min-width: 100px;
+    -fx-alignment: center;
+}
+
+.func-list-pagination .button {
+    -fx-background-color: #ecf0f1;
+    -fx-text-fill: #2c3e50;
+    -fx-padding: 4 10 4 10;
+    -fx-font-size: 12px;
+    -fx-background-radius: 4px;
+    -fx-cursor: hand;
+}
+
+.func-list-pagination .button:hover {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+}
+
+/* ========== STATUS BAR ========== */
+.func-list-status-bar {
+    -fx-background-color: #ffffff;
+    -fx-padding: 6 0 6 0;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1 0 0 0;
+}
+
+.func-list-status-text {
+    -fx-font-size: 12px;
+    -fx-text-fill: #95a5a6;
+}
+
+/* ========== BOTÕES (compartilhados) ========== */
+.button {
+    -fx-background-radius: 4px;
+    -fx-padding: 6 14 6 14;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-opacity: 0.9;
+}
+
+.btn-primary {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #2980b9;
+}
+
+.btn-secondary {
+    -fx-background-color: #ecf0f1;
+    -fx-text-fill: #2c3e50;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #dce4ec;
+}
+
+/* ========== CAMPOS DE FORMULÁRIO ========== */
+.text-field {
+    -fx-background-radius: 4px;
+    -fx-border-color: #ddd;
+    -fx-border-radius: 4px;
+    -fx-padding: 6 10 6 10;
+    -fx-font-size: 13px;
+}
+
+.text-field:focused {
+    -fx-border-color: #3498db;
+}
+
+.combo-box {
+    -fx-background-radius: 4px;
+    -fx-border-color: #ddd;
+    -fx-border-radius: 4px;
+}
+
+.combo-box:focused {
+    -fx-border-color: #3498db;
+}

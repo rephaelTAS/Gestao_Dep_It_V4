@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
+
+<!--
+    FuncionarioList.fxml v1.0
+    Estrutura da listagem de funcionários.
+    Responsabilidades: Hierarquia de containers, dimensões base e constraints de layout.
+    Estilização visual delegada ao CSS externo via styleClass semânticas.
+-->
+<AnchorPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ossobo.gestaoDepIt.controllers.gestao.funcionario.FuncionarioListController"
+            prefHeight="700.0" prefWidth="1200.0">
+
+    <VBox spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+        <!-- ========== HEADER ========== -->
+        <HBox alignment="CENTER_LEFT" spacing="20.0">
+            <padding>
+                <Insets bottom="10.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+            <Label text="Gestão de Funcionários" styleClass="func-list-title" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="novoButton" text="+ Novo Funcionário"
+                    styleClass="btn-primary" onAction="#handleNovoFuncionario" />
+        </HBox>
+
+        <!-- ========== FILTROS ========== -->
+        <VBox spacing="10.0" styleClass="func-list-card">
+            <padding>
+                <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+            </padding>
+            <Label text="Filtros" styleClass="func-list-card-header" />
+            <GridPane hgap="10.0" vgap="10.0">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="150.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="150.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="150.0" />
+                    <ColumnConstraints hgrow="ALWAYS" minWidth="100.0" />
+                </columnConstraints>
+
+                <Label text="Nome:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                <TextField fx:id="filtroNomeField" promptText="Buscar por nome..."
+                           GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+                <Label text="Departamento:" GridPane.rowIndex="0" GridPane.columnIndex="2" />
+                <ComboBox fx:id="filtroDepartamentoCombo" promptText="Todos departamentos"
+                          GridPane.rowIndex="0" GridPane.columnIndex="3" />
+
+                <Label text="Status:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                <ComboBox fx:id="filtroStatusCombo" promptText="Todos status"
+                          GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+                <Label text="Com Foto:" GridPane.rowIndex="1" GridPane.columnIndex="2" />
+                <ComboBox fx:id="filtroComFotoCombo" promptText="Todos"
+                          GridPane.rowIndex="1" GridPane.columnIndex="3" />
+
+                <HBox spacing="10.0" GridPane.rowIndex="2" GridPane.columnIndex="2"
+                      alignment="CENTER_RIGHT" GridPane.columnSpan="2">
+                    <Button fx:id="limparFiltrosButton" text="Limpar Filtros"
+                            styleClass="btn-secondary" onAction="#handleLimparFiltros" />
+                    <Button fx:id="aplicarFiltrosButton" text="Aplicar Filtros"
+                            styleClass="btn-primary" onAction="#handleAplicarFiltros" />
+                </HBox>
+            </GridPane>
+        </VBox>
+
+        <!-- ========== ESTATÍSTICAS ========== -->
+        <HBox spacing="20.0" alignment="CENTER_LEFT">
+            <padding><Insets left="20.0" /></padding>
+            <Label fx:id="estatisticasLabel" text="Carregando estatísticas..."
+                   styleClass="func-list-stats" />
+        </HBox>
+
+        <!-- ========== TABELA ========== -->
+        <VBox VBox.vgrow="ALWAYS">
+            <TableView fx:id="funcionariosTable" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="colFoto"          text="Foto"          prefWidth="60.0" />
+                    <TableColumn fx:id="colCodDep"        text="Código"        prefWidth="90.0" />
+                    <TableColumn fx:id="colNome"          text="Nome"          prefWidth="180.0" />
+                    <TableColumn fx:id="colFuncao"        text="Função"        prefWidth="130.0" />
+                    <TableColumn fx:id="colDepartamento"  text="Departamento"  prefWidth="130.0" />
+                    <TableColumn fx:id="colStatus"        text="Status"        prefWidth="70.0" />
+                    <TableColumn fx:id="colEmail"         text="Email"         prefWidth="160.0" />
+                    <TableColumn fx:id="colAcoes"         text="Ações"         prefWidth="120.0" />
+                </columns>
+            </TableView>
+
+            <!-- Paginação -->
+            <HBox spacing="10.0" alignment="CENTER" styleClass="func-list-pagination">
+                <Button fx:id="btnPrimeira"  text="&lt;&lt;" onAction="#handlePrimeiraPagina" />
+                <Button fx:id="btnAnterior"  text="&lt;"     onAction="#handlePaginaAnterior" />
+                <Label fx:id="labelPagina"   text="Página 1 de 1" styleClass="func-list-pagination-label" />
+                <Button fx:id="btnProxima"   text="&gt;"     onAction="#handleProximaPagina" />
+                <Button fx:id="btnUltima"    text="&gt;&gt;" onAction="#handleUltimaPagina" />
+                <ComboBox fx:id="comboItensPorPagina" prefWidth="80.0" />
+            </HBox>
+        </VBox>
+
+        <!-- ========== STATUS BAR ========== -->
+        <HBox spacing="10.0" alignment="CENTER_LEFT" styleClass="func-list-status-bar">
+            <padding><Insets left="20.0" right="20.0" /></padding>
+            <Label fx:id="statusLabel" text="Pronto" styleClass="func-list-status-text" />
+            <Region HBox.hgrow="ALWAYS" />
+            <ProgressIndicator fx:id="progressIndicator" progress="0.0" visible="false" />
+        </HBox>
+    </VBox>
+</AnchorPane>

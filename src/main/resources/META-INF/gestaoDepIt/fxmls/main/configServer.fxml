@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1">
+
+    <VBox spacing="20" AnchorPane.topAnchor="20" AnchorPane.leftAnchor="20"
+          AnchorPane.rightAnchor="20" AnchorPane.bottomAnchor="20">
+
+        <!-- TÍTULO -->
+        <HBox spacing="10">
+            <Text text="⚙️ Configuração de Servidor Remoto" styleClass="titulo-config" />
+        </HBox>
+
+        <Separator />
+
+        <!-- FORMULÁRIO -->
+        <GridPane hgap="15" vgap="12" styleClass="form-grid">
+
+            <!-- Linha 1: Nome da Configuração -->
+            <Label text="Nome da Configuração:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="label-config" />
+            <TextField fx:id="txtNomeConfig" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                       promptText="Ex: servidor_producao" styleClass="input-config" />
+
+            <!-- Linha 2: Tipo de Banco -->
+            <Label text="Tipo de Banco:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="label-config" />
+            <ComboBox fx:id="cmbTipoBanco" GridPane.rowIndex="1" GridPane.columnIndex="1"
+                      styleClass="input-config" />
+
+            <!-- Linha 3: Host -->
+            <Label text="Host:" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="label-config" />
+            <TextField fx:id="txtHost" GridPane.rowIndex="2" GridPane.columnIndex="1"
+                       promptText="Ex: 192.168.20.10" styleClass="input-config" />
+
+            <!-- Linha 4: Porta -->
+            <Label text="Porta:" GridPane.rowIndex="3" GridPane.columnIndex="0" styleClass="label-config" />
+            <TextField fx:id="txtPorta" GridPane.rowIndex="3" GridPane.columnIndex="1"
+                       promptText="Ex: 3306" styleClass="input-config" />
+
+            <!-- Linha 5: Database -->
+            <Label text="Banco de Dados:" GridPane.rowIndex="4" GridPane.columnIndex="0" styleClass="label-config" />
+            <TextField fx:id="txtDatabase" GridPane.rowIndex="4" GridPane.columnIndex="1"
+                       promptText="Ex: gestao_dep_it" styleClass="input-config" />
+
+            <!-- Linha 6: Usuário -->
+            <Label text="Usuário:" GridPane.rowIndex="5" GridPane.columnIndex="0" styleClass="label-config" />
+            <TextField fx:id="txtUsuario" GridPane.rowIndex="5" GridPane.columnIndex="1"
+                       promptText="Ex: rafael" styleClass="input-config" />
+
+            <!-- Linha 7: Senha -->
+            <Label text="Senha:" GridPane.rowIndex="6" GridPane.columnIndex="0" styleClass="label-config" />
+            <PasswordField fx:id="txtSenha" GridPane.rowIndex="6" GridPane.columnIndex="1"
+                           promptText="Digite a senha" styleClass="input-config" />
+
+            <!-- Linha 8: Parâmetros Extras -->
+            <Label text="Parâmetros Extras (JSON):" GridPane.rowIndex="7" GridPane.columnIndex="0" styleClass="label-config" />
+            <TextField fx:id="txtParametros" GridPane.rowIndex="7" GridPane.columnIndex="1"
+                       promptText='{"useSSL":false,"serverTimezone":"UTC"}' styleClass="input-config" />
+
+        </GridPane>
+
+        <Separator />
+
+        <!-- BARRA DE STATUS -->
+        <HBox spacing="15" styleClass="status-bar">
+            <Label fx:id="lblStatus" text="Status: Não testado" styleClass="status-label" />
+            <Label fx:id="lblConexao" text="Última conexão: --" styleClass="status-label" />
+        </HBox>
+
+        <!-- BOTÕES -->
+        <HBox spacing="15" styleClass="button-bar">
+            <Button fx:id="btnTestar" text="🔌 Testar Conexão" styleClass="btn-testar" />
+            <Button fx:id="btnSalvar" text="💾 Salvar" styleClass="btn-salvar" />
+            <Button fx:id="btnAtivar" text="✅ Ativar" styleClass="btn-ativar" />
+            <Button fx:id="btnFechar" text="✖️ Fechar" styleClass="btn-fechar" />
+        </HBox>
+
+    </VBox>
+
+</AnchorPane>

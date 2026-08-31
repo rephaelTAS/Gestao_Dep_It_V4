@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+
+<BorderPane prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: linear-gradient(to bottom right, #f8fafc, #e2e8f0);" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ossobo.gestaoDepIt.controllers.gestao.equipamentos.inventario.InventarioControllerDetails">
+
+    <!-- ===== TOP: HEADER COM STATUS ===== -->
+    <top>
+        <VBox spacing="0">
+            <!-- Barra superior com gradiente -->
+            <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-background-color: linear-gradient(to right, #1e3a8a, #3b82f6); -fx-padding: 20;">
+
+                <!-- Ícone e Título -->
+                <HBox alignment="CENTER_LEFT" spacing="15">
+                    <ImageView fx:id="imgEquipamentoIcon" fitHeight="32" fitWidth="32" preserveRatio="true" />
+                    <VBox spacing="2">
+                        <Label fx:id="lblTituloEquipamento" style="-fx-text-fill: white; -fx-font-size: 24; -fx-font-weight: bold;" text="Detalhes do Equipamento" />
+                        <Label fx:id="lblSubtitulo" style="-fx-text-fill: #dbeafe; -fx-font-size: 12;" text="Visualização completa de dados integrados" />
+                    </VBox>
+                </HBox>
+
+                <Region HBox.hgrow="ALWAYS" />
+
+                <!-- Badge de Status (REMOVIDO DATA BINDING) -->
+                <HBox alignment="CENTER" spacing="10">
+                    <Label fx:id="lblStatusBadge" style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-padding: 8 16; -fx-background-radius: 20; -fx-font-weight: bold;" text="" />
+                    <Label fx:id="lblCondicaoBadge" style="-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-padding: 8 16; -fx-background-radius: 20; -fx-font-weight: bold;" text="" />
+                </HBox>
+
+                <!-- Botões de Ação -->
+                <HBox spacing="10">
+                    <Button onAction="#editarEquipamento" style="-fx-background-color: #6366f1; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;" text="📝 Editar" />
+                    <Button onAction="#verHistorico" style="-fx-background-color: #8b5cf6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;" text="📊 Histórico" />
+                    <Button onAction="#gerarRelatorioDetalhes" style="-fx-background-color: #0ea5e9; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;" text="🖨️ Relatório" />
+                    <!-- Adicione esta linha ANTES do botão Fechar, dentro do HBox spacing="10" -->
+                    <Button onAction="#handleExcluir"
+                            style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"
+                            text="🗑️ Excluir" />
+                    <Button onAction="#fecharDialogo" style="-fx-background-color: #6b7280; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;" text="✕ Fechar" />
+                </HBox>
+            </HBox>
+
+            <!-- Barra de progresso/informações -->
+            <HBox alignment="CENTER_LEFT" spacing="30" style="-fx-background-color: white; -fx-padding: 12 20; -fx-border-color: #e5e7eb; -fx-border-width: 0 0 1 0;">
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label style="-fx-text-fill: #6b7280; -fx-font-weight: bold;" text="🕐 Tempo de Uso:" />
+                    <Label fx:id="lblTempoUso" style="-fx-text-fill: #1f2937; -fx-font-weight: bold;" text="Carregando..." />
+                </HBox>
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label style="-fx-text-fill: #6b7280; -fx-font-weight: bold;" text="📅 Próxima Verificação:" />
+                    <Label fx:id="lblProximaVerificacao" style="-fx-text-fill: #1f2937; -fx-font-weight: bold;" text="Carregando..." />
+                </HBox>
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label style="-fx-text-fill: #6b7280; -fx-font-weight: bold;" text="📈 Performance:" />
+                    <ProgressBar fx:id="pbPerformance" prefWidth="150" progress="0" />
+                    <Label fx:id="lblPerformancePercent" style="-fx-text-fill: #10b981; -fx-font-weight: bold;" text="0%" />
+                </HBox>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- ===== CENTER: DASHBOARD PRINCIPAL ===== -->
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-border-color: transparent;">
+            <VBox spacing="20" style="-fx-padding: 25;">
+
+                <!-- ===== LINHA 1: CARDS PRINCIPAIS ===== -->
+                <HBox spacing="20" VBox.vgrow="ALWAYS">
+
+                    <!-- CARD 1: IDENTIFICAÇÃO -->
+                    <VBox prefWidth="280" spacing="15" style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" styleClass="card">
+                        <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: #4f46e5; -fx-background-radius: 12 12 0 0; -fx-padding: 15;">
+                            <Label style="-fx-font-size: 18;" text="🔍" />
+                            <Label style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14;" text="IDENTIFICAÇÃO" />
+                        </HBox>
+                        <VBox spacing="12" style="-fx-padding: 20;">
+                            <GridPane hgap="10" vgap="10">
+                                <Label style="-fx-text-fill: #6b7280; -fx-font-weight: bold;" text="Nº Série:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                <Label fx:id="lblNumSerie" style="-fx-text-fill: #1f2937; -fx-font-weight: bold;" text="" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                                <!-- Endereço MAC -->
+                                <Label style="-fx-text-fill: #6b7280; -fx-font-weight: bold;" text="Endereço MAC:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                                <Label fx:id="lblEnderecoMac" style="-fx-text-fill: #1f2937; -fx-font-weight: bold;" text="" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                                <Label style="-fx-text-fill: #6b7280; -fx-font-weight: bold;" text="SKU Catálogo:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                                <Label fx:id="lblSku" style="-fx-text-fill: #1f2937; -fx-font-weight: bold;" text="" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                                <Label style="-fx-text-fill: #6b7280; -fx-font-weight: bold;" text="Tipo:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                                <Label fx:id="lblTipoEquipamento" style="-fx-text-fill: #1f2937; -fx-font-weight: bold;" text="" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <columnConstraints>
+                           <ColumnConstraints />
+                           <ColumnConstraints />
+                        </columnConstraints>
+                        <rowConstraints>
+                           <RowConstraints />
+                           <RowConstraints />
+                           <RowConstraints />
+                           <RowConstraints />
+                           <RowConstraints />
+                        </rowConstraints>
+                            </GridPane>
+                        </VBox>
+                    </VBox>
+
+                    <!-- CARD 2: LOCALIZAÇÃO & OPERADOR -->
+                    <VBox prefWidth="280" spacing="15" style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);">
+                        <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: #0ea5e9; -fx-background-radius: 12 12 0 0; -fx-padding: 15;">
+                            <Label style="-fx-font-size: 18;" text="📍" />
+                            <Label style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14;" text="LOCALIZAÇÃO &amp; OPERADOR" />
+                        </HBox>
+                        <VBox spacing="12" style="-fx-padding: 20;">
+                            <GridPane hgap="10" vgap="10">
+                                <Label style="-fx-text-fill: #6b7280; -fx-font-weight: bold;" text="Departamento:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                <Label fx:id="lblDepartamento" style="-fx-text-fill: #1f2937; -fx-font-weight: bold;" text="" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                                <Label style="-fx-text-fill: #6b7280; -fx-font-weight: bold;" text="Sala/Local:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                                <Label fx:id="lblLocalizacao" style="-fx-text-fill: #1f2937; -fx-font-weight: bold;" text="" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                                <!-- Funcionário ID -->
+                                <Label style="-fx-text-fill: #6b7280; -fx-font-weight: bold;" text="Funcionário ID:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                                <Label fx:id="lblFuncionarioId" style="-fx-text-fill: #1f2937; -fx-font-weight: bold;" text="" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                                <Label style="-fx-text-fill: #6b7280; -fx-font-weight: bold;" text="Nome Funcionário:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                                <Label fx:id="lblFuncionarioNome" style="-fx-text-fill: #1f2937; -fx-font-weight: bold;" text="" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                                <Label style="-fx-text-fill: #6b7280; -fx-font-weight: bold;" text="Função:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                                <Label fx:id="lblFuncao" style="-fx-text-fill: #1f2937; -fx-font-weight: bold;" text="" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+                                <Label style="-fx-text-fill: #6b7280; -fx-font-weight: bold;" text="Contato:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+                                <HBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                                    <Label fx:id="lblEmail" style="-fx-text-fill: #3b82f6; -fx-font-weight: bold;" text="" />
+                                    <Label fx:id="lblTelefone" style="-fx-text-fill: #1f2937; -fx-font-weight: bold;" text="" />
+                                </HBox>
+                        <columnConstraints>
+                           <ColumnConstraints />
+                           <ColumnConstraints />
+                        </columnConstraints>
+                        <rowConstraints>
+                           <RowConstraints />
+                           <RowConstraints />
+                           <RowConstraints />
+                           <RowConstraints />
+                           <RowConstraints />
+                           <RowConstraints />
+                        </rowConstraints>
+                            </GridPane>
+                        </VBox>
+                    </VBox>
+
+                    <!-- CARD 3: STATUS & CONDIÇÃO -->
+                    <VBox prefWidth="280" spacing="15" style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);">
+                        <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: #10b981; -fx-background-radius: 12 12 0 0; -fx-padding: 15;">
+                            <Label style="-fx-font-size: 18;" text="📊" />
+                            <Label style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14;" text="STATUS &amp; CONDIÇÃO" />
+                        </HBox>
+                        <VBox alignment="CENTER" spacing="15" style="-fx-padding: 20;">
+                            <!-- INDICADOR CIRCULAR DE PROGRESSO DINÂMICO -->
+                            <StackPane>
+                                <!-- Círculo de fundo (cinza claro) -->
+                                <Circle fill="transparent" radius="60" stroke="#e5e7eb" strokeWidth="10" />
+
+                                <!-- Arco de progresso dinâmico -->
+                                <Arc fx:id="arcStatusProgress" centerX="60" centerY="60" fill="transparent" length="0" radiusX="60" radiusY="60" startAngle="90" stroke="#10b981" strokeLineCap="ROUND" strokeWidth="10" />
+
+                                <!-- Texto central do indicador -->
+                                <VBox alignment="CENTER" spacing="2">
+                                    <Label fx:id="lblStatusScore" style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #1f2937;" text="0%" />
+                                    <Label style="-fx-text-fill: #6b7280; -fx-font-size: 12;" text="Saúde" />
+                                </VBox>
+                            </StackPane>
+
+                            <!-- DADOS DE STATUS -->
+                            <GridPane hgap="10" vgap="8">
+                                <Label style="-fx-text-fill: #6b7280; -fx-font-weight: bold;" text="Status Atual:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                <Label fx:id="lblStatus" style="-fx-text-fill: #1f2937; -fx-font-weight: bold;" text="" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                                <Label style="-fx-text-fill: #6b7280; -fx-font-weight: bold;" text="Condição:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                                <Label fx:id="lblCondicao" style="-fx-text-fill: #1f2937; -fx-font-weight: bold;" text="" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                                <Label style="-fx-text-fill: #6b7280; -fx-font-weight: bold;" text="Última Verif.:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                                <Label fx:id="lblUltimaVerificacao" style="-fx-text-fill: #1f2937; -fx-font-weight: bold;" text="" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <columnConstraints>
+                           <ColumnConstraints />
+                           <ColumnConstraints />
+                        </columnConstraints>
+                        <rowConstraints>
+                           <RowConstraints />
+                           <RowConstraints />
+                           <RowConstraints />
+                        </rowConstraints>
+                            </GridPane>
+                        </VBox>
+                    </VBox>
+
+                    <!-- SIDEBAR: AÇÕES RÁPIDAS -->
+                    <VBox prefWidth="220" spacing="15" style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);">
+                        <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: #8b5cf6; -fx-background-radius: 12 12 0 0; -fx-padding: 15;">
+                            <Label style="-fx-font-size: 18;" text="⚡" />
+                            <Label style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14;" text="AÇÕES RÁPIDAS" />
+                        </HBox>
+                        <VBox spacing="10" style="-fx-padding: 15;">
+                            <Button onAction="#registrarVerificacao" style="-fx-background-color: #f0f9ff; -fx-text-fill: #0ea5e9; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 12;" text="🔄 Registrar Verificação" />
+                            <Button onAction="#enviarManutencao" style="-fx-background-color: #fef2f2; -fx-text-fill: #ef4444; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 12;" text="🔧 Enviar p/ Manutenção" />
+                            <Button onAction="#gerarQRCode" style="-fx-background-color: #f0fdf4; -fx-text-fill: #10b981; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 12;" text="📋 Gerar QR Code" />
+                            <Button onAction="#anexarDocumento" style="-fx-background-color: #faf5ff; -fx-text-fill: #8b5cf6; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 12;" text="📎 Anexar Documento" />
+                            <Separator />
+                            <Button onAction="#baixarEquipamento" style="-fx-background-color: #f3f4f6; -fx-text-fill: #6b7280; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 12;" text="🗑️ Baixar Equipamento" />
+                        </VBox>
+                    </VBox>
+
+                </HBox>
+
+                <!-- ===== LINHA 2: DETALHES TÉCNICOS ===== -->
+                <HBox spacing="20" VBox.vgrow="ALWAYS">
+
+                    <!-- CARD 4: DADOS TÉCNICOS DO PRODUTO -->
+                    <VBox spacing="15" style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" VBox.vgrow="ALWAYS">
+                        <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: #f59e0b; -fx-background-radius: 12 12 0 0; -fx-padding: 15;">
+                            <Label style="-fx-font-size: 18;" text="⚙️" />
+                            <Label style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14;" text="DADOS TÉCNICOS DO PRODUTO" />
+                        </HBox>
+                        <VBox spacing="15" style="-fx-padding: 20;">
+                            <GridPane hgap="15" vgap="12">
+                                <!-- Coluna 1 -->
+                                <Label style="-fx-text-fill: #6b7280; -fx-font-weight: bold;" text="Marca:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                <Label fx:id="lblMarca" style="-fx-text-fill: #1f2937; -fx-font-weight: bold;" text="" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                                <Label style="-fx-text-fill: #6b7280; -fx-font-weight: bold;" text="Modelo:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                                <Label fx:id="lblModelo" style="-fx-text-fill: #1f2937; -fx-font-weight: bold;" text="" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                                <Label style="-fx-text-fill: #6b7280; -fx-font-weight: bold;" text="Cor:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                                <Label fx:id="lblCor" style="-fx-text-fill: #1f2937; -fx-font-weight: bold;" text="" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                                <Label style="-fx-text-fill: #6b7280; -fx-font-weight: bold;" text="Categoria:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                                <Label fx:id="lblCategoria" style="-fx-text-fill: #1f2937; -fx-font-weight: bold;" text="" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                                <!-- Coluna 2 -->
+                                <Label style="-fx-text-fill: #6b7280; -fx-font-weight: bold;" text="Preço Unitário:" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                                <Label fx:id="lblPrecoUnitario" style="-fx-text-fill: #1f2937; -fx-font-weight: bold;" text="" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+
+                                <Label style="-fx-text-fill: #6b7280; -fx-font-weight: bold;" text="Data Aquisição:" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                <Label fx:id="lblDataAquisicao" style="-fx-text-fill: #1f2937; -fx-font-weight: bold;" text="" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+
+                                <Label style="-fx-text-fill: #6b7280; -fx-font-weight: bold;" text="Data Instalação:" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                <Label fx:id="lblDataInstalacao" style="-fx-text-fill: #1f2937; -fx-font-weight: bold;" text="" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+
+                                <Label style="-fx-text-fill: #6b7280; -fx-font-weight: bold;" text="Em Serviço desde:" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                <Label fx:id="lblDataEntradaServico" style="-fx-text-fill: #1f2937; -fx-font-weight: bold;" text="" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+
+                                <!-- Campos de timestamp -->
+                                <Label style="-fx-text-fill: #6b7280; -fx-font-weight: bold;" text="Criado em:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                                <Label fx:id="lblCreatedAt" style="-fx-text-fill: #1f2937; -fx-font-weight: bold;" text="" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+                                <Label style="-fx-text-fill: #6b7280; -fx-font-weight: bold;" text="Atualizado em:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+                                <Label fx:id="lblUpdatedAt" style="-fx-text-fill: #1f2937; -fx-font-weight: bold;" text="" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                        <columnConstraints>
+                           <ColumnConstraints />
+                           <ColumnConstraints />
+                           <ColumnConstraints />
+                           <ColumnConstraints />
+                        </columnConstraints>
+                        <rowConstraints>
+                           <RowConstraints />
+                           <RowConstraints />
+                           <RowConstraints />
+                           <RowConstraints />
+                           <RowConstraints />
+                           <RowConstraints />
+                        </rowConstraints>
+                            </GridPane>
+
+                            <!-- Características Técnicas (JSON expandido) -->
+                            <VBox spacing="10" style="-fx-padding: 15; -fx-background-color: #f9fafb; -fx-background-radius: 8;">
+                                <Label style="-fx-text-fill: #6b7280; -fx-font-weight: bold;" text="📋 Características Técnicas:" />
+                                <TextArea fx:id="txtCaracteristicasTecnicas" editable="false" prefRowCount="4" style="-fx-background-color: white; -fx-border-color: #e5e7eb; -fx-border-radius: 6;" wrapText="true" />
+                            </VBox>
+
+                            <!-- Descrição -->
+                            <VBox spacing="10" style="-fx-padding: 15; -fx-background-color: #f9fafb; -fx-background-radius: 8;">
+                                <Label style="-fx-text-fill: #6b7280; -fx-font-weight: bold;" text="📝 Descrição:" />
+                                <TextArea fx:id="txtDescricao" editable="false" prefRowCount="3" style="-fx-background-color: white; -fx-border-color: #e5e7eb; -fx-border-radius: 6;" wrapText="true" />
+                            </VBox>
+                        </VBox>
+                    </VBox>
+
+                    <!-- CARD 5: HISTÓRICO & OBSERVAÇÕES -->
+                    <VBox spacing="15" style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" VBox.vgrow="ALWAYS">
+                        <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: #ec4899; -fx-background-radius: 12 12 0 0; -fx-padding: 15;">
+                            <Label style="-fx-font-size: 18;" text="📅" />
+                            <Label style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14;" text="HISTÓRICO &amp; OBSERVAÇÕES" />
+                        </HBox>
+                        <TabPane style="-fx-background-color: transparent; -fx-border-color: transparent;" tabClosingPolicy="UNAVAILABLE">
+                            <!-- TAB 1: Histórico de Verificações -->
+                            <Tab text="✅ Verificações">
+                                <ScrollPane fitToWidth="true" style="-fx-background: transparent;">
+                                    <VBox spacing="10" style="-fx-padding: 15;">
+                                        <ListView fx:id="listVerificacoes" style="-fx-background-color: transparent; -fx-border-color: transparent;" />
+                                    </VBox>
+                                </ScrollPane>
+                            </Tab>
+
+                            <!-- TAB 2: Manutenções -->
+                            <Tab text="🔧 Manutenções">
+                                <ScrollPane fitToWidth="true" style="-fx-background: transparent;">
+                                    <VBox spacing="10" style="-fx-padding: 15;">
+                                        <ListView fx:id="listManutencoes" style="-fx-background-color: transparent; -fx-border-color: transparent;" />
+                                    </VBox>
+                                </ScrollPane>
+                            </Tab>
+
+                            <!-- TAB 3: Observações -->
+                            <Tab text="📋 Observações">
+                                <VBox spacing="15" style="-fx-padding: 15;">
+                                    <TextArea fx:id="txtObservacoes" prefRowCount="8" promptText="Observações sobre o equipamento..." style="-fx-background-color: #f9fafb; -fx-border-color: #e5e7eb; -fx-border-radius: 6;" wrapText="true" />
+                                    <Button onAction="#salvarObservacoes" style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;" text="💾 Salvar Observações" />
+                                </VBox>
+                            </Tab>
+                        </TabPane>
+                    </VBox>
+
+                </HBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <!-- ===== BOTTOM: BARRA DE RESUMO ===== -->
+    <bottom>
+        <HBox alignment="CENTER_LEFT" spacing="30" style="-fx-background-color: white; -fx-border-color: #e5e7eb; -fx-border-width: 1 0 0 0; -fx-padding: 15 20;">
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label style="-fx-text-fill: #6b7280;" text="🔄 Última Atualização:" />
+                <Label fx:id="lblUltimaAtualizacao" style="-fx-text-fill: #1f2937; -fx-font-weight: bold;" text="Carregando..." />
+            </HBox>
+            <Region HBox.hgrow="ALWAYS" />
+            <HBox alignment="CENTER" spacing="10">
+                <Label style="-fx-text-fill: #6b7280;" text="📊 ID do Registro:" />
+                <Label fx:id="lblIdRegistro" style="-fx-text-fill: #3b7280; -fx-font-weight: bold;" text="#INV-00000" />
+
+                <Label style="-fx-text-fill: #6b7280; margin-left: 15;" text="ID Banco:" />
+                <Label fx:id="lblIdBanco" style="-fx-text-fill: #3b82f6; -fx-font-weight: bold;" text="#0" />
+            </HBox>
+        </HBox>
+    </bottom>
+
+</BorderPane>

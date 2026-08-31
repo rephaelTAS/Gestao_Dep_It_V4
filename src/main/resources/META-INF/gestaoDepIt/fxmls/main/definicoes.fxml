@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
+<?import javafx.scene.control.ScrollPane?>
+<AnchorPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+
+    <!-- TÍTULO PRINCIPAL -->
+    <VBox AnchorPane.topAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" spacing="10">
+        <padding>
+            <Insets bottom="10" left="20" right="20" top="20" />
+        </padding>
+
+        <!-- Cabeçalho -->
+        <HBox alignment="CENTER_LEFT" spacing="15">
+            <Label styleClass="titulo-principal" text="⚙️ Definições do Sistema" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Label fx:id="lblStatusConexao" styleClass="status-online" text="🟢 Conectado" />
+        </HBox>
+        <Separator />
+
+        <!-- Abas -->
+        <TabPane fx:id="tabPaneConfiguracoes" tabClosingPolicy="UNAVAILABLE" styleClass="tab-pane-config">
+            <VBox.margin>
+                <Insets top="10" />
+            </VBox.margin>
+
+            <!-- ======================== -->
+            <!-- ABA 1: CONFIGURAÇÕES GERAIS -->
+            <!-- ======================== -->
+            <Tab text="🎨 Geral" closable="false">
+                <VBox spacing="20" style="-fx-padding: 20;">
+
+                    <!-- Tema -->
+                    <GridPane hgap="20" vgap="15">
+                        <Label text="Tema da Aplicação:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                        <ComboBox fx:id="cmbTema" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="Claro" />
+                                    <String fx:value="Escuro" />
+                                    <String fx:value="Sistema" />
+                                </FXCollections>
+                            </items>
+                        </ComboBox>
+
+                        <Label text="Idioma:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                        <ComboBox fx:id="cmbIdioma" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="Português (BR)" />
+                                    <String fx:value="English (US)" />
+                                    <String fx:value="Español" />
+                                </FXCollections>
+                            </items>
+                        </ComboBox>
+                    </GridPane>
+
+                    <Separator />
+
+                    <!-- Backup -->
+                    <GridPane hgap="20" vgap="15">
+                        <Label text="Diretório de Backup:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                        <HBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                            <TextField fx:id="txtDiretorioBackup" prefWidth="400" />
+                            <Button fx:id="btnSelecionarBackup" text="📁" />
+                        </HBox>
+
+                        <Label text="Frequência de Backup:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                        <ComboBox fx:id="cmbFrequenciaBackup" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="Desativado" />
+                                    <String fx:value="Diário" />
+                                    <String fx:value="Semanal" />
+                                    <String fx:value="Mensal" />
+                                </FXCollections>
+                            </items>
+                        </ComboBox>
+
+                        <Label text="Manter backups:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                        <HBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                            <Spinner fx:id="spinnerQuantidadeBackups" prefWidth="80" editable="true" initialValue="5" min="1" max="50" />
+                            <Label text="backups" />
+                        </HBox>
+                    </GridPane>
+
+                    <Separator />
+
+                    <!-- Inicialização -->
+                    <GridPane hgap="20" vgap="15">
+                        <CheckBox fx:id="chkIniciarComWindows" text="Iniciar com o Windows" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                        <CheckBox fx:id="chkVerificarAtualizacoes" text="Verificar atualizações automaticamente" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                        <CheckBox fx:id="chkModoEconomia" text="Modo economia de energia (menos recursos)" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                    </GridPane>
+                </VBox>
+            </Tab>
+
+            <!-- ======================== -->
+            <!-- ABA 2: BANCO DE DADOS -->
+            <!-- ======================== -->
+            <Tab text="💾 Banco" closable="false">
+                <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;">
+                    <VBox spacing="20" style="-fx-padding: 20;">
+
+                        <!-- CONEXÃO REMOTA -->
+                        <Label styleClass="subtitulo-aba" text="🌐 Conexão Remota (MySQL)" />
+                        <GridPane hgap="20" vgap="15">
+                            <!-- Linha 1: Host -->
+                            <Label text="Host:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                            <TextField fx:id="txtHost" promptText="ex: servidor.dominio.com" prefWidth="350" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                            <!-- Linha 2: Porta -->
+                            <Label text="Porta:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                            <TextField fx:id="txtPorta" text="3306" prefWidth="100" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                            <!-- Linha 3: Banco -->
+                            <Label text="Banco:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                            <TextField fx:id="txtNomeBanco" promptText="nome_do_banco" prefWidth="350" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                            <!-- Linha 4: Usuário -->
+                            <Label text="Usuário:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                            <TextField fx:id="txtUsuario" promptText="usuario" prefWidth="350" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                            <!-- Linha 5: Senha -->
+                            <Label text="Senha:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                            <PasswordField fx:id="txtSenha" promptText="••••••••" prefWidth="350" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+                            <!-- Linha 6: SSL + Timeout -->
+                            <HBox spacing="20" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                                <CheckBox fx:id="chkSSL" text="Usar SSL" />
+                                <HBox spacing="10">
+                                    <Label text="Timeout:" />
+                                    <TextField fx:id="txtTimeout" text="30" prefWidth="60" />
+                                    <Label text="segundos" />
+                                </HBox>
+                            </HBox>
+
+                            <!-- Linha 7: Botões -->
+                            <HBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="6" GridPane.columnSpan="2">
+                                <Button fx:id="btnTestarConexao" styleClass="btn-primary" text="🔗 Testar Conexão" />
+                                <Button fx:id="btnSalvarBanco" styleClass="btn-success" text="💾 Salvar Configurações" />
+                            </HBox>
+                        </GridPane>
+
+                        <Separator />
+
+                        <!-- BANCO LOCAL -->
+                        <Label styleClass="subtitulo-aba" text="📍 Banco Local (SQLite)" />
+                        <GridPane hgap="20" vgap="15">
+                            <Label text="Caminho:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                            <HBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                <TextField fx:id="txtCaminhoLocal" prefWidth="400" editable="false" />
+                                <Button fx:id="btnAlterarLocal" text="📁" />
+                            </HBox>
+
+                            <Label text="Tamanho:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                            <Label fx:id="lblTamanhoLocal" text="---" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                            <Label text="Status:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                            <Label fx:id="lblStatusLocal" styleClass="status-online" text="🟢 Conectado" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                            <HBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.columnSpan="2">
+                                <Button fx:id="btnOtimizarLocal" text="🔄 Otimizar Banco" />
+                                <Button fx:id="btnExportarSQLite" text="📤 Exportar" />
+                                <Button fx:id="btnImportarSQLite" text="📥 Importar" />
+                            </HBox>
+                        </GridPane>
+                    </VBox>
+                </ScrollPane>
+            </Tab>
+
+            <!-- ======================== -->
+            <!-- ABA 3: SINCRONIZAÇÃO -->
+            <!-- ======================== -->
+            <Tab text="🔄 Sincronização" closable="false">
+                <VBox spacing="20" style="-fx-padding: 20;">
+
+                    <!-- Sincronização Automática -->
+                    <Label styleClass="subtitulo-aba" text="⚙️ Configurações de Sincronização" />
+                    <GridPane hgap="20" vgap="15">
+                        <CheckBox fx:id="chkSincronizarAutomatico" text="Sincronizar automaticamente" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+
+                        <Label text="Intervalo:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                        <HBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                            <Spinner fx:id="spinnerIntervalo" prefWidth="100" editable="true" initialValue="300" min="10" max="3600" />
+                            <Label text="segundos" />
+                        </HBox>
+
+                        <CheckBox fx:id="chkSincronizarAoIniciar" text="Sincronizar ao iniciar o sistema" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                    </GridPane>
+
+                    <Separator />
+
+                    <!-- Modo Offline -->
+                    <Label styleClass="subtitulo-aba" text="📱 Modo Offline (Trabalho em Casa)" />
+                    <GridPane hgap="20" vgap="15">
+                        <CheckBox fx:id="chkModoOffline" text="Habilitar modo offline" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+
+                        <Label text="Arquivo offline:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                        <HBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                            <TextField fx:id="txtArquivoOffline" prefWidth="350" editable="false" />
+                            <Button fx:id="btnAlterarOffline" text="📁" />
+                        </HBox>
+
+                        <Label text="Tamanho:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                        <Label fx:id="lblTamanhoOffline" text="---" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                        <Label text="Última exportação:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                        <Label fx:id="lblUltimaExportacao" text="---" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                        <HBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.columnSpan="2">
+                            <Button fx:id="btnExportarOffline" styleClass="btn-primary" text="📤 Exportar Dados Offline" />
+                            <Button fx:id="btnImportarOffline" text="📥 Importar Dados Offline" />
+                            <Button fx:id="btnLimparOffline" styleClass="btn-danger" text="🗑️ Limpar Dados Offline" />
+                        </HBox>
+                    </GridPane>
+
+                    <Separator />
+
+                    <!-- Status da Sincronização -->
+                    <Label styleClass="subtitulo-aba" text="📊 Status da Última Sincronização" />
+                    <GridPane hgap="20" vgap="15">
+                        <Label text="Última sincronização:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                        <Label fx:id="lblUltimaSincronizacao" text="---" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                        <Label text="Status:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                        <Label fx:id="lblStatusSync" styleClass="status-online" text="✅ Bem-sucedido" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                        <Label text="Registros sincronizados:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                        <Label fx:id="lblRegistrosSync" text="0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                    </GridPane>
+                </VBox>
+            </Tab>
+
+            <!-- ======================== -->
+            <!-- ABA 4: NOTIFICAÇÕES -->
+            <!-- ======================== -->
+            <Tab text="🔔 Notificações" closable="false">
+                <VBox spacing="20" style="-fx-padding: 20;">
+                    <GridPane hgap="20" vgap="15">
+                        <CheckBox fx:id="chkNotificacoesAtivas" text="Ativar notificações do sistema" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+
+                        <CheckBox fx:id="chkSomNotificacoes" text="Reproduzir som nas notificações" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+
+                        <Label text="Tempo de exibição:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                        <HBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                            <Spinner fx:id="spinnerTempoNotificacao" prefWidth="80" editable="true" initialValue="5" min="2" max="30" />
+                            <Label text="segundos" />
+                        </HBox>
+
+                        <Label text="Tipo de notificações:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                        <ComboBox fx:id="cmbTipoNotificacao" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="Todas" />
+                                    <String fx:value="Críticas" />
+                                    <String fx:value="Nenhuma" />
+                                </FXCollections>
+                            </items>
+                        </ComboBox>
+                    </GridPane>
+                </VBox>
+            </Tab>
+
+            <!-- ======================== -->
+            <!-- ABA 5: LOGS -->
+            <!-- ======================== -->
+            <Tab text="📊 Logs" closable="false">
+                <VBox spacing="20" style="-fx-padding: 20;">
+                    <GridPane hgap="20" vgap="15">
+                        <Label text="Nível de log:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                        <ComboBox fx:id="cmbNivelLog" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="DEBUG" />
+                                    <String fx:value="INFO" />
+                                    <String fx:value="WARN" />
+                                    <String fx:value="ERROR" />
+                                </FXCollections>
+                            </items>
+                        </ComboBox>
+
+                        <Label text="Manter logs por:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                        <HBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                            <Spinner fx:id="spinnerDiasLogs" prefWidth="80" editable="true" initialValue="30" min="1" max="365" />
+                            <Label text="dias" />
+                        </HBox>
+
+                        <Label text="Diretório de logs:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                        <HBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                            <TextField fx:id="txtDiretorioLogs" prefWidth="350" editable="false" />
+                            <Button fx:id="btnSelecionarLogs" text="📁" />
+                        </HBox>
+                    </GridPane>
+
+                    <Separator />
+
+                    <HBox spacing="10">
+                        <Button fx:id="btnExportarLogs" text="📤 Exportar Logs" />
+                        <Button fx:id="btnLimparLogs" styleClass="btn-danger" text="🗑️ Limpar Logs" />
+                        <Button fx:id="btnAbrirPastaLogs" text="📂 Abrir Pasta" />
+                    </HBox>
+                </VBox>
+            </Tab>
+        </TabPane>
+
+        <!-- ======================== -->
+        <!-- RODAPÉ COM BOTÕES DE AÇÃO -->
+        <!-- ======================== -->
+        <HBox alignment="CENTER_RIGHT" spacing="15" style="-fx-padding: 15 0 10 0;">
+            <Button fx:id="btnRestaurarPadroes" styleClass="btn-secondary" text="↩️ Restaurar Padrões" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="btnCancelarDefinicoes" styleClass="btn-secondary" text="Cancelar" />
+            <Button fx:id="btnSalvarDefinicoes" styleClass="btn-success" text="💾 Salvar" />
+        </HBox>
+    </VBox>
+</AnchorPane>

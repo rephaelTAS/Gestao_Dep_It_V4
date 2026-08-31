@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.ossobo.gestaoDepIt.controllers.gestao.relatorios.RelatorioSimplificadoController"
+            prefHeight="700" prefWidth="1100"
+            style="-fx-background-color: #f0f2f5;">
+
+    <!-- ==================================================================== -->
+    <!-- CONTEÚDO PRINCIPAL -->
+    <!-- ==================================================================== -->
+    <VBox spacing="16" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0"
+          AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0"
+          style="-fx-padding: 20;">
+
+        <!-- ================================================================ -->
+        <!-- CABEÇALHO -->
+        <!-- ================================================================ -->
+        <HBox spacing="15" alignment="CENTER_LEFT"
+              style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 16 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 6, 0, 2, 3);">
+            <Label text="📊" style="-fx-font-size: 28px;" />
+            <VBox spacing="3">
+                <Label text="Relatório Simples" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;" />
+                <Label text="Selecione uma tabela, aplique filtros e exporte para Excel"
+                       style="-fx-font-size: 11px; -fx-text-fill: #7f8c8d;" />
+            </VBox>
+            <Pane HBox.hgrow="ALWAYS" />
+            <Button text="📥 Exportar Excel" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 20; -fx-cursor: hand;"
+                    onAction="#handleExportarExcel" />
+        </HBox>
+
+        <!-- ================================================================ -->
+        <!-- CONFIGURAÇÃO DO RELATÓRIO -->
+        <!-- ================================================================ -->
+        <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 16 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 6, 0, 2, 3);">
+
+            <Label text="⚙️ Configuração do Relatório" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+
+            <HBox spacing="20" alignment="CENTER_LEFT">
+                <!-- Seleção da Tabela -->
+                <VBox spacing="5">
+                    <Label text="Tabela de Dados:" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #34495e;" />
+                    <ComboBox fx:id="comboTabela" prefWidth="220" promptText="Selecione a tabela..."
+                              style="-fx-background-radius: 5;" />
+                </VBox>
+
+                <!-- Filtro de Status/Tipo (dinâmico conforme tabela) -->
+                <VBox spacing="5">
+                    <Label fx:id="labelFiltro1" text="Status:" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #34495e;" />
+                    <ComboBox fx:id="comboFiltro1" prefWidth="180" promptText="Todos..."
+                              style="-fx-background-radius: 5;" />
+                </VBox>
+
+                <!-- Período -->
+                <VBox spacing="5">
+                    <Label text="Período:" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #34495e;" />
+                    <HBox spacing="8" alignment="CENTER_LEFT">
+                        <DatePicker fx:id="dpInicio" prefWidth="130" promptText="Data início" style="-fx-background-radius: 5;" />
+                        <Label text="até" style="-fx-text-fill: #95a5a6;" />
+                        <DatePicker fx:id="dpFim" prefWidth="130" promptText="Data fim" style="-fx-background-radius: 5;" />
+                    </HBox>
+                </VBox>
+
+                <!-- Botão Gerar -->
+                <VBox spacing="5">
+                    <Label text="⠀" style="-fx-font-size: 12px;" />
+                    <Button text="🔍 Gerar Relatório"
+                            style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 20; -fx-cursor: hand;"
+                            onAction="#handleGerarRelatorio" />
+                </VBox>
+            </HBox>
+
+            <!-- Opções adicionais -->
+            <HBox spacing="15" alignment="CENTER_LEFT">
+                <CheckBox fx:id="checkApenasAtivos" text="Apenas registros ativos" />
+                <CheckBox fx:id="checkIncluirCabecalho" text="Incluir cabeçalho no Excel" selected="true" />
+            </HBox>
+        </VBox>
+
+        <!-- ================================================================ -->
+        <!-- TABELA DE RESULTADOS -->
+        <!-- ================================================================ -->
+        <VBox spacing="8" VBox.vgrow="ALWAYS"
+              style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 16 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 6, 0, 2, 3);">
+
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="📋 Dados do Relatório" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+                <Pane HBox.hgrow="ALWAYS" />
+                <Label fx:id="lblTotalRegistros" text="0 registros"
+                       style="-fx-font-size: 12px; -fx-text-fill: #7f8c8d;" />
+            </HBox>
+
+            <TableView fx:id="tabelaResultados" VBox.vgrow="ALWAYS" style="-fx-border-color: #ecf0f1;">
+                <placeholder>
+                    <Label text="Selecione uma tabela e clique em 'Gerar Relatório' para visualizar os dados."
+                           style="-fx-text-fill: #95a5a6; -fx-font-size: 13px;" />
+                </placeholder>
+                <columnResizePolicy>
+                    <TableView fx:constant="UNCONSTRAINED_RESIZE_POLICY" />
+                </columnResizePolicy>
+            </TableView>
+        </VBox>
+
+        <!-- ================================================================ -->
+        <!-- BARRA DE STATUS -->
+        <!-- ================================================================ -->
+        <HBox spacing="10" alignment="CENTER_LEFT"
+              style="-fx-background-color: #1a1a2e; -fx-background-radius: 8; -fx-padding: 10 16;">
+            <Label fx:id="lblStatus" text="Pronto para gerar relatório."
+                   style="-fx-text-fill: #bdc3c7; -fx-font-size: 12px;" />
+            <Pane HBox.hgrow="ALWAYS" />
+            <Label fx:id="lblFiltroAtivo" text="Nenhum filtro aplicado"
+                   style="-fx-text-fill: #ecf0f1; -fx-font-size: 11px; -fx-font-weight: bold;" />
+        </HBox>
+    </VBox>
+</AnchorPane>

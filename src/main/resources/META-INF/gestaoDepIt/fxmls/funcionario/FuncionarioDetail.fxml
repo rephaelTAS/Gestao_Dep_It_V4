@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+
+<!--
+    FuncionarioDetail.fxml v1.0
+    Estrutura do layout de detalhes do funcionário.
+    Responsabilidades: Hierarquia de containers, dimensões base e constraints de layout.
+    Estilização visual delegada ao CSS externo via styleClass semânticas.
+-->
+<AnchorPane prefHeight="700.0" prefWidth="900.0"
+            styleClass="func-detail-root"
+            xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ossobo.gestaoDepIt.controllers.gestao.funcionario.FuncionarioDetailController">
+
+    <VBox fx:id="btn_alterarNivelAcess" spacing="20.0"
+          AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+        <!-- ========== HEADER ========== -->
+        <HBox alignment="CENTER_LEFT" spacing="15.0">
+            <padding>
+                <Insets bottom="10.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+            <Button fx:id="voltarButton" text="← Voltar"
+                    styleClass="func-detail-btn-back"
+                    onAction="#handleVoltar" />
+            <Label fx:id="tituloLabel" text="Detalhes do Funcionário"
+                   styleClass="func-detail-title" />
+            <Region HBox.hgrow="ALWAYS" />
+            <HBox spacing="10.0">
+                <Button fx:id="editarButton" text="Editar"
+                        styleClass="func-detail-btn-edit"
+                        onAction="#handleEditar" />
+                <Button fx:id="desativarButton" text="Desativar"
+                        styleClass="func-detail-btn-deactivate"
+                        onAction="#handleDesativarAtivar" />
+            </HBox>
+        </HBox>
+
+        <!-- ========== CONTEÚDO PRINCIPAL ========== -->
+        <HBox spacing="20.0" HBox.hgrow="ALWAYS">
+            <padding>
+                <Insets left="20.0" right="20.0" />
+            </padding>
+
+            <!-- Foto de Perfil -->
+            <VBox alignment="TOP_CENTER" prefWidth="200.0" spacing="15.0">
+                <VBox spacing="10.0" styleClass="func-detail-card">
+                    <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                    </padding>
+                    <Label text="Foto de Perfil" styleClass="func-detail-card-header" />
+                    <ImageView fx:id="detailImagemPerfil" fitHeight="150" fitWidth="150"
+                               preserveRatio="true" styleClass="func-detail-image" />
+                    <VBox alignment="CENTER" spacing="5.0">
+                        <Label fx:id="detailInfoImagem" text="Sem imagem"
+                               styleClass="func-detail-image-info" />
+                        <Button fx:id="btnAlterarFoto" text="Alterar Foto"
+                                styleClass="func-detail-btn-alter-foto"
+                                onAction="#handleAlterarFoto" />
+                    </VBox>
+                </VBox>
+            </VBox>
+
+            <!-- Informações Básicas -->
+            <VBox prefWidth="400.0" spacing="20.0">
+
+                <!-- Dados Pessoais -->
+                <VBox spacing="10.0" styleClass="func-detail-card">
+                    <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                    </padding>
+                    <Label text="Dados Pessoais" styleClass="func-detail-card-header" />
+
+                    <GridPane hgap="10.0" vgap="8.0">
+                        <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="120.0" prefWidth="120.0" />
+                            <ColumnConstraints hgrow="ALWAYS" minWidth="200.0" />
+                        </columnConstraints>
+                        <rowConstraints>
+                            <RowConstraints />
+                            <RowConstraints />
+                            <RowConstraints />
+                            <RowConstraints />
+                            <RowConstraints />
+                            <RowConstraints />
+                            <RowConstraints />
+                            <RowConstraints />
+                        </rowConstraints>
+
+                        <Label text="Código:"       styleClass="func-detail-label" GridPane.rowIndex="0" />
+                        <Label fx:id="detailCodDep" styleClass="func-detail-value-highlight" text=""
+                               GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                        <Label text="Nome:"         styleClass="func-detail-label" GridPane.rowIndex="1" />
+                        <Label fx:id="detailNome"   text="" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                        <Label text="Função:"       styleClass="func-detail-label" GridPane.rowIndex="2" />
+                        <Label fx:id="detailFuncao" text="" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                        <Label text="Departamento:" styleClass="func-detail-label" GridPane.rowIndex="3" />
+                        <Label fx:id="detailDepartamento" text="" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                        <Label text="Local:"        styleClass="func-detail-label" GridPane.rowIndex="4" />
+                        <Label fx:id="detailLocalTrabalho" text="" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+                        <Label text="Email:"        styleClass="func-detail-label" GridPane.rowIndex="5" />
+                        <Label fx:id="detailEmail"  text="" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+
+                        <Label text="Telefone:"     styleClass="func-detail-label" GridPane.rowIndex="6" />
+                        <Label fx:id="detailTelefone" text="" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+
+                        <Label text="Status:"       styleClass="func-detail-label" GridPane.rowIndex="7" />
+                        <Label fx:id="detailStatus" text="" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                    </GridPane>
+                </VBox>
+
+                <!-- Informações de Sistema -->
+                <VBox spacing="10.0" styleClass="func-detail-card">
+                    <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                    </padding>
+                    <Label text="Informações do Sistema" styleClass="func-detail-card-header" />
+
+                    <GridPane hgap="10.0" vgap="8.0">
+                        <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="120.0" prefWidth="120.0" />
+                            <ColumnConstraints hgrow="ALWAYS" minWidth="200.0" />
+                        </columnConstraints>
+                        <rowConstraints>
+                            <RowConstraints />
+                            <RowConstraints />
+                        </rowConstraints>
+
+                        <Label text="Criado em:"     styleClass="func-detail-label" GridPane.rowIndex="0" />
+                        <Label fx:id="detailCriadoEm" text="" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                        <Label text="Atualizado em:" styleClass="func-detail-label" GridPane.rowIndex="1" />
+                        <Label fx:id="detailAtualizadoEm" text="" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                    </GridPane>
+                </VBox>
+            </VBox>
+
+            <!-- Estatísticas e Ações Rápidas -->
+            <VBox spacing="20.0" VBox.vgrow="ALWAYS">
+
+                <!-- Estatísticas -->
+                <VBox spacing="10.0" styleClass="func-detail-card">
+                    <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                    </padding>
+                    <Label text="Estatísticas" styleClass="func-detail-card-header" />
+
+                    <VBox spacing="8.0">
+                        <Label fx:id="statEquipamentos"      text="Equipamentos: Carregando..."
+                               styleClass="func-detail-stat" />
+                        <Label fx:id="statTonerAtivo"         text="Toner Ativo: Carregando..."
+                               styleClass="func-detail-stat" />
+                        <Label fx:id="statUltimaVerificacao"  text="Última Verificação: Carregando..."
+                               styleClass="func-detail-stat" />
+                    </VBox>
+                </VBox>
+
+                <!-- Ações Rápidas -->
+                <VBox spacing="10.0" styleClass="func-detail-card">
+                    <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                    </padding>
+                    <Label text="Ações Rápidas" styleClass="func-detail-card-header" />
+
+                    <VBox spacing="8.0">
+                        <Button fx:id="btnVerEquipamentos" text="Ver Equipamentos"
+                                styleClass="func-detail-action-primary"
+                                onAction="#handleVerEquipamentos" />
+                        <Button fx:id="btnTransferirDepto" text="Transferir Departamento"
+                                styleClass="func-detail-action-purple"
+                                onAction="#handleTransferirDepartamento" />
+                        <Button fx:id="btnHistorico" text="Ver Histórico"
+                                styleClass="func-detail-action-dark"
+                                onAction="#handleVerHistorico" />
+                    </VBox>
+                </VBox>
+            </VBox>
+        </HBox>
+
+        <!-- ========== MENSAGEM DE STATUS ========== -->
+        <Label fx:id="mensagemStatusLabel" managed="false"
+               maxWidth="1.7976931348623157E308"
+               styleClass="func-detail-status-message"
+               visible="false">
+            <padding>
+                <Insets left="20.0" right="20.0" />
+            </padding>
+        </Label>
+    </VBox>
+</AnchorPane>

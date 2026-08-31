@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<!--
+    HistoricoEventosList.fxml v1.0
+    Estrutura da listagem de eventos do histórico de auditoria.
+    Responsabilidades: Hierarquia de containers, dimensões base e constraints de layout.
+    Estilização visual delegada ao CSS externo via styleClass semânticas.
+-->
+<AnchorPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ossobo.gestaoDepIt.controllers.gestao.equipamentos.inventario.historico.HistoricoEventosListController"
+            prefHeight="800.0" prefWidth="1400.0"
+            styleClass="historico-list-root">
+
+    <VBox spacing="0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+        <!-- ========== HEADER ========== -->
+        <HBox alignment="CENTER_LEFT" spacing="20.0"
+              styleClass="historico-list-header">
+            <Label text="📋 Histórico de Eventos do Sistema"
+                   styleClass="historico-list-title" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="relatorioButton" text="📊 Relatório"
+                    styleClass="historico-list-btn-relatorio"
+                    onAction="#handleGerarRelatorio" />
+            <Button fx:id="exportarButton" text="📥 Exportar CSV"
+                    styleClass="historico-list-btn-exportar"
+                    onAction="#handleExportarCSV" />
+        </HBox>
+
+        <!-- ========== SUBTÍTULO / ESTATÍSTICAS ========== -->
+        <VBox spacing="5" styleClass="historico-list-sub-header">
+            <Label text="Auditoria Completa — Monitoramento de todas as ações no sistema"
+                   styleClass="historico-list-subtitle" />
+            <HBox spacing="30">
+                <Label fx:id="estatisticasLabel" text="Carregando estatísticas..."
+                       styleClass="historico-list-stats" />
+                <Label fx:id="filtrosAtivosLabel" text=""
+                       styleClass="historico-list-active-filters" />
+            </HBox>
+        </VBox>
+
+        <!-- ========== FILTROS ========== -->
+        <VBox spacing="12.0" styleClass="historico-list-filter-box">
+            <Label text="🔍 Filtros de Auditoria"
+                   styleClass="historico-list-filter-title" />
+
+            <!-- Linha 1: Pesquisa textual + Tipo + Entidade + Usuário -->
+            <HBox spacing="10">
+                <TextField fx:id="filtroPesquisaField"
+                           promptText="🔎 Pesquisar por SKU, funcionário, descrição, IP, Nº Série..."
+                           HBox.hgrow="ALWAYS" prefWidth="350" />
+                <ComboBox fx:id="filtroTipoEventoCombo" promptText="Tipo de Evento" prefWidth="150" />
+                <ComboBox fx:id="filtroEntidadeCombo" promptText="Entidade" prefWidth="150" />
+                <ComboBox fx:id="filtroUsuarioCombo" promptText="Usuário" prefWidth="150" />
+            </HBox>
+
+            <!-- Linha 2: Período + IP + Botões -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Período:" styleClass="historico-list-filter-label" />
+                <DatePicker fx:id="filtroDataInicio" promptText="Data início" prefWidth="140" />
+                <Label text="até" styleClass="historico-list-filter-separator" />
+                <DatePicker fx:id="filtroDataFim" promptText="Data fim" prefWidth="140" />
+
+                <Label text="IP Origem:" styleClass="historico-list-filter-label">
+                    <padding><Insets left="20" /></padding>
+                </Label>
+                <TextField fx:id="filtroIpField" promptText="Ex: 192.168.1.100" prefWidth="150" />
+
+                <Region HBox.hgrow="ALWAYS" />
+
+                <Button fx:id="limparFiltrosButton" text="🧹 Limpar"
+                        styleClass="historico-list-btn-limpar"
+                        onAction="#handleLimparFiltros" />
+                <Button fx:id="aplicarFiltrosButton" text="🔍 Aplicar Filtros"
+                        styleClass="historico-list-btn-aplicar"
+                        onAction="#handleAplicarFiltros" defaultButton="true" />
+            </HBox>
+        </VBox>
+
+        <!-- ========== TABELA ========== -->
+        <VBox VBox.vgrow="ALWAYS" styleClass="historico-list-table-container">
+            <TableView fx:id="eventosTable" VBox.vgrow="ALWAYS"
+                       styleClass="historico-list-table">
+                <columns>
+                    <TableColumn fx:id="colId"           text="ID"           prefWidth="60" />
+                    <TableColumn fx:id="colDataHora"     text="Data/Hora"    prefWidth="150" />
+                    <TableColumn fx:id="colTipoEvento"   text="Tipo"         prefWidth="110" />
+                    <TableColumn fx:id="colEntidade"     text="Entidade"     prefWidth="110" />
+                    <TableColumn fx:id="colSkuProduto"   text="SKU / Ref"    prefWidth="120" />
+                    <TableColumn fx:id="colFuncionario"  text="Funcionário"  prefWidth="140" />
+                    <TableColumn fx:id="colDescricao"    text="Descrição"    prefWidth="280" />
+                    <TableColumn fx:id="colUsuario"      text="Usuário"      prefWidth="130" />
+                    <TableColumn fx:id="colIpOrigem"      text="IP Origem"    prefWidth="120" />
+                    <TableColumn fx:id="colDetalhes"     text="Ações"        prefWidth="100" />
+                </columns>
+            </TableView>
+
+            <!-- Paginação -->
+            <HBox spacing="10.0" alignment="CENTER" styleClass="historico-list-pagination">
+                <Button fx:id="btnPrimeira"  text="⏮" onAction="#handlePrimeiraPagina"
+                        styleClass="historico-list-pagination-btn" />
+                <Button fx:id="btnAnterior"  text="◀" onAction="#handlePaginaAnterior"
+                        styleClass="historico-list-pagination-btn" />
+                <Label fx:id="labelPagina"   text="Página 1 de 1"
+                       styleClass="historico-list-pagination-label" />
+                <Button fx:id="btnProxima"   text="▶" onAction="#handleProximaPagina"
+                        styleClass="historico-list-pagination-btn" />
+                <Button fx:id="btnUltima"    text="⏭" onAction="#handleUltimaPagina"
+                        styleClass="historico-list-pagination-btn" />
+                <Label text="Itens/pág:" styleClass="historico-list-pagination-hint" />
+                <ComboBox fx:id="comboItensPorPagina" prefWidth="75" />
+            </HBox>
+        </VBox>
+
+        <!-- ========== STATUS BAR ========== -->
+        <HBox spacing="10.0" alignment="CENTER_LEFT"
+              styleClass="historico-list-status-bar">
+            <Label fx:id="statusLabel" text="Pronto" styleClass="historico-list-status-text" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button text="🔄 Atualizar" onAction="#handleAtualizar"
+                    styleClass="historico-list-btn-atualizar" />
+            <Button text="✕ Fechar" onAction="#handleFechar"
+                    styleClass="historico-list-btn-fechar" />
+            <ProgressIndicator fx:id="progressIndicator" visible="false" />
+        </HBox>
+    </VBox>
+</AnchorPane>

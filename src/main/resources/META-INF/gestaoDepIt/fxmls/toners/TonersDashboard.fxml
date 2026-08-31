@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: #f8f9fa;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ossobo.gestaoDepIt.controllers.gestao.toners.TonersDashboardController">
+
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+        <VBox spacing="20.0">
+
+            <HBox alignment="CENTER_LEFT" spacing="20.0">
+                <padding>
+                    <Insets bottom="10.0" left="20.0" right="20.0" top="20.0" />
+                </padding>
+                <Label style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="📊 Dashboard de Gestão de Toners" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Button fx:id="atualizarButton" onAction="#handleAtualizar" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold;" text="🔄 Atualizar" />
+            </HBox>
+
+            <HBox alignment="CENTER" spacing="15.0">
+                <padding>
+                    <Insets left="20.0" right="20.0" />
+                </padding>
+
+                <VBox spacing="10.0" style="-fx-background-color: white; -fx-border-color: #27ae60; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 20;">
+                    <Label style="-fx-font-size: 24px;" text="🖨️" />
+                    <Label fx:id="cardAtivos" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #27ae60;" text="0" />
+                    <Label style="-fx-text-fill: #7f8c8d; -fx-font-size: 14px;" text="Toners Ativos" />
+                </VBox>
+
+                <VBox spacing="10.0" style="-fx-background-color: white; -fx-border-color: #e74c3c; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 20;">
+                    <Label style="-fx-font-size: 24px;" text="⚠️" />
+                    <Label fx:id="cardAlertas" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #e74c3c;" text="0" />
+                    <Label style="-fx-text-fill: #7f8c8d; -fx-font-size: 14px;" text="Necessitam Troca" />
+                </VBox>
+
+                <VBox spacing="10.0" style="-fx-background-color: white; -fx-border-color: #3498db; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 20;">
+                    <Label style="-fx-font-size: 24px;" text="📈" />
+                    <Label fx:id="cardMediaUso" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #3498db;" text="0%" />
+                    <Label style="-fx-text-fill: #7f8c8d; -fx-font-size: 14px;" text="Média de Uso" />
+                </VBox>
+
+                <VBox spacing="10.0" style="-fx-background-color: white; -fx-border-color: #9b59b6; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 20;">
+                    <Label style="-fx-font-size: 24px;" text="🔄" />
+                    <Label fx:id="cardCiclosMedios" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #9b59b6;" text="0" />
+                    <Label style="-fx-text-fill: #7f8c8d; -fx-font-size: 14px;" text="Ciclos Médios" />
+                </VBox>
+            </HBox>
+
+            <HBox alignment="TOP_LEFT" spacing="20.0">
+                <padding>
+                    <Insets left="20.0" right="20.0" />
+                </padding>
+
+                <VBox prefWidth="600.0" spacing="10.0">
+                    <VBox spacing="10.0" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8;">
+                        <padding>
+                            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                        </padding>
+                        <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="Distribuição por Nível de Toner" />
+                        <PieChart fx:id="distribuicaoChart" />
+                    </VBox>
+                </VBox>
+
+                <VBox spacing="10.0" VBox.vgrow="ALWAYS">
+                    <VBox spacing="10.0" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8;">
+                        <padding>
+                            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                        </padding>
+                        <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="🔔 Alertas de Toners" />
+                        <ListView fx:id="alertasListView" prefHeight="200.0" />
+                    </VBox>
+
+                    <VBox spacing="10.0" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8;">
+                        <padding>
+                            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                        </padding>
+                        <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="⚡ Ações Rápidas" />
+                        <VBox spacing="8.0">
+                            <Button fx:id="btnRelatorio" onAction="#handleGerarRelatorio" style="-fx-background-color: #34495e; -fx-text-fill: white; -fx-max-width: infinity;" text="📋 Gerar Relatório" />
+                            <Button fx:id="btnSubstituicoes" onAction="#handlePlanejarSubstituicoes" style="-fx-background-color: #e67e22; -fx-text-fill: white; -fx-max-width: infinity;" text="🔄 Planejar Substituições" />
+                     <Button fx:id="btn_listaToner" onAction="#handeleListarToner" mnemonicParsing="false" prefHeight="25.0" prefWidth="248.0" text="Ver Lista toner Usado" />
+                            <Button fx:id="btnEstoque" onAction="#handleVerEstoque" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-max-width: infinity;" text="📦 Ver Estoque Toners" />
+                        </VBox>
+                    </VBox>
+                </VBox>
+            </HBox>
+
+            <VBox spacing="10.0">
+                <padding>
+                    <Insets left="20.0" right="20.0" />
+                </padding>
+                <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #e74c3c;" text="🚨 Toners que Necessitam Atenção Imediata" />
+
+                <TableView fx:id="tonersCriticosTable" prefHeight="200.0">
+                    <columns>
+                        <TableColumn fx:id="colCriticoEquipamento" prefWidth="200" text="Equipamento" />
+                        <TableColumn fx:id="colCriticoToner" prefWidth="150" text="Toner" />
+                        <TableColumn fx:id="colCriticoPercentagem" prefWidth="80" text="\%" />
+                        <TableColumn fx:id="colCriticoDias" prefWidth="80" text="Dias" />
+                        <TableColumn fx:id="colCriticoAcao" prefWidth="120" text="Ação" />
+                    </columns>
+                </TableView>
+            </VBox>
+        </VBox>
+    </ScrollPane>
+</AnchorPane>

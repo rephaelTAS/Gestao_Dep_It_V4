@@ -1,0 +1,167 @@
+/**
+ * funcionario-form.css v1.0
+ * Estilos visuais para FuncionarioForm.fxml
+ * Responsabilidades: Cores, sombras, bordas, fontes, estados de validação, preview de imagem.
+ * NÃO contém regras de layout estrutural.
+ * Prefixo "func-form-" para isolamento de namespaces.
+ */
+
+/* ========== SCROLL E ROOT ========== */
+.func-form-scroll {
+    -fx-background-color: #f5f6fa;
+}
+
+.func-form-scroll .viewport {
+    -fx-background-color: transparent;
+}
+
+/* ========== TÍTULO ========== */
+.func-form-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+/* ========== GRID DO FORMULÁRIO ========== */
+.func-form-grid {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 8px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 4, 0, 0, 1);
+    -fx-border-color: #e8e8e8;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+}
+
+/* ========== LABELS ========== */
+.func-form-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #34495e;
+    -fx-alignment: center-right;
+    -fx-padding: 6 0 0 0;
+}
+
+/* ========== IMAGEM ========== */
+.func-form-image-info {
+    -fx-font-size: 12px;
+    -fx-text-fill: #95a5a6;
+    -fx-font-style: italic;
+}
+
+.func-form-image-preview {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 4, 0, 0, 1);
+    -fx-background-radius: 6px;
+    -fx-border-color: #ddd;
+    -fx-border-radius: 6px;
+    -fx-border-width: 1px;
+}
+
+/* ========== MENSAGEM DE ERRO ========== */
+.func-form-error {
+    -fx-background-color: #fdecea;
+    -fx-text-fill: #c0392b;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 12 20 12 20;
+    -fx-background-radius: 6px;
+    -fx-border-color: #e74c3c;
+    -fx-border-radius: 6px;
+    -fx-border-width: 1px;
+}
+
+/* ========== CAMPOS DE TEXTO ========== */
+.text-field {
+    -fx-background-radius: 4px;
+    -fx-border-color: #ddd;
+    -fx-border-radius: 4px;
+    -fx-padding: 6 10 6 10;
+    -fx-font-size: 13px;
+}
+
+.text-field:focused {
+    -fx-border-color: #3498db;
+    -fx-effect: dropshadow(gaussian, rgba(52,152,219,0.15), 3, 0, 0, 1);
+}
+
+/* ========== COMBOBOX ========== */
+.combo-box {
+    -fx-background-radius: 4px;
+    -fx-border-color: #ddd;
+    -fx-border-radius: 4px;
+}
+
+.combo-box:focused {
+    -fx-border-color: #3498db;
+}
+
+/* ========== CHECKBOX ========== */
+.check-box {
+    -fx-font-size: 13px;
+    -fx-text-fill: #2c3e50;
+}
+
+.check-box .box {
+    -fx-background-radius: 3px;
+    -fx-border-color: #bbb;
+    -fx-border-radius: 3px;
+}
+
+.check-box:selected .box {
+    -fx-background-color: #3498db;
+    -fx-border-color: #2980b9;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: white;
+}
+
+/* ========== BOTÕES (compartilhados) ========== */
+.button {
+    -fx-background-radius: 4px;
+    -fx-padding: 8 18 8 18;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-opacity: 0.9;
+}
+
+.btn-primary {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #2980b9;
+}
+
+.btn-secondary {
+    -fx-background-color: #ecf0f1;
+    -fx-text-fill: #7f8c8d;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #dce4ec;
+    -fx-text-fill: #2c3e50;
+}
+
+.btn-success {
+    -fx-background-color: #27ae60;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.btn-success:hover {
+    -fx-background-color: #219a52;
+}
+
+.btn-danger {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+}
+
+.btn-danger:hover {
+    -fx-background-color: #c0392b;
+}

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!--
+    CatalogoProdutoForm.fxml v1.0
+    Estrutura do formulário de criação/edição de produto no catálogo.
+    Responsabilidades: Hierarquia de containers, dimensões base e constraints de layout.
+    Estilização visual delegada ao CSS externo via styleClass semânticas.
+-->
+<AnchorPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ossobo.gestaoDepIt.controllers.gestao.estoque.catalugoproduto.CatalogoProdutoFormController"
+            prefHeight="750.0" prefWidth="800.0">
+
+    <ScrollPane fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER"
+                AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+        <VBox spacing="20" styleClass="form-root">
+
+            <!-- ========== HEADER ========== -->
+            <Label fx:id="tituloLabel" text="Novo Produto no Catálogo"
+                   styleClass="form-title" VBox.vgrow="NEVER">
+                <padding>
+                    <Insets bottom="10" left="20" right="20" top="20" />
+                </padding>
+            </Label>
+
+            <!-- ========== SKU GERADO ========== -->
+            <VBox fx:id="idGeradoContainer" spacing="5"
+                  visible="false" managed="false" VBox.vgrow="NEVER">
+                <padding>
+                    <Insets bottom="10" left="20" right="20" top="10" />
+                </padding>
+                <Label fx:id="idGeradoLabel" text="SKU gerado: "
+                       styleClass="form-sku-label" />
+                <Label text="SKU gerado automaticamente baseado em Tipo, Marca e Modelo"
+                       styleClass="form-hint" />
+            </VBox>
+
+            <!-- ========== FORMULÁRIO ========== -->
+            <GridPane hgap="15" vgap="15" VBox.vgrow="NEVER">
+                <padding>
+                    <Insets bottom="20" left="20" right="20" top="20" />
+                </padding>
+
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="150" prefWidth="150" />
+                    <ColumnConstraints hgrow="ALWAYS" minWidth="250" prefWidth="250" />
+                </columnConstraints>
+
+                <!-- SKU (Readonly) -->
+                <Label text="SKU *" styleClass="form-label"
+                       GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                <TextField fx:id="skuField" promptText="Será gerado automaticamente"
+                           editable="false"
+                           GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+                <!-- Tipo de Produto -->
+                <Label text="Tipo de Produto *" styleClass="form-label"
+                       GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                <ComboBox fx:id="tipoProdutoCombo" promptText="Selecione o tipo"
+                          GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+                <!-- Categoria -->
+                <Label text="Categoria *" styleClass="form-label"
+                       GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                <TextField fx:id="categoriaField" promptText="Ex: Impressora, Toner, Monitor"
+                           GridPane.rowIndex="2" GridPane.columnIndex="1" />
+
+                <!-- Marca -->
+                <Label text="Marca *" styleClass="form-label"
+                       GridPane.rowIndex="3" GridPane.columnIndex="0" />
+                <TextField fx:id="marcaField" promptText="Fabricante do produto"
+                           GridPane.rowIndex="3" GridPane.columnIndex="1" />
+
+                <!-- Modelo -->
+                <Label text="Modelo *" styleClass="form-label"
+                       GridPane.rowIndex="4" GridPane.columnIndex="0" />
+                <TextField fx:id="modeloField" promptText="Modelo específico"
+                           GridPane.rowIndex="4" GridPane.columnIndex="1" />
+
+                <!-- Cor -->
+                <Label text="Cor" styleClass="form-label"
+                       GridPane.rowIndex="5" GridPane.columnIndex="0" />
+                <TextField fx:id="corField" promptText="Cor do produto (opcional)"
+                           GridPane.rowIndex="5" GridPane.columnIndex="1" />
+
+                <!-- Preço Unitário -->
+                <Label text="Preço Unitário" styleClass="form-label"
+                       GridPane.rowIndex="6" GridPane.columnIndex="0" />
+                <HBox spacing="10" alignment="CENTER_LEFT"
+                      GridPane.rowIndex="6" GridPane.columnIndex="1">
+                    <TextField fx:id="precoUnitarioField" promptText="0.00"
+                               HBox.hgrow="ALWAYS" />
+                    <Label text="€" styleClass="form-currency-symbol" />
+                </HBox>
+
+                <!-- Estoque Inicial -->
+                <Label text="Estoque Inicial" styleClass="form-label"
+                       GridPane.rowIndex="7" GridPane.columnIndex="0" />
+                <TextField fx:id="totalRecebidoField" promptText="0"
+                           GridPane.rowIndex="7" GridPane.columnIndex="1" />
+
+                <!-- Descrição -->
+                <Label text="Descrição" styleClass="form-label"
+                       GridPane.rowIndex="8" GridPane.columnIndex="0" />
+                <TextArea fx:id="descricaoField"
+                          promptText="Descrição detalhada do produto"
+                          wrapText="true" prefRowCount="3"
+                          GridPane.rowIndex="8" GridPane.columnIndex="1" />
+
+                <!-- Características Técnicas -->
+                <Label text="Características Técnicas" styleClass="form-label"
+                       GridPane.rowIndex="9" GridPane.columnIndex="0" />
+                <VBox spacing="5" GridPane.rowIndex="9" GridPane.columnIndex="1">
+                    <TextArea fx:id="caracteristicasField"
+                              promptText='JSON com características técnicas&#10;Ex: {"peso": "2.5kg", "dimensoes": "30x20x15cm"}'
+                              wrapText="true" prefRowCount="4" />
+                    <Label text='Formato JSON: {"chave": "valor"}'
+                           styleClass="form-hint" />
+                </VBox>
+
+                <!-- Status -->
+                <Label text="Status" styleClass="form-label"
+                       GridPane.rowIndex="10" GridPane.columnIndex="0" />
+                <CheckBox fx:id="ativoCheckBox" text="Produto Ativo" selected="true"
+                          GridPane.rowIndex="10" GridPane.columnIndex="1" />
+            </GridPane>
+
+            <!-- ========== PREVIEW ========== -->
+            <VBox spacing="10" styleClass="form-preview-box" VBox.vgrow="NEVER">
+                <padding>
+                    <Insets bottom="15" left="20" right="20" top="15" />
+                </padding>
+                <Label text="Preview do Produto" styleClass="form-preview-title" />
+                <Label fx:id="previewLabel"
+                       text="SKU: - | Tipo: - | Marca: - | Modelo: - | Preço: - | Estoque: -"
+                       styleClass="form-preview-text" />
+            </VBox>
+
+            <!-- ========== MENSAGEM DE ERRO ========== -->
+            <Label fx:id="mensagemErroLabel"
+                   visible="false" managed="false" VBox.vgrow="NEVER"
+                   maxWidth="Infinity"
+                   styleClass="form-message-error">
+                <padding>
+                    <Insets left="20" right="20" />
+                </padding>
+            </Label>
+
+            <!-- ========== BOTÕES DE AÇÃO ========== -->
+            <HBox spacing="15" alignment="CENTER_RIGHT" VBox.vgrow="NEVER">
+                <padding>
+                    <Insets bottom="20" left="20" right="20" top="10" />
+                </padding>
+                <Button fx:id="cancelarButton" text="Cancelar"
+                        styleClass="btn-secondary"
+                        onAction="#handleCancelar" />
+                <Button fx:id="salvarButton" text="Salvar Produto"
+                        styleClass="btn-primary"
+                        onAction="#handleSalvar" />
+            </HBox>
+        </VBox>
+    </ScrollPane>
+</AnchorPane>

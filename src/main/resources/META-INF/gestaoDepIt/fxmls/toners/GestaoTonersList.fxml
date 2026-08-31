@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ossobo.gestaoDepIt.controllers.gestao.toners.GestaoTonersListController"
+            prefHeight="800.0" prefWidth="1400.0" style="-fx-background-color: #f8f9fa;">
+
+    <VBox spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+        <HBox alignment="CENTER_LEFT" spacing="20.0">
+            <padding>
+                <Insets bottom="10.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+            <Label text="Gestão de Toners em Equipamentos"
+                   style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="novaInstalacaoButton" text="+ Nova Instalação"
+                    style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;"
+                    onAction="#handleNovaInstalacao" />
+        </HBox>
+
+        <VBox spacing="10.0" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8;">
+            <padding>
+                <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+            </padding>
+
+            <Label text="Filtros de Gestão de Toners" style="-fx-font-weight: bold; -fx-text-fill: #34495e; -fx-font-size: 16px;" />
+
+            <GridPane hgap="10.0" vgap="10.0">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="120.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="150.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="120.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="150.0" />
+                    <ColumnConstraints hgrow="ALWAYS" minWidth="100.0" />
+                </columnConstraints>
+
+                <Label text="Equipamento:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                <ComboBox fx:id="filtroEquipamentoCombo" promptText="Todos equipamentos"
+                          GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+                <Label text="Toner:" GridPane.rowIndex="0" GridPane.columnIndex="2" />
+                <ComboBox fx:id="filtroTonerCombo" promptText="Todos toners"
+                          GridPane.rowIndex="0" GridPane.columnIndex="3" />
+
+                <Label text="Percentagem:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                <HBox spacing="5.0" GridPane.rowIndex="1" GridPane.columnIndex="1">
+                    <TextField fx:id="filtroPercentagemMin" promptText="Mín" prefWidth="60" />
+                    <Label text="a" style="-fx-text-fill: #7f8c8d;" />
+                    <TextField fx:id="filtroPercentagemMax" promptText="Máx" prefWidth="60" />
+                    <Label text="\%" style="-fx-text-fill: #7f8c8d;" />
+                </HBox>
+
+                <Label text="Status:" GridPane.rowIndex="1" GridPane.columnIndex="2" />
+                <ComboBox fx:id="filtroStatusCombo" promptText="Todos status"
+                          GridPane.rowIndex="1" GridPane.columnIndex="3" />
+
+                <HBox spacing="10.0" GridPane.rowIndex="1" GridPane.columnIndex="4"
+                      alignment="CENTER_RIGHT">
+                    <Button fx:id="limparFiltrosButton" text="Limpar Filtros"
+                            style="-fx-background-color: #95a5a6; -fx-text-fill: white;"
+                            onAction="#handleLimparFiltros" />
+                    <Button fx:id="aplicarFiltrosButton" text="Aplicar Filtros"
+                            style="-fx-background-color: #3498db; -fx-text-fill: white;"
+                            onAction="#handleAplicarFiltros" />
+                </HBox>
+            </GridPane>
+        </VBox>
+
+        <HBox spacing="30.0" alignment="CENTER_LEFT">
+            <padding>
+                <Insets left="20.0" />
+            </padding>
+            <Label fx:id="estatisticasLabel" text="Carregando estatísticas..."
+                   style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;" />
+            <Label fx:id="alertasLabel" text=""
+                   style="-fx-text-fill: #e74c3c; -fx-font-weight: bold; -fx-font-size: 12px;" />
+        </HBox>
+
+        <VBox VBox.vgrow="ALWAYS">
+            <TableView fx:id="tonersTable" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="colEquipamento" text="Equipamento" prefWidth="200.0">
+                        <cellValueFactory><PropertyValueFactory property="equipamentoInfo" /></cellValueFactory>
+                    </TableColumn>
+
+                    <TableColumn fx:id="colToner" text="Toner" prefWidth="180.0">
+                        <cellValueFactory><PropertyValueFactory property="tonerInfo" /></cellValueFactory>
+                    </TableColumn>
+
+                    <TableColumn fx:id="colDataInstalacao" text="Instalado em" prefWidth="110.0">
+                        <cellValueFactory><PropertyValueFactory property="dataInstalacao" /></cellValueFactory>
+                    </TableColumn>
+
+                    <TableColumn fx:id="colPercentagem" text="Restante (%)" prefWidth="100.0">
+                        <cellValueFactory><PropertyValueFactory property="percentagemRestante" /></cellValueFactory>
+                    </TableColumn>
+
+                    <TableColumn fx:id="colCiclos" text="Ciclos" prefWidth="80.0">
+                        <cellValueFactory><PropertyValueFactory property="ciclosImpressao" /></cellValueFactory>
+                    </TableColumn>
+
+                    <TableColumn fx:id="colStatus" text="Status" prefWidth="90.0">
+                        <cellValueFactory><PropertyValueFactory property="status" /></cellValueFactory>
+                    </TableColumn>
+
+                    <TableColumn fx:id="colDiasInstalado" text="Dias" prefWidth="70.0">
+                        <cellValueFactory><PropertyValueFactory property="diasInstalado" /></cellValueFactory>
+                    </TableColumn>
+
+                    <TableColumn fx:id="colUsuario" text="Instalado por" prefWidth="120.0">
+                        <cellValueFactory><PropertyValueFactory property="usuarioResponsavel" /></cellValueFactory>
+                    </TableColumn>
+
+                    <TableColumn fx:id="colAcoes" text="Ações" prefWidth="150.0" />
+                </columns>
+            </TableView>
+
+            <HBox spacing="10.0" alignment="CENTER" style="-fx-background-color: white; -fx-padding: 10;">
+                <Button fx:id="btnPrimeira" text="&lt;&lt;" onAction="#handlePrimeiraPagina" />
+                <Button fx:id="btnAnterior" text="&lt;" onAction="#handlePaginaAnterior" />
+                <Label fx:id="labelPagina" text="Página 1 de 1" />
+                <Button fx:id="btnProxima" text="&gt;" onAction="#handleProximaPagina" />
+                <Button fx:id="btnUltima" text="&gt;&gt;" onAction="#handleUltimaPagina" />
+                <ComboBox fx:id="comboItensPorPagina" prefWidth="80.0" />
+            </HBox>
+        </VBox>
+
+        <HBox spacing="10.0" alignment="CENTER_LEFT" style="-fx-background-color: #ecf0f1; -fx-padding: 8;">
+            <padding>
+                <Insets left="20.0" right="20.0" />
+            </padding>
+            <Label fx:id="statusLabel" text="Pronto" style="-fx-text-fill: #7f8c8d;" />
+            <Region HBox.hgrow="ALWAYS" />
+            <ProgressIndicator fx:id="progressIndicator" progress="0.0" visible="false" />
+        </HBox>
+    </VBox>
+</AnchorPane>

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ossobo.gestaoDepIt.controllers.gestao.equipamentos.inventario.InventarioFormController"
+            prefHeight="750" prefWidth="950">
+
+    <!-- Cabeçalho -->
+    <VBox fx:id="headerContainer" spacing="12" styleClass="form-header"
+          AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="20">
+        <padding>
+            <Insets bottom="20" left="30" right="30" top="25" />
+        </padding>
+
+        <Label fx:id="labelTitulo" text="Novo Equipamento no Inventário"
+               styleClass="form-title" />
+        <Label text="Cadastro completo de equipamento no sistema de inventário"
+               styleClass="form-subtitle" />
+    </VBox>
+
+    <!-- Conteúdo com Scroll -->
+    <ScrollPane fitToWidth="true" styleClass="form-scroll"
+                vbarPolicy="AS_NEEDED"
+                AnchorPane.bottomAnchor="100" AnchorPane.leftAnchor="20"
+                AnchorPane.rightAnchor="20" AnchorPane.topAnchor="120">
+
+        <VBox spacing="25" styleClass="form-content">
+            <padding>
+                <Insets bottom="20" left="10" right="10" top="0" />
+            </padding>
+
+            <!-- Seção 1: Identificação -->
+            <VBox styleClass="form-section">
+                <Label text="Identificação do Equipamento" styleClass="section-title" />
+                <GridPane hgap="20" vgap="18">
+                    <columnConstraints>
+                        <ColumnConstraints halignment="RIGHT" prefWidth="200" />
+                        <ColumnConstraints prefWidth="280" />
+                        <ColumnConstraints halignment="RIGHT" prefWidth="200" />
+                        <ColumnConstraints prefWidth="280" />
+                    </columnConstraints>
+
+                    <Label text="Produto do Catálogo *" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <ComboBox fx:id="comboCatalogo" promptText="Selecione um produto..."
+                              GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="0" />
+
+                    <Label text="Número de Série *" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                    <TextField fx:id="txtNumSerie" promptText="Ex: SN2024-001"
+                               GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                    <Label text="Endereço MAC *" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                    <TextField fx:id="txtEnderecoMac" promptText="Ex: 00:1A:2B:3C:4D:5E"
+                               GridPane.columnIndex="3" GridPane.rowIndex="1" />
+
+                    <Label text="Data Aquisição *" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                    <DatePicker fx:id="dateAquisicao" promptText="dd/mm/aaaa"
+                                GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                    <Label text="Data Instalação" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                    <DatePicker fx:id="dateInstalacao" promptText="dd/mm/aaaa (opcional)"
+                                GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                </GridPane>
+            </VBox>
+
+            <!-- Seção 2: Localização -->
+            <VBox styleClass="form-section">
+                <Label text="Localização e Responsável" styleClass="section-title" />
+                <GridPane hgap="20" vgap="18">
+                    <columnConstraints>
+                        <ColumnConstraints halignment="RIGHT" prefWidth="200" />
+                        <ColumnConstraints prefWidth="280" />
+                        <ColumnConstraints halignment="RIGHT" prefWidth="200" />
+                        <ColumnConstraints prefWidth="280" />
+                    </columnConstraints>
+
+                    <Label text="Funcionário Responsável *" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <ComboBox fx:id="comboFuncionario" promptText="Selecione um funcionário..."
+                              GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="0" />
+
+                    <Label text="Localização *" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                    <TextField fx:id="txtLocalizacao" promptText="Ex: Sala 301, Prédio A"
+                               GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                    <Label text="Departamento" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                    <TextField fx:id="txtDepartamento" promptText="Ex: TI, Administração"
+                               GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                </GridPane>
+            </VBox>
+
+            <!-- Seção 3: Status -->
+            <VBox styleClass="form-section">
+                <Label text="Status e Manutenção" styleClass="section-title" />
+                <GridPane hgap="20" vgap="18">
+                    <columnConstraints>
+                        <ColumnConstraints halignment="RIGHT" prefWidth="200" />
+                        <ColumnConstraints prefWidth="280" />
+                        <ColumnConstraints halignment="RIGHT" prefWidth="200" />
+                        <ColumnConstraints prefWidth="280" />
+                    </columnConstraints>
+
+                    <Label text="Status *" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <ComboBox fx:id="comboStatus" promptText="Selecione o status"
+                              GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                    <Label text="Condição *" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                    <ComboBox fx:id="comboCondicao" promptText="Selecione a condição"
+                              GridPane.columnIndex="3" GridPane.rowIndex="0" />
+
+                    <Label text="Última Verificação" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                    <DatePicker fx:id="dateUltimaVerificacao" promptText="dd/mm/aaaa (opcional)"
+                                GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                </GridPane>
+            </VBox>
+
+            <!-- Seção 4: Observações -->
+            <VBox styleClass="form-section">
+                <Label text="Observações" styleClass="section-title" />
+                <VBox spacing="12">
+                    <TextArea fx:id="txtObservacoes" prefRowCount="6"
+                              promptText="Observações sobre o equipamento..."
+                              wrapText="true" />
+                    <HBox alignment="CENTER_RIGHT" spacing="10">
+                        <Label fx:id="labelContadorCaracteres" text="0/1000" />
+                        <Label text="Máximo 1000 caracteres" styleClass="form-hint" />
+                    </HBox>
+                </VBox>
+            </VBox>
+
+            <!-- Seção 5: Informações do Sistema (apenas edição) -->
+            <VBox fx:id="sistemaInfoSection" styleClass="form-section" visible="false" managed="false">
+                <Label text="Informações do Sistema" styleClass="section-title" />
+                <GridPane hgap="20" vgap="18">
+                    <columnConstraints>
+                        <ColumnConstraints halignment="RIGHT" prefWidth="200" />
+                        <ColumnConstraints prefWidth="280" />
+                        <ColumnConstraints halignment="RIGHT" prefWidth="200" />
+                        <ColumnConstraints prefWidth="280" />
+                    </columnConstraints>
+
+                    <Label text="SKU Produto" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <TextField fx:id="txtSkuProduto" editable="false"
+                               GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                    <Label text="ID Funcionário" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                    <TextField fx:id="txtFuncionarioId" editable="false"
+                               GridPane.columnIndex="3" GridPane.rowIndex="0" />
+
+                    <Label text="Criado em" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                    <TextField fx:id="txtCreatedAt" editable="false"
+                               GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                    <Label text="Atualizado em" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                    <TextField fx:id="txtUpdatedAt" editable="false"
+                               GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                </GridPane>
+            </VBox>
+        </VBox>
+    </ScrollPane>
+
+    <!-- Rodapé -->
+    <HBox alignment="CENTER_RIGHT" spacing="15" styleClass="form-footer"
+          AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0"
+          AnchorPane.rightAnchor="0">
+        <padding>
+            <Insets bottom="15" left="30" right="30" top="15" />
+        </padding>
+        <Label text="* Campos obrigatórios" styleClass="form-hint" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Button fx:id="cancelarButton" text="Cancelar"
+                styleClass="button-secondary"
+                onAction="#handleCancelar" />
+        <Button fx:id="salvarButton" text="Salvar Equipamento"
+                styleClass="button-primary"
+                onAction="#handleSalvar" defaultButton="true" />
+    </HBox>
+</AnchorPane>

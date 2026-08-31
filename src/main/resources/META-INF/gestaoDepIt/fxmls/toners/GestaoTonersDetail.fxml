@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ossobo.gestaoDepIt.controllers.gestao.toners.GestaoTonersDetailController"
+            prefHeight="700.0" prefWidth="1000.0" style="-fx-background-color: #f8f9fa;">
+
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER"
+                AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+        <VBox spacing="20.0">
+            <!-- Cabeçalho -->
+            <HBox alignment="CENTER_LEFT" spacing="15.0">
+                <padding>
+                    <Insets bottom="10.0" left="20.0" right="20.0" top="20.0" />
+                </padding>
+                <Button fx:id="voltarButton" text="← Voltar"
+                        style="-fx-background-color: #95a5a6; -fx-text-fill: white;"
+                        onAction="#handleVoltar" />
+                <VBox spacing="2.0">
+                    <Label fx:id="tituloLabel" text="Detalhes da Instalação de Toner"
+                           style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+                    <Label fx:id="subtituloLabel" text="ID: -"
+                           style="-fx-text-fill: #7f8c8d; -fx-font-size: 14px;" />
+                </VBox>
+                <Region HBox.hgrow="ALWAYS" />
+                <HBox spacing="10.0">
+                    <Button fx:id="editarButton" text="Editar"
+                            style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold;"
+                            onAction="#handleEditar" />
+                    <Button fx:id="atualizarUsoButton" text="Atualizar Uso"
+                            style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold;"
+                            onAction="#handleAtualizarUso" />
+                    <Button fx:id="substituirButton" text="Substituir"
+                            style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold;"
+                            onAction="#handleSubstituir" />
+                </HBox>
+            </HBox>
+
+            <!-- Conteúdo Principal -->
+            <HBox spacing="20.0" alignment="TOP_LEFT">
+                <padding>
+                    <Insets left="20.0" right="20.0" />
+                </padding>
+
+                <!-- Informações da Instalação -->
+                <VBox spacing="20.0" prefWidth="400.0">
+                    <!-- Dados da Instalação -->
+                    <VBox spacing="10.0" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8;">
+                        <padding>
+                            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                        </padding>
+                        <Label text="Dados da Instalação"
+                               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+
+                        <GridPane hgap="10.0" vgap="8.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="120.0" prefWidth="120.0" />
+                                <ColumnConstraints hgrow="ALWAYS" minWidth="200.0" />
+                            </columnConstraints>
+
+                            <Label text="ID:" style="-fx-font-weight: bold;" GridPane.rowIndex="0" />
+                            <Label fx:id="detailId" text="" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+                            <Label text="Equipamento:" style="-fx-font-weight: bold;" GridPane.rowIndex="1" />
+                            <Label fx:id="detailEquipamento" text="" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+                            <Label text="Toner:" style="-fx-font-weight: bold;" GridPane.rowIndex="2" />
+                            <Label fx:id="detailToner" text="" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+
+                            <Label text="Data Instalação:" style="-fx-font-weight: bold;" GridPane.rowIndex="3" />
+                            <Label fx:id="detailDataInstalacao" text="" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+
+                            <Label text="Dias Instalado:" style="-fx-font-weight: bold;" GridPane.rowIndex="4" />
+                            <Label fx:id="detailDiasInstalado" text="" GridPane.rowIndex="4" GridPane.columnIndex="1" />
+
+                            <Label text="Instalado por:" style="-fx-font-weight: bold;" GridPane.rowIndex="5" />
+                            <Label fx:id="detailUsuario" text="" GridPane.rowIndex="5" GridPane.columnIndex="1" />
+                        </GridPane>
+                    </VBox>
+
+                    <!-- Status do Toner -->
+                    <VBox spacing="10.0" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8;">
+                        <padding>
+                            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                        </padding>
+                        <Label text="Status do Toner"
+                               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+
+                        <GridPane hgap="10.0" vgap="8.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="120.0" prefWidth="120.0" />
+                                <ColumnConstraints hgrow="ALWAYS" minWidth="200.0" />
+                            </columnConstraints>
+
+                            <Label text="Percentagem:" style="-fx-font-weight: bold;" GridPane.rowIndex="0" />
+                            <Label fx:id="detailPercentagem" text="" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+                            <Label text="Ciclos:" style="-fx-font-weight: bold;" GridPane.rowIndex="1" />
+                            <Label fx:id="detailCiclos" text="" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+                            <Label text="Status:" style="-fx-font-weight: bold;" GridPane.rowIndex="2" />
+                            <Label fx:id="detailStatus" text="" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+
+                            <Label text="Vida Útil:" style="-fx-font-weight: bold;" GridPane.rowIndex="3" />
+                            <Label fx:id="detailVidaUtil" text="" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+                        </GridPane>
+                    </VBox>
+
+                    <!-- Observações -->
+                    <VBox spacing="10.0" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8;">
+                        <padding>
+                            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                        </padding>
+                        <Label text="Observações"
+                               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+                        <TextArea fx:id="detailObservacoes" wrapText="true" editable="false"
+                                  prefRowCount="3" style="-fx-background-color: transparent; -fx-border-color: transparent;" />
+                    </VBox>
+                </VBox>
+
+                <!-- Gráficos e Ações -->
+                <VBox spacing="20.0" VBox.vgrow="ALWAYS">
+                    <!-- Barra de Progresso -->
+                    <VBox spacing="10.0" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8;">
+                        <padding>
+                            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                        </padding>
+                        <Label text="Nível do Toner"
+                               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+
+                        <VBox spacing="10.0" alignment="CENTER">
+                            <ProgressBar fx:id="progressBar" progress="1.0"
+                                         style="-fx-accent: #27ae60; -fx-pref-width: 300; -fx-pref-height: 20;" />
+                            <Label fx:id="progressLabel" text="100%"
+                                   style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+                            <Label fx:id="alertaLabel" text=""
+                                   style="-fx-text-fill: #e74c3c; -fx-font-size: 12px;" />
+                        </VBox>
+                    </VBox>
+
+                    <!-- Estatísticas de Uso -->
+                    <VBox spacing="10.0" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8;">
+                        <padding>
+                            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                        </padding>
+                        <Label text="Estatísticas de Uso"
+                               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+
+                        <VBox spacing="8.0">
+                            <Label fx:id="statCiclosDia" text="Ciclos/dia: Carregando..."
+                                   style="-fx-text-fill: #34495e;" />
+                            <Label fx:id="statProjecao" text="Projeção de troca: Carregando..."
+                                   style="-fx-text-fill: #34495e;" />
+                            <Label fx:id="statHistorico" text="Histórico equipamento: Carregando..."
+                                   style="-fx-text-fill: #34495e;" />
+                        </VBox>
+                    </VBox>
+
+                    <!-- Ações Rápidas -->
+                    <VBox spacing="10.0" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8;">
+                        <padding>
+                            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                        </padding>
+                        <Label text="Ações Rápidas"
+                               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+
+                        <VBox spacing="8.0">
+                            <Button fx:id="btnRegistrarUso" text="Registrar Uso"
+                                    style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-max-width: infinity;"
+                                    onAction="#handleRegistrarUso" />
+                            <Button fx:id="btnAjustarPercentagem" text="Ajustar Percentagem"
+                                    style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-max-width: infinity;"
+                                    onAction="#handleAjustarPercentagem" />
+                            <Button fx:id="btnVerHistorico" text="Ver Histórico"
+                                    style="-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-max-width: infinity;"
+                                    onAction="#handleVerHistorico" />
+                            <Button fx:id="btnMarcarEsgotado" text="Marcar como Esgotado"
+                                    style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-max-width: infinity;"
+                                    onAction="#handleMarcarEsgotado" />
+                        </VBox>
+                    </VBox>
+                </VBox>
+            </HBox>
+
+            <!-- Mensagens de Status -->
+            <Label fx:id="mensagemStatusLabel" textFill="#27ae60"
+                   style="-fx-font-size: 12px; -fx-wrap-text: true;"
+                   visible="false" managed="false"
+                   maxWidth="1.7976931348623157E308">
+                <padding>
+                    <Insets left="20.0" right="20.0" bottom="20.0" />
+                </padding>
+            </Label>
+        </VBox>
+    </ScrollPane>
+</AnchorPane>

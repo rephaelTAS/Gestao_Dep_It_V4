@@ -1,0 +1,189 @@
+/**
+ * list.css v1.0
+ * Estilos visuais para CatalogoProdutoList.fxml
+ * Responsabilidades: Cores, sombras, bordas, fontes, efeitos.
+ * NÃO contém regras de layout estrutural.
+ */
+
+/* ========== ROOT ========== */
+.root {
+    -fx-background-color: #f5f6fa;
+}
+
+/* ========== HEADER ========== */
+.list-header {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 0 0 1 0;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 4, 0, 0, 2);
+}
+
+.list-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+/* ========== CARDS ========== */
+.list-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 8px;
+    -fx-padding: 0;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 4, 0, 0, 1);
+    -fx-border-color: #e8e8e8;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+}
+
+.list-card-header {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #34495e;
+}
+
+/* ========== ESTATÍSTICAS ========== */
+.list-statistics {
+    -fx-font-size: 13px;
+    -fx-text-fill: #7f8c8d;
+}
+
+.list-active-filters {
+    -fx-font-size: 12px;
+    -fx-text-fill: #3498db;
+    -fx-font-style: italic;
+}
+
+/* ========== BOTÕES GENÉRICOS ========== */
+.button {
+    -fx-background-radius: 4px;
+    -fx-padding: 6 14 6 14;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-opacity: 0.9;
+}
+
+/* Primário */
+.btn-primary {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #2980b9;
+}
+
+/* Secundário */
+.btn-secondary {
+    -fx-background-color: #ecf0f1;
+    -fx-text-fill: #2c3e50;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #dce4ec;
+}
+
+/* ========== TABELA ========== */
+.table-view {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 4px;
+    -fx-table-cell-border-color: #f0f0f0;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 0 0 1 0;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-padding: 8 10 8 10;
+}
+
+.table-view .column-header .label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+    -fx-font-size: 12px;
+}
+
+.table-row-cell {
+    -fx-padding: 6 10 6 10;
+    -fx-font-size: 13px;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #fafbfc;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #eaf2fb;
+    -fx-text-fill: #2c3e50;
+}
+
+/* ========== PAGINAÇÃO ========== */
+.pagination-bar {
+    -fx-background-color: #ffffff;
+    -fx-padding: 10 20 10 20;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1 0 0 0;
+}
+
+.pagination-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #7f8c8d;
+    -fx-min-width: 100px;
+    -fx-alignment: center;
+}
+
+.pagination-bar .button {
+    -fx-background-color: #ecf0f1;
+    -fx-text-fill: #2c3e50;
+    -fx-padding: 4 10 4 10;
+    -fx-font-size: 12px;
+}
+
+.pagination-bar .button:hover {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+}
+
+/* ========== STATUS BAR ========== */
+.status-bar {
+    -fx-background-color: #ffffff;
+    -fx-padding: 6 20 6 20;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1 0 0 0;
+}
+
+.status-bar .label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #95a5a6;
+}
+
+/* ========== COMBOBOX ========== */
+.combo-box {
+    -fx-background-radius: 4px;
+    -fx-border-color: #ddd;
+    -fx-border-radius: 4px;
+}
+
+.combo-box:hover {
+    -fx-border-color: #3498db;
+}
+
+/* ========== TEXTFIELD ========== */
+.text-field {
+    -fx-background-radius: 4px;
+    -fx-border-color: #ddd;
+    -fx-border-radius: 4px;
+    -fx-padding: 6 10 6 10;
+}
+
+.text-field:focused {
+    -fx-border-color: #3498db;
+}

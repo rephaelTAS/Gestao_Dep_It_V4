@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+
+<!--
+    FuncionarioForm.fxml v1.0
+    Estrutura do formulário de criação/edição de funcionário.
+    Responsabilidades: Hierarquia de containers, dimensões base e constraints de layout.
+    Estilização visual delegada ao CSS externo via styleClass semânticas.
+-->
+<AnchorPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ossobo.gestaoDepIt.controllers.gestao.funcionario.FuncionarioFormController"
+            prefHeight="650.0" prefWidth="700.0">
+
+    <ScrollPane fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER"
+                AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
+                styleClass="func-form-scroll">
+
+        <VBox spacing="20.0">
+
+            <!-- ========== HEADER ========== -->
+            <Label fx:id="tituloLabel" text="Novo Funcionário" styleClass="func-form-title">
+                <padding>
+                    <Insets bottom="10.0" left="20.0" right="20.0" top="20.0" />
+                </padding>
+            </Label>
+
+            <!-- ========== FORMULÁRIO ========== -->
+            <GridPane hgap="15.0" vgap="15.0" styleClass="func-form-grid">
+                <padding>
+                    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                </padding>
+
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="120.0" prefWidth="120.0" />
+                    <ColumnConstraints hgrow="ALWAYS" minWidth="200.0" prefWidth="200.0" />
+                </columnConstraints>
+
+                <rowConstraints>
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                </rowConstraints>
+
+                <!-- Linha 0: Código Departamento -->
+                <Label text="Código Depto *" styleClass="func-form-label"
+                       GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                <TextField fx:id="codDepField" promptText="Ex: TI001"
+                           GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+                <!-- Linha 1: Nome -->
+                <Label text="Nome Completo *" styleClass="func-form-label"
+                       GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                <TextField fx:id="nomeField" promptText="Nome do funcionário"
+                           GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+                <!-- Linha 2: Função -->
+                <Label text="Função *" styleClass="func-form-label"
+                       GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                <TextField fx:id="funcaoField" promptText="Cargo/função"
+                           GridPane.rowIndex="2" GridPane.columnIndex="1" />
+
+                <!-- Linha 3: Departamento -->
+                <Label text="Departamento *" styleClass="func-form-label"
+                       GridPane.rowIndex="3" GridPane.columnIndex="0" />
+                <ComboBox fx:id="departamentoCombo" promptText="Selecione o departamento"
+                          GridPane.rowIndex="3" GridPane.columnIndex="1" />
+
+                <!-- Linha 4: Local de Trabalho -->
+                <Label text="Local de Trabalho" styleClass="func-form-label"
+                       GridPane.rowIndex="4" GridPane.columnIndex="0" />
+                <TextField fx:id="localTrabalhoField" promptText="Localização física"
+                           GridPane.rowIndex="4" GridPane.columnIndex="1" />
+
+                <!-- Linha 5: Email -->
+                <Label text="Email" styleClass="func-form-label"
+                       GridPane.rowIndex="5" GridPane.columnIndex="0" />
+                <TextField fx:id="emailField" promptText="email@empresa.com"
+                           GridPane.rowIndex="5" GridPane.columnIndex="1" />
+
+                <!-- Linha 6: Telefone -->
+                <Label text="Telefone" styleClass="func-form-label"
+                       GridPane.rowIndex="6" GridPane.columnIndex="0" />
+                <TextField fx:id="telefoneField" promptText="(11) 99999-9999"
+                           GridPane.rowIndex="6" GridPane.columnIndex="1" />
+
+                <!-- Linha 7: Upload de Imagem -->
+                <Label text="Foto de Perfil" styleClass="func-form-label"
+                       GridPane.rowIndex="7" GridPane.columnIndex="0" />
+                <VBox spacing="10.0" GridPane.rowIndex="7" GridPane.columnIndex="1">
+                    <HBox spacing="10.0" alignment="CENTER_LEFT">
+                        <Button fx:id="btnSelecionarImagem" text="Selecionar Imagem"
+                                styleClass="btn-primary" onAction="#handleSelecionarImagem" />
+                        <Button fx:id="btnRemoverImagem" text="Remover"
+                                styleClass="btn-danger" onAction="#handleRemoverImagem" />
+                    </HBox>
+                    <Label fx:id="labelInfoImagem" text="Nenhuma imagem selecionada"
+                           styleClass="func-form-image-info" />
+                    <ImageView fx:id="imagePreview" fitWidth="100" fitHeight="100" preserveRatio="true"
+                               styleClass="func-form-image-preview" visible="false" />
+                </VBox>
+
+                <!-- Linha 8: Status -->
+                <Label text="Status" styleClass="func-form-label"
+                       GridPane.rowIndex="8" GridPane.columnIndex="0" />
+                <CheckBox fx:id="ativoCheckBox" text="Ativo" selected="true"
+                          GridPane.rowIndex="8" GridPane.columnIndex="1" />
+            </GridPane>
+
+            <!-- ========== MENSAGEM DE ERRO ========== -->
+            <Label fx:id="mensagemErroLabel" styleClass="func-form-error"
+                   visible="false" managed="false" maxWidth="1.7976931348623157E308">
+                <padding>
+                    <Insets left="20.0" right="20.0" />
+                </padding>
+            </Label>
+
+            <!-- ========== BOTÕES DE AÇÃO ========== -->
+            <HBox spacing="15.0" alignment="CENTER_RIGHT">
+                <padding>
+                    <Insets bottom="20.0" left="20.0" right="20.0" top="10.0" />
+                </padding>
+                <Button fx:id="cancelarButton" text="Cancelar"
+                        styleClass="btn-secondary" onAction="#handleCancelar" />
+                <Button fx:id="salvarButton" text="Salvar Funcionário"
+                        styleClass="btn-success" onAction="#handleSalvar" />
+            </HBox>
+        </VBox>
+    </ScrollPane>
+</AnchorPane>

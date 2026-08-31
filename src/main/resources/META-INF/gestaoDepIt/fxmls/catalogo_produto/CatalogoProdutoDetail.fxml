@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!--
+    CatalogoProdutoDetail.fxml v1.0
+    Estrutura do layout de detalhes do produto no catálogo de estoque.
+    Responsabilidades: Hierarquia de containers, dimensões base e constraints de layout.
+    Estilização visual delegada ao CSS externo via styleClass.
+-->
+<AnchorPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ossobo.gestaoDepIt.controllers.gestao.estoque.catalugoproduto.CatalogoProdutoDetailController"
+            prefHeight="750.0" prefWidth="1000.0">
+
+    <!-- Container de scroll com ancoragem total -->
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER"
+                AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+        <!-- Raiz vertical com espaçamento estrutural -->
+        <VBox spacing="20" styleClass="detail-root">
+
+            <!-- ========== HEADER ========== -->
+            <HBox alignment="CENTER_LEFT" spacing="15" styleClass="detail-header">
+                <padding>
+                    <Insets bottom="10" left="20" right="20" top="20" />
+                </padding>
+                <Button fx:id="voltarButton" text="← Voltar" onAction="#handleVoltar" />
+                <VBox spacing="2">
+                    <Label fx:id="tituloLabel" text="Detalhes do Produto" styleClass="detail-title" />
+                    <Label fx:id="subtituloLabel" text="SKU: -" styleClass="detail-subtitle" />
+                </VBox>
+                <Region HBox.hgrow="ALWAYS" />
+                <HBox spacing="10">
+                    <Button fx:id="editarButton" text="Editar" onAction="#handleEditar" />
+                    <Button fx:id="desativarButton" text="Desativar" onAction="#handleDesativarAtivar" />
+                </HBox>
+            </HBox>
+
+            <!-- ========== CONTENT ========== -->
+            <HBox spacing="20" alignment="TOP_LEFT">
+                <padding>
+                    <Insets left="20" right="20" />
+                </padding>
+
+                <!-- ========== LEFT COLUMN ========== -->
+                <VBox spacing="15" prefWidth="550">
+
+                    <!-- Card: Informações do Produto -->
+                    <VBox spacing="10" styleClass="detail-card">
+                        <Label text="Informações do Produto" styleClass="detail-card-header" />
+                        <GridPane hgap="10" vgap="8">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="140" prefWidth="140" />
+                                <ColumnConstraints hgrow="ALWAYS" minWidth="200" />
+                            </columnConstraints>
+
+                            <Label text="SKU:"                             GridPane.rowIndex="0" />
+                            <Label fx:id="detailSku"                       GridPane.rowIndex="0" GridPane.columnIndex="1" styleClass="detail-value" />
+
+                            <Label text="Tipo:"                           GridPane.rowIndex="1" />
+                            <Label fx:id="detailTipo"                     GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+                            <Label text="Categoria:"                      GridPane.rowIndex="2" />
+                            <Label fx:id="detailCategoria"                GridPane.rowIndex="2" GridPane.columnIndex="1" />
+
+                            <Label text="Marca:"                          GridPane.rowIndex="3" />
+                            <Label fx:id="detailMarca"                    GridPane.rowIndex="3" GridPane.columnIndex="1" />
+
+                            <Label text="Modelo:"                         GridPane.rowIndex="4" />
+                            <Label fx:id="detailModelo"                   GridPane.rowIndex="4" GridPane.columnIndex="1" />
+
+                            <Label text="Cor:"                            GridPane.rowIndex="5" />
+                            <Label fx:id="detailCor"                      GridPane.rowIndex="5" GridPane.columnIndex="1" />
+
+                            <Label text="Preço:"                          GridPane.rowIndex="6" />
+                            <Label fx:id="detailPrecoUnitario"            GridPane.rowIndex="6" GridPane.columnIndex="1" />
+
+                            <Label text="Estoque:"                        GridPane.rowIndex="7" />
+                            <Label fx:id="detailEstoque"                  GridPane.rowIndex="7" GridPane.columnIndex="1" />
+
+                            <Label text="Status:"                         GridPane.rowIndex="8" />
+                            <Label fx:id="detailStatus"                   GridPane.rowIndex="8" GridPane.columnIndex="1" />
+                        </GridPane>
+                    </VBox>
+
+                    <!-- Card: Descrição -->
+                    <VBox spacing="10" styleClass="detail-card">
+                        <Label text="Descrição" styleClass="detail-card-header" />
+                        <TextArea fx:id="detailDescricao" wrapText="true" editable="false" prefRowCount="4" />
+                    </VBox>
+
+                    <!-- Card: Características Técnicas -->
+                    <VBox spacing="10" styleClass="detail-card">
+                        <Label text="Características Técnicas" styleClass="detail-card-header" />
+                        <TextArea fx:id="detailCaracteristicas" wrapText="true" editable="false" prefRowCount="6" />
+                    </VBox>
+                </VBox>
+
+                <!-- ========== RIGHT COLUMN ========== -->
+                <VBox spacing="15" VBox.vgrow="ALWAYS">
+
+                    <!-- Card: Informações Financeiras -->
+                    <VBox spacing="10" styleClass="detail-card">
+                        <Label text="Informações Financeiras" styleClass="detail-card-header" />
+                        <VBox spacing="8">
+                            <HBox spacing="10">
+                                <Label text="Valor Total:" />
+                                <Label fx:id="statValorTotal" text="€ 0,00" />
+                            </HBox>
+                            <HBox spacing="10">
+                                <Label text="Preço Unitário:" />
+                                <Label fx:id="statPrecoUnitario" text="€ 0,00" />
+                            </HBox>
+                            <HBox spacing="10">
+                                <Label text="Estoque:" />
+                                <Label fx:id="statQuantidadeEstoque" text="0 unidades" />
+                            </HBox>
+                        </VBox>
+                    </VBox>
+
+                    <!-- Card: Estatísticas -->
+                    <VBox spacing="10" styleClass="detail-card">
+                        <Label text="Estatísticas" styleClass="detail-card-header" />
+                        <VBox spacing="8">
+                            <Label fx:id="statEstoque"       text="Em Estoque: -" />
+                            <Label fx:id="statEquipamentos"  text="Equipamentos: -" />
+                            <Label fx:id="statMovimentacoes" text="Movimentações: -" />
+                            <Label fx:id="statToners"        text="Toners: -" />
+                        </VBox>
+                    </VBox>
+
+                    <!-- Card: Datas -->
+                    <VBox spacing="10" styleClass="detail-card">
+                        <Label text="Datas" styleClass="detail-card-header" />
+                        <GridPane hgap="10" vgap="8">
+                            <Label text="Criado em:"                              GridPane.rowIndex="0" />
+                            <Label fx:id="detailCriadoEm"                         GridPane.rowIndex="0" GridPane.columnIndex="1" />
+                            <Label text="Atualizado em:"                          GridPane.rowIndex="1" />
+                            <Label fx:id="detailAtualizadoEm"                     GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                        </GridPane>
+                    </VBox>
+
+                    <!-- Card: Ações Rápidas -->
+                    <VBox spacing="10" styleClass="detail-card">
+                        <Label text="Ações Rápidas" styleClass="detail-card-header" />
+                        <VBox spacing="8">
+                            <Button fx:id="btnAjustarEstoque" text="Ajustar Estoque"            onAction="#handleAjustarEstoque" />
+                            <Button fx:id="btnAtualizarPreco" text="Atualizar Preço"            onAction="#handleAtualizarPreco" />
+                            <Button fx:id="btnMovimentar"    text="Registrar Movimentação"      onAction="#handleRegistrarMovimentacao" />
+                            <Button fx:id="btnHistorico"     text="Ver Histórico"               onAction="#handleVerHistorico" />
+                        </VBox>
+                    </VBox>
+                </VBox>
+            </HBox>
+        </VBox>
+    </ScrollPane>
+</AnchorPane>

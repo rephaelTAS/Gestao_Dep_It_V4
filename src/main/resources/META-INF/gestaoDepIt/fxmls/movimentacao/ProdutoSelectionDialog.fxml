@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- packt/fxmls/dialogs/ProdutoSelectionDialog.fxml -->
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ossobo.gestaoDepIt.controllers.gestao.estoque.movimentacoes.dialogs.ProdutoSelectionDialog"
+            prefHeight="600.0" prefWidth="800.0"
+            style="-fx-background-color: #f8f9fa;">
+
+    <!-- TOP: Barra de filtro -->
+    <top>
+        <VBox spacing="10" style="-fx-background-color: #ffffff; -fx-padding: 15;">
+            <Label text="Selecionar Produto"
+                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <TextField fx:id="filtroTextField"
+                           HBox.hgrow="ALWAYS"
+                           style="-fx-font-size: 14px;" />
+                <Button fx:id="buscarButton" text="Buscar"
+                        style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold;" />
+            </HBox>
+
+            <Label fx:id="contadorLabel" text="Carregando produtos..."
+                   style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;" />
+        </VBox>
+    </top>
+
+    <!-- CENTER: Tabela de produtos -->
+    <center>
+        <TableView fx:id="produtosTable"
+                   style="-fx-background-color: white;">
+            <columns>
+                <TableColumn fx:id="codigoColumn" text="Código" />
+                <TableColumn fx:id="descricaoColumn" text="Descrição" />
+            </columns>
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+            </columnResizePolicy>
+        </TableView>
+    </center>
+
+    <!-- BOTTOM: Botões de ação -->
+    <bottom>
+        <HBox spacing="15" alignment="CENTER_RIGHT"
+              style="-fx-background-color: #ffffff; -fx-padding: 15;">
+            <Button fx:id="cancelarButton" text="Cancelar"
+                    style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-weight: bold; -fx-min-width: 100;" />
+            <Button fx:id="selecionarButton" text="Selecionar"
+                    style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-min-width: 100;"
+                    disable="true" />
+        </HBox>
+    </bottom>
+
+</BorderPane>

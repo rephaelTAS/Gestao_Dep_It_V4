@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ossobo.gestaoDepIt.controllers.gestao.equipamentos.inventario.InventarioListController"
+            prefHeight="750.0" prefWidth="1400.0">
+
+    <VBox spacing="0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+        <!-- Cabeçalho -->
+        <HBox alignment="CENTER_LEFT" spacing="20" styleClass="inventory-header">
+            <padding>
+                <Insets bottom="15" left="20" right="20" top="15" />
+            </padding>
+            <Label text="Inventário de Equipamentos" styleClass="header-title" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="novoButton" text="+ Novo Equipamento"
+                    styleClass="button-primary"
+                    onAction="#handleNovoEquipamento" />
+            <Button fx:id="historicoButton" text="Histórico"
+                    styleClass="button-secondary"
+                    onAction="#handleVerHistorico" />
+        </HBox>
+
+        <!-- Barra de Filtros -->
+        <VBox spacing="10" styleClass="filter-bar">
+            <padding>
+                <Insets bottom="15" left="20" right="20" top="15" />
+            </padding>
+
+            <!-- Linha 1 -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <TextField fx:id="filtroMacField" promptText="Endereço MAC..."
+                           prefWidth="200" />
+                <ComboBox fx:id="filtroStatusCombo" promptText="Status"
+                          prefWidth="130" />
+                <ComboBox fx:id="filtroCondicaoCombo" promptText="Condição"
+                          prefWidth="120" />
+                <ComboBox fx:id="filtroLocalizacaoCombo" promptText="Localização"
+                          prefWidth="150" />
+                <ComboBox fx:id="filtroDepartamentoCombo" promptText="Departamento"
+                          prefWidth="180" />
+                <TextField fx:id="filtroBuscaField" promptText="Nº Série, SKU ou Funcionário..."
+                           prefWidth="250" />
+                <Button fx:id="aplicarFiltrosButton" text="Buscar"
+                        styleClass="button-primary"
+                        onAction="#handleAplicarFiltros" />
+                <Button fx:id="limparFiltrosButton" text="Limpar"
+                        styleClass="button-secondary"
+                        onAction="#handleLimparFiltros" />
+            </HBox>
+
+            <!-- Linha 2 - Datas -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Aquisição:" styleClass="filter-label" />
+                <DatePicker fx:id="filtroAquisicaoInicio" promptText="De"
+                            prefWidth="130" />
+                <Label text="até" styleClass="filter-label" />
+                <DatePicker fx:id="filtroAquisicaoFim" promptText="Até"
+                            prefWidth="130" />
+
+                <Label text="Instalação:" styleClass="filter-label">
+                    <padding>
+                        <Insets left="20" />
+                    </padding>
+                </Label>
+                <DatePicker fx:id="filtroInstalacaoInicio" promptText="De"
+                            prefWidth="130" />
+                <Label text="até" styleClass="filter-label" />
+                <DatePicker fx:id="filtroInstalacaoFim" promptText="Até"
+                            prefWidth="130" />
+
+                <Label text="Verificação:" styleClass="filter-label">
+                    <padding>
+                        <Insets left="20" />
+                    </padding>
+                </Label>
+                <DatePicker fx:id="filtroVerificacaoInicio" promptText="De"
+                            prefWidth="130" />
+                <Label text="até" styleClass="filter-label" />
+                <DatePicker fx:id="filtroVerificacaoFim" promptText="Até"
+                            prefWidth="130" />
+            </HBox>
+        </VBox>
+
+        <!-- Estatísticas -->
+        <HBox spacing="30" alignment="CENTER_LEFT" styleClass="stats-bar">
+            <padding>
+                <Insets left="20" right="20" top="10" bottom="10" />
+            </padding>
+            <VBox spacing="2">
+                <Label text="Total" styleClass="stat-label" />
+                <Label fx:id="statTotal" text="0" styleClass="stat-value" />
+            </VBox>
+            <VBox spacing="2">
+                <Label text="Ativos" styleClass="stat-label-active" />
+                <Label fx:id="statAtivos" text="0" styleClass="stat-value-active" />
+            </VBox>
+            <VBox spacing="2">
+                <Label text="Manutenção" styleClass="stat-label-warning" />
+                <Label fx:id="statManutencao" text="0" styleClass="stat-value-warning" />
+            </VBox>
+            <VBox spacing="2">
+                <Label text="Críticos" styleClass="stat-label-danger" />
+                <Label fx:id="statCriticos" text="0" styleClass="stat-value-danger" />
+            </VBox>
+            <VBox spacing="2">
+                <Label text="Sem MAC" styleClass="stat-label-muted" />
+                <Label fx:id="statSemMac" text="0" styleClass="stat-value-muted" />
+            </VBox>
+        </HBox>
+
+        <!-- Tabela -->
+        <VBox VBox.vgrow="ALWAYS">
+            <padding>
+                <Insets left="20" right="20" top="10" />
+            </padding>
+            <TableView fx:id="equipamentosTable" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="colNumSerie" text="Nº Série" prefWidth="120" />
+                    <TableColumn fx:id="colEnderecoMac" text="Endereço MAC" prefWidth="140" />
+                    <TableColumn fx:id="colSkuProduto" text="SKU Produto" prefWidth="110" />
+                    <TableColumn fx:id="colFuncionarioId" text="Funcionário" prefWidth="100" />
+                    <TableColumn fx:id="colLocalizacao" text="Localização" prefWidth="110" />
+                    <TableColumn fx:id="colDepartamento" text="Departamento" prefWidth="120" />
+                    <TableColumn fx:id="colStatus" text="Status" prefWidth="90" />
+                    <TableColumn fx:id="colCondicao" text="Condição" prefWidth="80" />
+                    <TableColumn fx:id="colDataAquisicao" text="Aquisição" prefWidth="90" />
+                    <TableColumn fx:id="colDataInstalacao" text="Instalação" prefWidth="90" />
+                    <TableColumn fx:id="colDataUltimaVerificacao" text="Verificação" prefWidth="90" />
+                    <TableColumn fx:id="colAcoes" text="Ações" prefWidth="180" />
+                </columns>
+            </TableView>
+
+            <!-- Paginação -->
+            <HBox spacing="10" alignment="CENTER" styleClass="pagination-bar">
+                <Button fx:id="btnPrimeira" text="&lt;&lt;"
+                        onAction="#handlePrimeiraPagina" />
+                <Button fx:id="btnAnterior" text="&lt;"
+                        onAction="#handlePaginaAnterior" />
+                <Label fx:id="labelPagina" text="Página 1 de 1" />
+                <Button fx:id="btnProxima" text="&gt;"
+                        onAction="#handleProximaPagina" />
+                <Button fx:id="btnUltima" text="&gt;&gt;"
+                        onAction="#handleUltimaPagina" />
+                <Label text="Itens por página:" />
+                <ComboBox fx:id="comboItensPorPagina" prefWidth="80" />
+            </HBox>
+        </VBox>
+
+        <!-- Status Bar -->
+        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="status-bar">
+            <Label fx:id="statusLabel" text="Pronto" />
+            <Region HBox.hgrow="ALWAYS" />
+            <ProgressIndicator fx:id="progressIndicator" visible="false" />
+        </HBox>
+    </VBox>
+</AnchorPane>

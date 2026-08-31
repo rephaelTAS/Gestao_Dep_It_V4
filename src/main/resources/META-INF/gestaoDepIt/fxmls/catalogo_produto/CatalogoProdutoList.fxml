@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!--
+    CatalogoProdutoList.fxml v1.0
+    Estrutura do layout de listagem do catálogo de produtos.
+    Responsabilidades: Hierarquia de containers, dimensões base e constraints de layout.
+    Estilização visual delegada ao CSS externo via styleClass semânticas.
+-->
+<AnchorPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ossobo.gestaoDepIt.controllers.gestao.estoque.catalugoproduto.CatalogoProdutoListController"
+            prefHeight="800.0" prefWidth="1400.0">
+
+    <VBox spacing="20" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+        <!-- ========== HEADER ========== -->
+        <HBox alignment="CENTER_LEFT" spacing="20" styleClass="list-header">
+            <padding>
+                <Insets bottom="10" left="20" right="20" top="20" />
+            </padding>
+            <Label text="Catálogo de Produtos" styleClass="list-title" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="novoButton" text="+ Novo Produto"
+                    styleClass="btn-primary"
+                    onAction="#handleNovoProduto" />
+        </HBox>
+
+        <!-- ========== FILTROS ========== -->
+        <VBox spacing="10" styleClass="list-card">
+            <padding>
+                <Insets bottom="15" left="20" right="20" top="15" />
+            </padding>
+            <Label text="Filtros Avançados" styleClass="list-card-header" />
+            <GridPane hgap="10" vgap="10">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="100" prefWidth="120" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="100" prefWidth="150" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="100" prefWidth="120" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="100" prefWidth="150" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="100" prefWidth="120" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="100" prefWidth="150" />
+                </columnConstraints>
+
+                <!-- Linha 1 -->
+                <Label text="Tipo:"                                   GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                <ComboBox fx:id="filtroTipoCombo" promptText="Todos tipos"
+                          GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+                <Label text="Categoria:"                              GridPane.rowIndex="0" GridPane.columnIndex="2" />
+                <TextField fx:id="filtroCategoriaField" promptText="Categoria..."
+                           GridPane.rowIndex="0" GridPane.columnIndex="3" />
+
+                <Label text="Estoque:"                                GridPane.rowIndex="0" GridPane.columnIndex="4" />
+                <ComboBox fx:id="filtroEstoqueCombo" promptText="Todos"
+                          GridPane.rowIndex="0" GridPane.columnIndex="5" />
+
+                <!-- Linha 2 -->
+                <Label text="Marca:"                                  GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                <TextField fx:id="filtroMarcaField" promptText="Marca..."
+                           GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+                <Label text="Modelo:"                                 GridPane.rowIndex="1" GridPane.columnIndex="2" />
+                <TextField fx:id="filtroModeloField" promptText="Modelo..."
+                           GridPane.rowIndex="1" GridPane.columnIndex="3" />
+
+                <Label text="Status:"                                 GridPane.rowIndex="1" GridPane.columnIndex="4" />
+                <ComboBox fx:id="filtroStatusCombo" promptText="Todos status"
+                          GridPane.rowIndex="1" GridPane.columnIndex="5" />
+
+                <!-- Botões de filtro -->
+                <HBox spacing="10" GridPane.rowIndex="2" GridPane.columnIndex="4"
+                      alignment="CENTER_RIGHT" GridPane.columnSpan="2">
+                    <Button fx:id="limparFiltrosButton" text="Limpar Filtros"
+                            styleClass="btn-secondary"
+                            onAction="#handleLimparFiltros" />
+                    <Button fx:id="aplicarFiltrosButton" text="Aplicar Filtros"
+                            styleClass="btn-primary"
+                            onAction="#handleAplicarFiltros" />
+                </HBox>
+            </GridPane>
+        </VBox>
+
+        <!-- ========== ESTATÍSTICAS ========== -->
+        <HBox spacing="20" alignment="CENTER_LEFT">
+            <padding>
+                <Insets left="20" />
+            </padding>
+            <Label fx:id="estatisticasLabel" text="Carregando estatísticas..." styleClass="list-statistics" />
+            <Label fx:id="filtrosAtivosLabel" text="" styleClass="list-active-filters" />
+        </HBox>
+
+        <!-- ========== TABELA ========== -->
+        <VBox VBox.vgrow="ALWAYS">
+            <TableView fx:id="produtosTable" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="colSku"          text="SKU"    prefWidth="120" />
+                    <TableColumn fx:id="colTipo"         text="Tipo"   prefWidth="100" />
+                    <TableColumn fx:id="colCategoria"    text="Categoria" prefWidth="120" />
+                    <TableColumn fx:id="colMarca"        text="Marca"  prefWidth="110" />
+                    <TableColumn fx:id="colModelo"       text="Modelo" prefWidth="130" />
+                    <TableColumn fx:id="colCor"          text="Cor"    prefWidth="70" />
+                    <TableColumn fx:id="colPrecoUnitario" text="Preço" prefWidth="90" />
+                    <TableColumn fx:id="colEstoque"      text="Estoque" prefWidth="80" />
+                    <TableColumn fx:id="colStatus"       text="Status" prefWidth="80" />
+                    <TableColumn fx:id="colAcoes"        text="Ações"  prefWidth="140" />
+                </columns>
+            </TableView>
+
+            <!-- Paginação -->
+            <HBox spacing="10" alignment="CENTER" styleClass="pagination-bar">
+                <Button fx:id="btnPrimeira"  text="&lt;&lt;" onAction="#handlePrimeiraPagina" />
+                <Button fx:id="btnAnterior"  text="&lt;"     onAction="#handlePaginaAnterior" />
+                <Label fx:id="labelPagina"   text="Página 1 de 1" styleClass="pagination-label" />
+                <Button fx:id="btnProxima"   text="&gt;"     onAction="#handleProximaPagina" />
+                <Button fx:id="btnUltima"    text="&gt;&gt;" onAction="#handleUltimaPagina" />
+                <Label text="Itens por página:" />
+                <ComboBox fx:id="comboItensPorPagina" prefWidth="80" />
+            </HBox>
+        </VBox>
+
+        <!-- ========== STATUS BAR ========== -->
+        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="status-bar">
+            <Label fx:id="statusLabel" text="Pronto" />
+            <Region HBox.hgrow="ALWAYS" />
+            <ProgressIndicator fx:id="progressIndicator"
+                               progress="0.0" visible="false" />
+        </HBox>
+    </VBox>
+</AnchorPane>

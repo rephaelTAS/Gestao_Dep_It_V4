@@ -1,0 +1,130 @@
+/* ============================================================
+   SERVIDOR_DETAIL.CSS - Detalhes do Servidor
+   v1.0
+   ============================================================ */
+
+.header {
+    -fx-alignment: center-left;
+}
+
+.titulo {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-fill: #2c3e50;
+}
+
+.status-badge {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 4 12 4 12;
+    -fx-background-radius: 12px;
+}
+
+.status-badge.conectado {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: #ffffff;
+}
+
+.status-badge.falha {
+    -fx-background-color: #F44336;
+    -fx-text-fill: #ffffff;
+}
+
+.status-badge.testando {
+    -fx-background-color: #FF9800;
+    -fx-text-fill: #ffffff;
+}
+
+.status-badge.nao-testado {
+    -fx-background-color: #9E9E9E;
+    -fx-text-fill: #ffffff;
+}
+
+.detalhes-grid {
+    -fx-padding: 10 0 10 0;
+}
+
+.label-detalhe {
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #555555;
+    -fx-pref-width: 120px;
+}
+
+.valor-detalhe {
+    -fx-font-size: 14px;
+    -fx-text-fill: #333333;
+    -fx-wrap-text: true;
+}
+
+.valor-url {
+    -fx-font-size: 13px;
+    -fx-text-fill: #1976D2;
+    -fx-font-family: "Monospaced", monospace;
+}
+
+.url-box {
+    -fx-padding: 10 0 10 0;
+    -fx-background-color: #f5f5f5;
+    -fx-background-radius: 4px;
+    -fx-padding: 10 15 10 15;
+}
+
+.button-bar {
+    -fx-padding: 15 0 0 0;
+    -fx-alignment: center-left;
+    -fx-spacing: 12;
+}
+
+.button-bar .button {
+    -fx-padding: 8 20 8 20;
+    -fx-font-size: 13px;
+    -fx-font-weight: 500;
+    -fx-background-radius: 4px;
+    -fx-cursor: hand;
+}
+
+.btn-testar {
+    -fx-background-color: #FF9800;
+    -fx-text-fill: #ffffff;
+}
+
+.btn-testar:hover {
+    -fx-background-color: #F57C00;
+}
+
+.btn-ativar {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: #ffffff;
+}
+
+.btn-ativar:hover {
+    -fx-background-color: #388E3C;
+}
+
+.btn-desativar {
+    -fx-background-color: #F44336;
+    -fx-text-fill: #ffffff;
+}
+
+.btn-desativar:hover {
+    -fx-background-color: #D32F2F;
+}
+
+.btn-editar {
+    -fx-background-color: #2196F3;
+    -fx-text-fill: #ffffff;
+}
+
+.btn-editar:hover {
+    -fx-background-color: #1976D2;
+}
+
+.btn-voltar {
+    -fx-background-color: #9E9E9E;
+    -fx-text-fill: #ffffff;
+}
+
+.btn-voltar:hover {
+    -fx-background-color: #757575;
+}

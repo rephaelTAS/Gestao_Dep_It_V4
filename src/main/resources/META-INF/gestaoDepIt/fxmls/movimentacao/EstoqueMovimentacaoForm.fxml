@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ossobo.gestaoDepIt.controllers.gestao.estoque.movimentacoes.EstoqueMovimentacaoFormController"
+            prefHeight="700.0" prefWidth="800.0" style="-fx-background-color: #f8f9fa;">
+
+    <ScrollPane fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER"
+                AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+        <VBox spacing="20.0">
+            <!-- Cabeçalho -->
+            <Label fx:id="tituloLabel" text="Nova Movimentação de Estoque"
+                   style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;">
+                <padding>
+                    <Insets bottom="10.0" left="20.0" right="20.0" top="20.0" />
+                </padding>
+            </Label>
+
+            <!-- Informações do Produto -->
+            <VBox spacing="10.0" style="-fx-background-color: #e8f4f8; -fx-border-color: #3498db; -fx-border-radius: 8; -fx-background-radius: 8;">
+                <padding>
+                    <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+                </padding>
+                <Label text="Produto Selecionado"
+                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2980b9;" />
+                <Label fx:id="produtoInfoLabel" text="Nenhum produto selecionado"
+                       style="-fx-text-fill: #2c3e50; -fx-wrap-text: true;" />
+                <Label fx:id="saldoAtualLabel" text="Saldo atual: -"
+                       style="-fx-text-fill: #27ae60; -fx-font-weight: bold;" />
+                <Button fx:id="selecionarProdutoButton" text="Selecionar Produto"
+                        style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-max-width: 200;"
+                        onAction="#handleSelecionarProduto" />
+            </VBox>
+
+            <!-- Formulário Principal -->
+            <GridPane hgap="15.0" vgap="15.0"
+                      style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8;">
+                <padding>
+                    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                </padding>
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="180.0" prefWidth="180.0" />
+                    <ColumnConstraints hgrow="ALWAYS" minWidth="250.0" prefWidth="250.0" />
+                </columnConstraints>
+
+                <!-- Linha 1: Tipo de Movimentação -->
+                <Label text="Tipo de Movimentação *"
+                       style="-fx-font-weight: bold; -fx-text-fill: #34495e;"
+                       GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                <ComboBox fx:id="tipoMovimentacaoCombo" promptText="Selecione o tipo"
+                          GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+                <!-- Linha 2: Quantidade -->
+                <Label text="Quantidade *"
+                       style="-fx-font-weight: bold; -fx-text-fill: #34495e;"
+                       GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                <HBox spacing="10.0" GridPane.rowIndex="1" GridPane.columnIndex="1">
+                    <TextField fx:id="quantidadeField" promptText="Quantidade"
+                               HBox.hgrow="ALWAYS" />
+                    <Label fx:id="unidadeLabel" text="un"
+                           style="-fx-text-fill: #7f8c8d; -fx-font-weight: bold;" />
+                </HBox>
+
+                <!-- Linha 3: Lote -->
+                <Label text="Número do Lote"
+                       style="-fx-font-weight: bold; -fx-text-fill: #34495e;"
+                       GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                <TextField fx:id="loteField" promptText="Número do lote (opcional)"
+                           GridPane.rowIndex="2" GridPane.columnIndex="1" />
+
+                <!-- Linha 4: Data de Movimentação -->
+                <Label text="Data da Movimentação *"
+                       style="-fx-font-weight: bold; -fx-text-fill: #34495e;"
+                       GridPane.rowIndex="3" GridPane.columnIndex="0" />
+                <DatePicker fx:id="dataMovimentacaoPicker"
+                            GridPane.rowIndex="3" GridPane.columnIndex="1" />
+
+                <!-- Linha 5: Data de Validade -->
+                <Label text="Data de Validade"
+                       style="-fx-font-weight: bold; -fx-text-fill: #34495e;"
+                       GridPane.rowIndex="4" GridPane.columnIndex="0" />
+                <DatePicker fx:id="dataValidadePicker"
+                            GridPane.rowIndex="4" GridPane.columnIndex="1" />
+
+                <!-- Linha 6: Data Fim Licença (para software) -->
+                <Label text="Data Fim Licença"
+                       style="-fx-font-weight: bold; -fx-text-fill: #34495e;"
+                       GridPane.rowIndex="5" GridPane.columnIndex="0" />
+                <DatePicker fx:id="dataFimLicencaPicker"
+                            GridPane.rowIndex="5" GridPane.columnIndex="1" />
+
+                <!-- Linha 7: Localização -->
+                <Label text="Localização"
+                       style="-fx-font-weight: bold; -fx-text-fill: #34495e;"
+                       GridPane.rowIndex="6" GridPane.columnIndex="0" />
+                <TextField fx:id="localizacaoField" promptText="Local onde o item será armazenado"
+                           GridPane.rowIndex="6" GridPane.columnIndex="1" />
+
+                <!-- Linha 8: Motivo -->
+                <Label text="Motivo *"
+                       style="-fx-font-weight: bold; -fx-text-fill: #34495e;"
+                       GridPane.rowIndex="7" GridPane.columnIndex="0" />
+                <TextField fx:id="motivoField" promptText="Motivo da movimentação"
+                           GridPane.rowIndex="7" GridPane.columnIndex="1" />
+
+                <!-- Linha 9: Observações -->
+                <Label text="Observações"
+                       style="-fx-font-weight: bold; -fx-text-fill: #34495e;"
+                       GridPane.rowIndex="8" GridPane.columnIndex="0" />
+                <TextArea fx:id="observacoesField" promptText="Observações adicionais"
+                          wrapText="true" prefRowCount="3"
+                          GridPane.rowIndex="8" GridPane.columnIndex="1" />
+            </GridPane>
+
+            <!-- Impacto no Saldo -->
+            <VBox spacing="10.0" style="-fx-background-color: #fff9e6; -fx-border-color: #f39c12; -fx-border-radius: 8; -fx-background-radius: 8;">
+                <padding>
+                    <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+                </padding>
+                <Label text="Impacto no Saldo"
+                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #f39c12;" />
+                <HBox spacing="20.0" alignment="CENTER_LEFT">
+                    <VBox spacing="5.0">
+                        <Label text="Saldo Atual" style="-fx-text-fill: #7f8c8d;" />
+                        <Label fx:id="saldoAtualDisplay" text="0"
+                               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+                    </VBox>
+                    <VBox spacing="5.0">
+                        <Label text="Movimentação" style="-fx-text-fill: #7f8c8d;" />
+                        <Label fx:id="movimentacaoDisplay" text="+0"
+                               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #e74c3c;" />
+                    </VBox>
+                    <VBox spacing="5.0">
+                        <Label text="Novo Saldo" style="-fx-text-fill: #7f8c8d;" />
+                        <Label fx:id="novoSaldoDisplay" text="0"
+                               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #27ae60;" />
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <!-- Mensagens de Erro -->
+            <Label fx:id="mensagemErroLabel" textFill="RED"
+                   style="-fx-font-size: 12px; -fx-wrap-text: true;"
+                   visible="false" managed="false"
+                   maxWidth="1.7976931348623157E308">
+                <padding>
+                    <Insets left="20.0" right="20.0" />
+                </padding>
+            </Label>
+
+            <!-- Botões de Ação -->
+            <HBox spacing="15.0" alignment="CENTER_RIGHT">
+                <padding>
+                    <Insets bottom="20.0" left="20.0" right="20.0" top="10.0" />
+                </padding>
+                <Button fx:id="cancelarButton" text="Cancelar"
+                        style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-weight: bold;"
+                        onAction="#handleCancelar" />
+                <Button fx:id="salvarButton" text="Registrar Movimentação"
+                        style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold;"
+                        onAction="#handleSalvar" />
+            </HBox>
+        </VBox>
+    </ScrollPane>
+</AnchorPane>

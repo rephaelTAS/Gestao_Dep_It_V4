@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.shape.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.ossobo.gestaoDepIt.controllers.gestao.relatorios.RelatorioDashboardController">
+
+    <!-- ==================================================================== -->
+    <!-- TOPO -->
+    <!-- ==================================================================== -->
+    <top>
+        <VBox styleClass="header-container">
+            <HBox spacing="20" alignment="CENTER_LEFT" styleClass="header-row">
+                <StackPane>
+                    <Rectangle width="44" height="44" arcWidth="12" arcHeight="12"
+                               fill="linear-gradient(to bottom right, #3498db, #2980b9)" />
+                    <ImageView fx:id="imageicone" fitWidth="26" fitHeight="26" />
+                </StackPane>
+                <VBox spacing="2">
+                    <Label text="Dashboard de Relatórios" styleClass="page-title" />
+                    <Label text="Exportação e análise de dados do sistema" styleClass="page-subtitle" />
+                </VBox>
+                <Pane HBox.hgrow="ALWAYS" />
+                <HBox spacing="25" alignment="CENTER">
+                    <VBox alignment="CENTER" spacing="4" styleClass="kpi-card kpi-blue">
+                        <Label text="Relatórios Hoje" styleClass="kpi-label" />
+                        <Label fx:id="labelHoje" text="0" styleClass="kpi-value-blue" />
+                    </VBox>
+                    <VBox alignment="CENTER" spacing="4" styleClass="kpi-card kpi-green">
+                        <Label text="Esta Semana" styleClass="kpi-label" />
+                        <Label fx:id="labelSemana" text="0" styleClass="kpi-value-green" />
+                    </VBox>
+                    <VBox alignment="CENTER" spacing="4" styleClass="kpi-card kpi-red">
+                        <Label text="Modelos Salvos" styleClass="kpi-label" />
+                        <Label fx:id="labelModelosSalvos" text="0" styleClass="kpi-value-red" />
+                    </VBox>
+                </HBox>
+            </HBox>
+            <Separator />
+            <HBox spacing="12" alignment="CENTER_LEFT" styleClass="action-bar">
+                <Label text="⚡ Ações:" styleClass="action-bar-label" />
+                <Button text="🔄 Atualizar" styleClass="btn-outline" onAction="#atualizarDashboard" />
+                <Button text="📥 Exportar Inventário + Catálogo + Funcionários" styleClass="btn-success" onAction="#exportarParaExcel" />
+                <Pane HBox.hgrow="ALWAYS" />
+                <Label fx:id="labelUltimaAtualizacao" text="Atualizado: --" styleClass="last-update" />
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- ==================================================================== -->
+    <!-- CENTRO -->
+    <!-- ==================================================================== -->
+    <center>
+        <ScrollPane fitToWidth="true" vbarPolicy="AS_NEEDED" styleClass="scroll-pane">
+            <VBox spacing="24" styleClass="content-container">
+
+                <!-- ============================================================ -->
+                <!-- LINHA 1: CARDS DE AÇÃO PRINCIPAL -->
+                <!-- ============================================================ -->
+                <Label text="📋 Gerar Relatórios" styleClass="section-title" />
+
+                <HBox spacing="20" alignment="CENTER">
+                    <!-- Relatório Simples -->
+                    <VBox alignment="CENTER" spacing="12" styleClass="action-card" HBox.hgrow="ALWAYS">
+                        <StackPane>
+                            <Circle radius="38" fill="linear-gradient(to bottom right, #3498db, #2980b9)" />
+                            <Label text="📊" style="-fx-font-size: 28px;" />
+                        </StackPane>
+                        <Label text="Relatório Simples" styleClass="card-title" />
+                        <Label text="Selecione uma tabela, aplique filtros e exporte" styleClass="card-desc" wrapText="true" textAlignment="CENTER" />
+                        <Button text="Abrir →" styleClass="btn-primary" onAction="#abrirRelatorioSimples" />
+                    </VBox>
+
+                    <!-- Relatório Avançado -->
+                    <VBox alignment="CENTER" spacing="12" styleClass="action-card" HBox.hgrow="ALWAYS">
+                        <StackPane>
+                            <Circle radius="38" fill="linear-gradient(to bottom right, #2ecc71, #27ae60)" />
+                            <Label text="🚀" style="-fx-font-size: 28px;" />
+                        </StackPane>
+                        <Label text="Relatório Avançado" styleClass="card-title" />
+                        <Label text="Cruze tabelas com JOINs, múltiplos filtros e exportação" styleClass="card-desc" wrapText="true" textAlignment="CENTER" />
+                        <Button text="Abrir →" styleClass="btn-success" onAction="#abrirRelatorioAvancado" />
+                    </VBox>
+
+                    <!-- Exportação Rápida -->
+                    <VBox alignment="CENTER" spacing="12" styleClass="action-card" HBox.hgrow="ALWAYS">
+                        <StackPane>
+                            <Circle radius="38" fill="linear-gradient(to bottom right, #e67e22, #d35400)" />
+                            <Label text="📥" style="-fx-font-size: 28px;" />
+                        </StackPane>
+                        <Label text="Exportação Rápida" styleClass="card-title" />
+                        <Label text="Inventário + Catálogo + Funcionários em Excel" styleClass="card-desc" wrapText="true" textAlignment="CENTER" />
+                        <Button text="Exportar →" styleClass="btn-warning" onAction="#exportarParaExcel" />
+                    </VBox>
+                </HBox>
+
+                <!-- ============================================================ -->
+                <!-- LINHA 2: MODELOS SALVOS + VISÃO GERAL -->
+                <!-- ============================================================ -->
+                <HBox spacing="20" HBox.hgrow="ALWAYS">
+
+                    <!-- Modelos Salvos (reutilizáveis) -->
+                    <VBox spacing="12" styleClass="chart-card" HBox.hgrow="ALWAYS" prefWidth="350">
+                        <HBox spacing="8" alignment="CENTER_LEFT">
+                            <Label text="💾" style="-fx-font-size: 18px;" />
+                            <Label text="Modelos de Relatório Salvos" styleClass="card-subtitle" />
+                        </HBox>
+                        <Label text="Clique em um modelo para gerar o mesmo relatório novamente"
+                               styleClass="hint-text" wrapText="true" />
+                        <ListView fx:id="listaModelosSalvos" VBox.vgrow="ALWAYS" prefHeight="200" styleClass="model-list" />
+                        <HBox spacing="10">
+                            <Button text="🗑 Remover" styleClass="btn-outline-danger" onAction="#removerModeloSelecionado" />
+                            <Button text="📥 Exportar Modelo" styleClass="btn-primary" onAction="#exportarModeloSelecionado" />
+                        </HBox>
+                    </VBox>
+
+                    <!-- Visão Geral de Uso dos Relatórios -->
+                    <VBox spacing="12" styleClass="chart-card" HBox.hgrow="ALWAYS">
+                        <HBox spacing="8" alignment="CENTER_LEFT">
+                            <Label text="📈" style="-fx-font-size: 18px;" />
+                            <Label text="Visão Geral de Relatórios Gerados" styleClass="card-subtitle" />
+                        </HBox>
+                        <BarChart fx:id="graficoCombinacoes" legendVisible="false" animated="true" prefHeight="260"
+                                  barGap="8" categoryGap="40">
+                            <xAxis><CategoryAxis label="" /></xAxis>
+                            <yAxis><NumberAxis label="Relatórios Gerados" /></yAxis>
+                        </BarChart>
+                        <Label text="Quantas vezes cada tipo de relatório foi gerado"
+                               styleClass="hint-text" />
+                    </VBox>
+                </HBox>
+
+                <!-- ============================================================ -->
+                <!-- LINHA 3: TABELAS MAIS USADAS EM RELATÓRIOS + KPIs -->
+                <!-- ============================================================ -->
+                <HBox spacing="20" HBox.hgrow="ALWAYS">
+
+                    <!-- Tabelas mais usadas em relatórios -->
+                    <VBox spacing="12" styleClass="chart-card" HBox.hgrow="ALWAYS">
+                        <Label text="📊 Tabelas Mais Usadas em Relatórios" styleClass="card-subtitle" />
+                        <TableView fx:id="tabelaEstatisticas" prefHeight="200">
+                            <columns>
+                                <TableColumn fx:id="colTabela" text="Tabela / Combinação" prefWidth="280" />
+                                <TableColumn fx:id="colConsultas" text="Relatórios Gerados" prefWidth="120" />
+                                <TableColumn fx:id="colUso" text="Última Vez" prefWidth="140" />
+                            </columns>
+                        </TableView>
+                    </VBox>
+
+                    <!-- KPIs -->
+                    <VBox spacing="12" prefWidth="300">
+                        <HBox spacing="12">
+                            <VBox spacing="6" alignment="CENTER" styleClass="kpi-box" HBox.hgrow="ALWAYS">
+                                <Label text="Total de Relatórios" styleClass="kpi-box-label" />
+                                <Label fx:id="labelTotalRelatorios" text="0" styleClass="kpi-box-value-blue" />
+                            </VBox>
+                            <VBox spacing="6" alignment="CENTER" styleClass="kpi-box" HBox.hgrow="ALWAYS">
+                                <Label text="Média por Dia" styleClass="kpi-box-label" />
+                                <Label fx:id="labelMediaDia" text="0" styleClass="kpi-box-value-green" />
+                            </VBox>
+                        </HBox>
+                        <HBox spacing="12">
+                            <VBox spacing="6" alignment="CENTER" styleClass="kpi-box" HBox.hgrow="ALWAYS">
+                                <Label text="Combinações Únicas" styleClass="kpi-box-label" />
+                                <Label fx:id="labelCombinacoesUnicas" text="0" styleClass="kpi-box-value-orange" />
+                            </VBox>
+                            <VBox spacing="6" alignment="CENTER" styleClass="kpi-box" HBox.hgrow="ALWAYS">
+                                <Label text="Modelos Salvos" styleClass="kpi-box-label" />
+                                <Label fx:id="labelTotalModelos" text="0" styleClass="kpi-box-value-purple" />
+                            </VBox>
+                        </HBox>
+                    </VBox>
+                </HBox>
+
+                <!-- ============================================================ -->
+                <!-- LINHA 4: ATIVIDADE RECENTE -->
+                <!-- ============================================================ -->
+                <VBox spacing="12" styleClass="chart-card">
+                    <HBox spacing="8" alignment="CENTER_LEFT">
+                        <Label text="🕒" style="-fx-font-size: 18px;" />
+                        <Label text="Relatórios Gerados Recentemente" styleClass="card-subtitle" />
+                        <Pane HBox.hgrow="ALWAYS" />
+                        <Button text="Limpar Histórico" styleClass="btn-outline-danger" onAction="#limparHistoricoRelatorios" />
+                    </HBox>
+                    <TableView fx:id="tabelaRelatoriosRecentes" prefHeight="200">
+                        <columns>
+                            <TableColumn fx:id="colRecData" text="Data / Hora" prefWidth="140" />
+                            <TableColumn fx:id="colRecTitulo" text="Relatório Gerado" prefWidth="350" />
+                            <TableColumn fx:id="colRecTabelas" text="Tabelas Utilizadas" prefWidth="200" />
+                            <TableColumn fx:id="colRecAcoes" text="" prefWidth="60" />
+                        </columns>
+                    </TableView>
+                </VBox>
+
+                <!-- ============================================================ -->
+                <!-- LINHA 5: EXPORTAÇÕES RÁPIDAS -->
+                <!-- ============================================================ -->
+                <Label text="⭐ Exportações Rápidas" styleClass="section-title" />
+
+                <HBox spacing="16">
+                    <VBox spacing="10" styleClass="template-card" HBox.hgrow="ALWAYS">
+                        <Label text="💻 Inventário Completo" styleClass="card-title" />
+                        <Label text="3 abas Excel: Inventário + Catálogo + Funcionários"
+                               styleClass="card-desc" wrapText="true" />
+                        <Button text="📥 Exportar Excel" styleClass="btn-success" onAction="#exportarInventarioCompleto" />
+                    </VBox>
+
+                    <VBox spacing="10" styleClass="template-card" HBox.hgrow="ALWAYS">
+                        <Label text="📋 Catálogo de Produtos" styleClass="card-title" />
+                        <Label text="Lista completa de produtos com preços e estoque"
+                               styleClass="card-desc" wrapText="true" />
+                        <Button text="📥 Exportar Catálogo" styleClass="btn-primary" onAction="#exportarCatalogo" />
+                    </VBox>
+
+                    <VBox spacing="10" styleClass="template-card" HBox.hgrow="ALWAYS">
+                        <Label text="👥 Funcionários" styleClass="card-title" />
+                        <Label text="Lista de funcionários com departamento e contato"
+                               styleClass="card-desc" wrapText="true" />
+                        <Button text="📥 Exportar Funcionários" styleClass="btn-primary" onAction="#exportarFuncionarios" />
+                    </VBox>
+
+                    <VBox spacing="10" styleClass="template-card" HBox.hgrow="ALWAYS">
+                        <Label text="📦 Movimentações" styleClass="card-title" />
+                        <Label text="Entradas, saídas, ajustes e transferências"
+                               styleClass="card-desc" wrapText="true" />
+                        <Button text="📥 Exportar Estoque" styleClass="btn-warning" onAction="#exportarMovimentacoes" />
+                    </VBox>
+                </HBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <!-- ==================================================================== -->
+    <!-- RODAPÉ -->
+    <!-- ==================================================================== -->
+    <bottom>
+        <HBox alignment="CENTER" styleClass="footer">
+            <Label text="© 2024 Sistema de Gestão Departamental — Módulo de Relatórios" styleClass="footer-text" />
+            <Pane HBox.hgrow="ALWAYS" />
+            <Label text="v2.0" styleClass="footer-version" />
+        </HBox>
+    </bottom>
+
+</BorderPane>

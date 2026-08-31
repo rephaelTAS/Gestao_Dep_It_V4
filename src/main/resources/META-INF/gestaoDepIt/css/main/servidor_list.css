@@ -1,0 +1,169 @@
+/* ============================================================
+   SERVIDOR_LIST.CSS - Lista de Servidores
+   v1.0
+   ============================================================ */
+
+.header {
+    -fx-alignment: center-left;
+}
+
+.titulo {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-fill: #2c3e50;
+}
+
+.total-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #7f8c8d;
+    -fx-padding: 5 0 0 15;
+}
+
+.toolbar {
+    -fx-padding: 5 0 5 0;
+}
+
+.btn-novo {
+    -fx-background-color: #2196F3;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-padding: 8 16 8 16;
+    -fx-background-radius: 4px;
+}
+
+.btn-novo:hover {
+    -fx-background-color: #1976D2;
+}
+
+.btn-refresh {
+    -fx-background-color: #607D8B;
+    -fx-text-fill: #ffffff;
+    -fx-padding: 8 16 8 16;
+    -fx-background-radius: 4px;
+}
+
+.btn-refresh:hover {
+    -fx-background-color: #455A64;
+}
+
+.btn-testar-todos {
+    -fx-background-color: #FF9800;
+    -fx-text-fill: #ffffff;
+    -fx-padding: 8 16 8 16;
+    -fx-background-radius: 4px;
+}
+
+.btn-testar-todos:hover {
+    -fx-background-color: #F57C00;
+}
+
+/* Tabela */
+.tabela {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 4px;
+}
+
+.tabela .column-header-background {
+    -fx-background-color: #f5f5f5;
+}
+
+.tabela .column-header {
+    -fx-background-color: #f5f5f5;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 0 0 1 0;
+}
+
+.tabela .column-header .label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+}
+
+.tabela .table-cell {
+    -fx-padding: 8 10 8 10;
+    -fx-border-color: #f0f0f0;
+    -fx-border-width: 0 0 1 0;
+    -fx-font-size: 13px;
+}
+
+.tabela .table-row-cell:hover {
+    -fx-background-color: #e3f2fd;
+}
+
+.tabela .table-row-cell:selected {
+    -fx-background-color: #bbdefb;
+}
+
+/* Status na tabela */
+.status-conectado {
+    -fx-text-fill: #4CAF50;
+    -fx-font-weight: bold;
+}
+
+.status-falha {
+    -fx-text-fill: #F44336;
+    -fx-font-weight: bold;
+}
+
+.status-testando {
+    -fx-text-fill: #FF9800;
+    -fx-font-weight: bold;
+}
+
+.status-nao-testado {
+    -fx-text-fill: #9E9E9E;
+    -fx-font-style: italic;
+}
+
+/* Botões de ação na tabela */
+.btn-acoes {
+    -fx-padding: 4 8 4 8;
+    -fx-font-size: 12px;
+    -fx-background-radius: 3px;
+}
+
+.btn-ver {
+    -fx-background-color: #2196F3;
+    -fx-text-fill: #ffffff;
+}
+
+.btn-ver:hover {
+    -fx-background-color: #1976D2;
+}
+
+.btn-ativar {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: #ffffff;
+}
+
+.btn-ativar:hover {
+    -fx-background-color: #388E3C;
+}
+
+.btn-desativar {
+    -fx-background-color: #F44336;
+    -fx-text-fill: #ffffff;
+}
+
+.btn-desativar:hover {
+    -fx-background-color: #D32F2F;
+}
+
+.btn-editar {
+    -fx-background-color: #FF9800;
+    -fx-text-fill: #ffffff;
+}
+
+.btn-editar:hover {
+    -fx-background-color: #F57C00;
+}
+
+.btn-testar {
+    -fx-background-color: #9E9E9E;
+    -fx-text-fill: #ffffff;
+}
+
+.btn-testar:hover {
+    -fx-background-color: #757575;
+}

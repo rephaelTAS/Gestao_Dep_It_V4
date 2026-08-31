@@ -1,0 +1,21 @@
+{
+  "systemsAletry": {
+    "audio": {
+      "volume": 0.7,
+      "enabled": true
+    },
+    "events": {
+      "asyncMode": true,
+      "maxQueueSize": 2000,
+      "maxRetryAttempts": 3
+    },
+    "ui": {
+      "semiModalDuration": "PT15S",
+      "autoShowModals": true
+    },
+    "performance": {
+      "metricsEnabled": true,
+      "healthCheckInterval": "PT30S"
+    }
+  }
+}

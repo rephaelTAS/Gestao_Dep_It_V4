@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ossobo.gestaoDepIt.controllers.gestao.pessoal.UsuarioListController"
+            prefHeight="800.0" prefWidth="1200.0">
+
+    <VBox spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+        <HBox alignment="CENTER_LEFT" spacing="20.0">
+            <padding>
+                <Insets bottom="10.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+            <Label text="Gestão de Usuários do Sistema" styleClass="page-title" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="novoUsuarioButton" text="+ Novo Usuário"
+                    styleClass="btn-primary" onAction="#handleNovoUsuario" />
+        </HBox>
+
+        <VBox spacing="10.0" styleClass="filter-box">
+            <padding>
+                <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+            </padding>
+            <Label text="Filtros de Usuários" styleClass="section-title" />
+
+            <GridPane hgap="10.0" vgap="10.0">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="120.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="150.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="120.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="150.0" />
+                    <ColumnConstraints hgrow="ALWAYS" minWidth="100.0" />
+                </columnConstraints>
+
+                <Label text="Nome:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                <TextField fx:id="filtroNomeField" promptText="Buscar por nome..."
+                           GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+                <Label text="Email:" GridPane.rowIndex="0" GridPane.columnIndex="2" />
+                <TextField fx:id="filtroEmailField" promptText="Buscar por email..."
+                           GridPane.rowIndex="0" GridPane.columnIndex="3" />
+
+                <Label text="Nível:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                <ComboBox fx:id="filtroNivelCombo" promptText="Todos níveis"
+                          GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+                <Label text="Status:" GridPane.rowIndex="1" GridPane.columnIndex="2" />
+                <ComboBox fx:id="filtroStatusCombo" promptText="Todos status"
+                          GridPane.rowIndex="1" GridPane.columnIndex="3" />
+
+                <Label text="Sessão:" GridPane.rowIndex="1" GridPane.columnIndex="4" />
+                <ComboBox fx:id="filtroSessaoCombo" promptText="Todas"
+                          GridPane.rowIndex="1" GridPane.columnIndex="5" />
+
+                <HBox spacing="10.0" GridPane.rowIndex="2" GridPane.columnIndex="3"
+                      alignment="CENTER_RIGHT" GridPane.columnSpan="3">
+                    <Button fx:id="limparFiltrosButton" text="Limpar Filtros"
+                            styleClass="btn-secondary" onAction="#handleLimparFiltros" />
+                    <Button fx:id="aplicarFiltrosButton" text="Aplicar Filtros"
+                            styleClass="btn-primary" onAction="#handleAplicarFiltros" />
+                </HBox>
+            </GridPane>
+        </VBox>
+
+        <HBox spacing="30.0" alignment="CENTER_LEFT">
+            <padding><Insets left="20.0" /></padding>
+            <Label fx:id="estatisticasLabel" text="Carregando estatísticas..." styleClass="stats-label" />
+            <Label fx:id="sessoesAtivasLabel" text="" styleClass="sessoes-ativas-label" />
+        </HBox>
+
+        <VBox VBox.vgrow="ALWAYS">
+            <TableView fx:id="usuariosTable" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="colNome" text="Nome" prefWidth="180.0" />
+                    <TableColumn fx:id="colEmail" text="Email" prefWidth="200.0" />
+                    <TableColumn fx:id="colFuncionario" text="Funcionário" prefWidth="120.0" />
+                    <TableColumn fx:id="colNivelAcesso" text="Nível" prefWidth="100.0" />
+                    <TableColumn fx:id="colStatus" text="Status" prefWidth="80.0" />
+                    <TableColumn fx:id="colUltimoLogin" text="Último Login" prefWidth="140.0" />
+                    <TableColumn fx:id="colIpLogin" text="IP Login" prefWidth="120.0" />
+                    <TableColumn fx:id="colSessaoAtiva" text="Sessão" prefWidth="80.0" />
+                    <TableColumn fx:id="colAcoes" text="Ações" prefWidth="150.0" />
+                </columns>
+            </TableView>
+
+            <HBox spacing="10.0" alignment="CENTER" styleClass="pagination-bar">
+                <Button fx:id="btnPrimeira" text="&lt;&lt;" onAction="#handlePrimeiraPagina" />
+                <Button fx:id="btnAnterior" text="&lt;" onAction="#handlePaginaAnterior" />
+                <Label fx:id="labelPagina" text="Página 1 de 1" />
+                <Button fx:id="btnProxima" text="&gt;" onAction="#handleProximaPagina" />
+                <Button fx:id="btnUltima" text="&gt;&gt;" onAction="#handleUltimaPagina" />
+                <ComboBox fx:id="comboItensPorPagina" prefWidth="80.0" />
+            </HBox>
+        </VBox>
+
+        <HBox spacing="10.0" alignment="CENTER_LEFT" styleClass="status-bar">
+            <padding><Insets left="20.0" right="20.0" /></padding>
+            <Label fx:id="statusLabel" text="Pronto" styleClass="status-text" />
+            <Region HBox.hgrow="ALWAYS" />
+            <ProgressIndicator fx:id="progressIndicator" progress="0.0" visible="false" />
+        </HBox>
+    </VBox>
+</AnchorPane>

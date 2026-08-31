@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ossobo.gestaoDepIt.controllers.gestao.pessoal.UsuarioDetailController"
+            prefHeight="750.0" prefWidth="1050.0">
+
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER"
+                AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+        <VBox spacing="20.0">
+
+            <!-- Cabeçalho -->
+            <HBox alignment="CENTER_LEFT" spacing="15.0">
+                <padding><Insets bottom="10.0" left="20.0" right="20.0" top="20.0" /></padding>
+                <Button fx:id="voltarButton" text="← Voltar"
+                        styleClass="btn-secondary" onAction="#handleVoltar" />
+                <VBox spacing="2.0">
+                    <Label fx:id="tituloLabel" text="Detalhes do Usuário" styleClass="page-title" />
+                    <Label fx:id="subtituloLabel" text="Email: -" styleClass="subtitle-label" />
+                </VBox>
+                <Region HBox.hgrow="ALWAYS" />
+                <HBox spacing="10.0">
+                    <Button fx:id="alterarSenhaButton" text="🔑 Alterar Senha"
+                            styleClass="btn-primary" onAction="#handleMostrarAlterarSenha" />
+                    <Button fx:id="redefinirSenhaButton" text="🔄 Redefinir Senha"
+                            styleClass="btn-warning" onAction="#handleMostrarRedefinirSenha" />
+                    <Button fx:id="desativarButton" text="Desativar"
+                            styleClass="btn-danger" onAction="#handleDesativarAtivar" />
+                </HBox>
+            </HBox>
+
+            <!-- Conteúdo Principal -->
+            <HBox spacing="20.0" alignment="TOP_LEFT">
+                <padding><Insets left="20.0" right="20.0" /></padding>
+
+                <!-- Coluna Esquerda -->
+                <VBox spacing="20.0" prefWidth="400.0">
+
+                    <!-- Dados do Usuário -->
+                    <VBox spacing="10.0" styleClass="card">
+                        <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
+                        <Label text="Dados do Usuário" styleClass="card-title" />
+                        <GridPane hgap="10.0" vgap="8.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="120.0" prefWidth="120.0" />
+                                <ColumnConstraints hgrow="ALWAYS" minWidth="200.0" />
+                            </columnConstraints>
+                            <Label text="ID:" styleClass="field-label" GridPane.rowIndex="0" />
+                            <Label fx:id="detailId" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+                            <Label text="Nome:" styleClass="field-label" GridPane.rowIndex="1" />
+                            <Label fx:id="detailNome" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                            <Label text="Email:" styleClass="field-label" GridPane.rowIndex="2" />
+                            <Label fx:id="detailEmail" styleClass="email-value" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+                            <Label text="Funcionário:" styleClass="field-label" GridPane.rowIndex="3" />
+                            <Label fx:id="detailFuncionario" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+                            <Label text="Nível Acesso:" styleClass="field-label" GridPane.rowIndex="4" />
+                            <Label fx:id="detailNivelAcesso" GridPane.rowIndex="4" GridPane.columnIndex="1" />
+                            <Label text="Status:" styleClass="field-label" GridPane.rowIndex="5" />
+                            <Label fx:id="detailStatus" GridPane.rowIndex="5" GridPane.columnIndex="1" />
+                        </GridPane>
+                    </VBox>
+
+                    <!-- Informações do Sistema -->
+                    <VBox spacing="10.0" styleClass="card">
+                        <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
+                        <Label text="Informações do Sistema" styleClass="card-title" />
+                        <GridPane hgap="10.0" vgap="8.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="120.0" prefWidth="120.0" />
+                                <ColumnConstraints hgrow="ALWAYS" minWidth="200.0" />
+                            </columnConstraints>
+                            <Label text="Criado em:" styleClass="field-label" GridPane.rowIndex="0" />
+                            <Label fx:id="detailCriadoEm" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+                            <Label text="Atualizado em:" styleClass="field-label" GridPane.rowIndex="1" />
+                            <Label fx:id="detailAtualizadoEm" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                        </GridPane>
+                    </VBox>
+                </VBox>
+
+                <!-- Coluna Direita -->
+                <VBox spacing="20.0" VBox.vgrow="ALWAYS">
+
+                    <!-- Segurança e Acesso -->
+                    <VBox spacing="10.0" styleClass="card">
+                        <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
+                        <Label text="Segurança e Acesso" styleClass="card-title" />
+                        <GridPane hgap="10.0" vgap="8.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="120.0" prefWidth="120.0" />
+                                <ColumnConstraints hgrow="ALWAYS" minWidth="200.0" />
+                            </columnConstraints>
+                            <Label text="Último Login:" styleClass="field-label" GridPane.rowIndex="0" />
+                            <Label fx:id="detailUltimoLogin" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+                            <Label text="IP Último Login:" styleClass="field-label" GridPane.rowIndex="1" />
+                            <Label fx:id="detailIpLogin" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                            <Label text="Sessão Ativa:" styleClass="field-label" GridPane.rowIndex="2" />
+                            <Label fx:id="detailSessaoAtiva" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+                            <Label text="Expira Sessão:" styleClass="field-label" GridPane.rowIndex="3" />
+                            <Label fx:id="detailExpiraSessao" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+                        </GridPane>
+                    </VBox>
+
+                    <!-- Estatísticas de Atividade -->
+                    <VBox spacing="10.0" styleClass="card">
+                        <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
+                        <Label text="Estatísticas de Atividade" styleClass="card-title" />
+                        <VBox spacing="8.0">
+                            <Label fx:id="statEventos" text="Eventos Registrados: —" styleClass="stat-label" />
+                            <Label fx:id="statMovimentacoes" text="Movimentações: —" styleClass="stat-label" />
+                            <Label fx:id="statLogin30dias" text="Logins (30 dias): —" styleClass="stat-label" />
+                        </VBox>
+                    </VBox>
+
+                    <!-- Ações de Segurança -->
+                    <VBox spacing="10.0" styleClass="card">
+                        <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
+                        <Label text="Ações de Segurança" styleClass="card-title" />
+                        <VBox spacing="8.0">
+                            <Button fx:id="btnForcarLogout" text="Forçar Logout"
+                                    styleClass="btn-danger-full" onAction="#handleForcarLogout" />
+                            <Button fx:id="btnAuditarUsuario" text="Auditar Atividade"
+                                    styleClass="btn-dark-full" onAction="#handleAuditarUsuario" />
+                            <Button fx:id="btnAlterarNivel" text="Alterar Nível Acesso"
+                                    styleClass="btn-purple-full" onAction="#handleAlterarNivelAcesso" />
+                        </VBox>
+                    </VBox>
+
+                    <!-- Painel ALTERAR Senha (usuário sabe a atual) -->
+                    <VBox fx:id="alterarSenhaPanel" spacing="10.0" styleClass="card"
+                          visible="false" managed="false">
+                        <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
+                        <Label text="🔑 Alterar Senha" styleClass="card-title" />
+                        <Label text="Usuário sabe a senha atual" styleClass="hint-label" />
+
+                        <GridPane hgap="10.0" vgap="8.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="130.0" prefWidth="130.0" />
+                                <ColumnConstraints hgrow="ALWAYS" minWidth="200.0" />
+                            </columnConstraints>
+
+                            <Label text="Senha Atual *" styleClass="field-label"
+                                   GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                            <PasswordField fx:id="alterarSenhaAtualField" promptText="Digite a senha atual"
+                                           GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+                            <Label text="Nova Senha *" styleClass="field-label"
+                                   GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                            <PasswordField fx:id="alterarNovaSenhaField" promptText="Mínimo 6 caracteres"
+                                           GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+                            <Label text="Confirmar *" styleClass="field-label"
+                                   GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                            <PasswordField fx:id="alterarConfirmarSenhaField" promptText="Confirme a nova senha"
+                                           GridPane.rowIndex="2" GridPane.columnIndex="1" />
+                        </GridPane>
+
+                        <Label fx:id="alterarSenhaErroLabel" styleClass="error-label"
+                               visible="false" managed="false" />
+
+                        <HBox spacing="10.0" alignment="CENTER_RIGHT">
+                            <Button text="Cancelar" styleClass="btn-secondary"
+                                    onAction="#handleCancelarAlterarSenha" />
+                            <Button text="Salvar" styleClass="btn-success"
+                                    onAction="#handleSalvarAlterarSenha" />
+                        </HBox>
+                    </VBox>
+
+                    <!-- Painel REDEFINIR Senha (admin, sem senha atual) -->
+                    <VBox fx:id="redefinirSenhaPanel" spacing="10.0" styleClass="card"
+                          visible="false" managed="false">
+                        <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
+                        <Label text="🔄 Redefinir Senha" styleClass="card-title" />
+                        <Label text="Redefinição administrativa — não requer senha atual" styleClass="hint-label" />
+
+                        <GridPane hgap="10.0" vgap="8.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="130.0" prefWidth="130.0" />
+                                <ColumnConstraints hgrow="ALWAYS" minWidth="200.0" />
+                            </columnConstraints>
+
+                            <Label text="Nova Senha *" styleClass="field-label"
+                                   GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                            <PasswordField fx:id="redefinirNovaSenhaField" promptText="Mínimo 6 caracteres"
+                                           GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+                            <Label text="Confirmar *" styleClass="field-label"
+                                   GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                            <PasswordField fx:id="redefinirConfirmarSenhaField" promptText="Confirme a nova senha"
+                                           GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                        </GridPane>
+
+                        <Label fx:id="redefinirSenhaErroLabel" styleClass="error-label"
+                               visible="false" managed="false" />
+
+                        <HBox spacing="10.0" alignment="CENTER_RIGHT">
+                            <Button text="Cancelar" styleClass="btn-secondary"
+                                    onAction="#handleCancelarRedefinirSenha" />
+                            <Button text="Redefinir" styleClass="btn-success"
+                                    onAction="#handleSalvarRedefinirSenha" />
+                        </HBox>
+                    </VBox>
+                </VBox>
+            </HBox>
+
+            <!-- Mensagens de Status -->
+            <Label fx:id="mensagemStatusLabel" styleClass="status-message"
+                   visible="false" managed="false" maxWidth="1.7976931348623157E308">
+                <padding><Insets left="20.0" right="20.0" bottom="20.0" /></padding>
+            </Label>
+        </VBox>
+    </ScrollPane>
+</AnchorPane>

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.ossobo.gestaoDepIt.controllers.gestao.relatorios.RelatorioAvancadoController"
+            prefHeight="750" prefWidth="1300"
+            style="-fx-background-color: #f0f2f5;">
+
+    <SplitPane dividerPositions="0.28" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0"
+               AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+
+        <!-- ================================================================ -->
+        <!-- PAINEL ESQUERDO: CONFIGURAÇÃO -->
+        <!-- ================================================================ -->
+        <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 14; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 4, 0, 2, 2);"
+              prefWidth="340" minWidth="300">
+
+            <Label text="⚙️ Configuração Avançada" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;" />
+            <Separator />
+
+            <!-- TABELA BASE -->
+            <VBox spacing="4">
+                <Label text="📌 Tabela Base (obrigatória):" style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #e74c3c;" />
+                <ComboBox fx:id="comboTabelaBase" prefWidth="310" promptText="Selecione a tabela principal..." />
+            </VBox>
+
+            <!-- COLUNAS DA TABELA BASE -->
+            <VBox spacing="4">
+                <Label text="Colunas da Tabela Base:" style="-fx-font-weight: bold; -fx-font-size: 11px;" />
+                <ScrollPane fitToWidth="true" prefHeight="130" style="-fx-background-color: #f8f9fa; -fx-background-radius: 4; -fx-padding: 4;">
+                    <VBox fx:id="containerColunasBase" spacing="2" />
+                </ScrollPane>
+                <HBox spacing="8">
+                    <Button text="Todos" style="-fx-font-size: 10px; -fx-padding: 2 8;" onAction="#selecionarTodasColunasBase" />
+                    <Button text="Nenhum" style="-fx-font-size: 10px; -fx-padding: 2 8;" onAction="#limparTodasColunasBase" />
+                </HBox>
+            </VBox>
+
+            <Separator />
+
+            <!-- TABELAS OPCIONAIS -->
+            <Label text="🔗 Tabelas Adicionais (opcional):" style="-fx-font-weight: bold; -fx-font-size: 11px;" />
+
+            <!-- JOIN: Funcionários -->
+            <CheckBox fx:id="checkJoinFuncionarios" text="Funcionários (cod_dep = funcionario_id)"
+                      style="-fx-font-weight: bold; -fx-font-size: 11px;" />
+            <ScrollPane fx:id="scrollFuncionarios" fitToWidth="true" prefHeight="90"
+                        style="-fx-background-color: #f8f9fa; -fx-background-radius: 4; -fx-padding: 4;"
+                        visible="false" managed="false">
+                <VBox fx:id="containerColunasFuncionarios" spacing="2" />
+            </ScrollPane>
+
+            <!-- JOIN: Catálogo -->
+            <CheckBox fx:id="checkJoinCatalogo" text="Catálogo Produtos (sku = sku_produto)"
+                      style="-fx-font-weight: bold; -fx-font-size: 11px;" />
+            <ScrollPane fx:id="scrollCatalogo" fitToWidth="true" prefHeight="90"
+                        style="-fx-background-color: #f8f9fa; -fx-background-radius: 4; -fx-padding: 4;"
+                        visible="false" managed="false">
+                <VBox fx:id="containerColunasCatalogo" spacing="2" />
+            </ScrollPane>
+
+            <!-- JOIN: Usuários -->
+            <CheckBox fx:id="checkJoinUsuarios" text="Usuários (funcionario_id = funcionario_id)"
+                      style="-fx-font-weight: bold; -fx-font-size: 11px;" />
+            <ScrollPane fx:id="scrollUsuarios" fitToWidth="true" prefHeight="90"
+                        style="-fx-background-color: #f8f9fa; -fx-background-radius: 4; -fx-padding: 4;"
+                        visible="false" managed="false">
+                <VBox fx:id="containerColunasUsuarios" spacing="2" />
+            </ScrollPane>
+
+            <!-- JOIN: Movimentações -->
+            <CheckBox fx:id="checkJoinMovimentacoes" text="Movimentações (sku_produto = sku)"
+                      style="-fx-font-weight: bold; -fx-font-size: 11px;" />
+            <ScrollPane fx:id="scrollMovimentacoes" fitToWidth="true" prefHeight="90"
+                        style="-fx-background-color: #f8f9fa; -fx-background-radius: 4; -fx-padding: 4;"
+                        visible="false" managed="false">
+                <VBox fx:id="containerColunasMovimentacoes" spacing="2" />
+            </ScrollPane>
+
+            <Separator />
+
+            <!-- BOTÕES -->
+            <Button text="🔍 GERAR RELATÓRIO COMBINADO"
+                    style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 12 20; -fx-cursor: hand; -fx-max-width: infinity;"
+                    onAction="#handleGerarRelatorio" />
+            <Button text="📥 Exportar Excel"
+                    style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 10 20; -fx-cursor: hand; -fx-max-width: infinity;"
+                    onAction="#handleExportarExcel" />
+            <Button text="💾 Salvar Configuração"
+                    style="-fx-background-color: #8e44ad; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 10 20; -fx-cursor: hand; -fx-max-width: infinity;"
+                    onAction="#handleSalvarModelo" />
+        </VBox>
+
+        <!-- ================================================================ -->
+        <!-- PAINEL DIREITO: RESULTADOS + FILTROS -->
+        <!-- ================================================================ -->
+        <VBox spacing="10" VBox.vgrow="ALWAYS" style="-fx-padding: 14;">
+
+            <!-- CABEÇALHO -->
+            <HBox spacing="12" alignment="CENTER_LEFT"
+                  style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 10 14; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 3, 0, 1, 1);">
+                <Label text="🚀" style="-fx-font-size: 22px;" />
+                <VBox spacing="2">
+                    <Label text="Relatório Avançado" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;" />
+                    <Label fx:id="lblConfigAtiva" text="Selecione a tabela base para começar"
+                           style="-fx-font-size: 10px; -fx-text-fill: #7f8c8d;" />
+                </VBox>
+                <Pane HBox.hgrow="ALWAYS" />
+                <Label fx:id="lblTotalRegistros" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #3498db;" />
+                <Label text="registros" style="-fx-font-size: 11px; -fx-text-fill: #95a5a6;" />
+            </HBox>
+
+            <!-- ===== FILTROS (estilo inventário) ===== -->
+            <VBox spacing="8" style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 10 14; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 3, 0, 1, 1);">
+                <Label text="🔍 Filtrar Resultados:" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #2c3e50;" />
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <VBox spacing="3"><Label text="Status:" style="-fx-font-size: 10px;" /><ComboBox fx:id="comboFiltroStatus" prefWidth="120" promptText="Todos..." /></VBox>
+                    <VBox spacing="3"><Label text="Condição:" style="-fx-font-size: 10px;" /><ComboBox fx:id="comboFiltroCondicao" prefWidth="120" promptText="Todos..." /></VBox>
+                    <!-- SUBSTITUIR Localização e Departamento por ComboBox -->
+                    <VBox spacing="3"><Label text="Localização:" style="-fx-font-size: 10px;" /><ComboBox fx:id="comboFiltroLocalizacao" prefWidth="130" promptText="Todos..." editable="true" /></VBox>
+                    <VBox spacing="3"><Label text="Departamento:" style="-fx-font-size: 10px;" /><ComboBox fx:id="comboFiltroDepartamento" prefWidth="130" promptText="Todos..." editable="true" /></VBox>
+                    <VBox spacing="3">
+                        <Label text="Período:" style="-fx-font-size: 10px;" />
+                        <HBox spacing="5"><DatePicker fx:id="dpInicio" prefWidth="110" promptText="Início" /><DatePicker fx:id="dpFim" prefWidth="110" promptText="Fim" /></HBox>
+                    </VBox>
+                    <VBox spacing="3">
+                        <Label text="⠀" style="-fx-font-size: 10px;" />
+                        <HBox spacing="5">
+                            <Button text="Aplicar" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 4; -fx-padding: 5 12; -fx-cursor: hand;" onAction="#handleAplicarFiltroPosGeracao" />
+                            <Button text="Limpar" style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 4; -fx-padding: 5 12; -fx-cursor: hand;" onAction="#handleLimparFiltro" />
+                        </HBox>
+                    </VBox>
+                </HBox>
+                <Label fx:id="lblFiltroAtivo" text="Nenhum filtro aplicado" style="-fx-font-size: 10px; -fx-text-fill: #95a5a6; -fx-font-style: italic;" />
+            </VBox>
+
+            <!-- TABELA DE RESULTADOS -->
+            <VBox spacing="6" VBox.vgrow="ALWAYS"
+                  style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 10 14; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 3, 0, 1, 1);">
+                <HBox spacing="8" alignment="CENTER_LEFT">
+                    <Label text="📋 Dados Combinados" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+                    <Pane HBox.hgrow="ALWAYS" />
+                    <Label fx:id="lblTempoExecucao" text="" style="-fx-font-size: 10px; -fx-text-fill: #95a5a6;" />
+                </HBox>
+                <TableView fx:id="tabelaResultados" VBox.vgrow="ALWAYS" style="-fx-border-color: #ecf0f1;">
+                    <placeholder>
+                        <Label text="Configure as tabelas e colunas, depois clique em 'Gerar Relatório'."
+                               style="-fx-text-fill: #95a5a6; -fx-font-size: 12px;" />
+                    </placeholder>
+                    <columnResizePolicy>
+                        <TableView fx:constant="UNCONSTRAINED_RESIZE_POLICY" />
+                    </columnResizePolicy>
+                </TableView>
+            </VBox>
+
+            <!-- BARRA DE STATUS -->
+            <HBox spacing="8" alignment="CENTER_LEFT"
+                  style="-fx-background-color: #1a1a2e; -fx-background-radius: 6; -fx-padding: 6 12;">
+                <Label fx:id="lblStatus" text="Pronto." style="-fx-text-fill: #bdc3c7; -fx-font-size: 10px;" />
+                <Pane HBox.hgrow="ALWAYS" />
+                <Label fx:id="lblJoinsAtivos" text="" style="-fx-text-fill: #3498db; -fx-font-size: 10px; -fx-font-weight: bold;" />
+            </HBox>
+        </VBox>
+    </SplitPane>
+</AnchorPane>

@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+
+<!--
+    Main.fxml v1.0
+    Estrutura do layout principal da aplicação (BorderPane: top/left/center/right/bottom).
+    Responsabilidades: Header, sidebar de navegação, área de conteúdo, painel direito, footer.
+    Estilização visual delegada ao CSS externo via styleClass semânticas.
+-->
+<BorderPane fx:id="borderpanel" styleClass="main-root"
+            xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ossobo.gestaoDepIt.controllers.main.MainController">
+
+    <!-- ========== HEADER ========== -->
+    <top>
+        <HBox styleClass="main-header"
+              alignment="CENTER_LEFT">
+
+            <padding>
+                <Insets left="15" right="15" top="5" bottom="5"/>
+            </padding>
+
+            <!-- Botão Menu -->
+            <Button fx:id="toggleMenuBtn" onAction="#toggleMenu"
+                    styleClass="main-header-icon-btn">
+                <HBox.margin>
+                    <Insets right="10"/>
+                </HBox.margin>
+                <graphic>
+                    <ImageView fx:id="menuIcon"
+                               fitHeight="20" fitWidth="20"
+                               preserveRatio="true"
+                               styleClass="main-header-icon"/>
+                </graphic>
+            </Button>
+
+            <!-- Título principal -->
+            <Label styleClass="main-header-title"
+                   text="Gestão de Equipamentos TI"
+                   HBox.hgrow="SOMETIMES"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <!-- Área central (Ícone e Nome da Página) -->
+            <HBox alignment="CENTER_LEFT" spacing="8">
+                <ImageView fx:id="iconepage"
+                           fitHeight="24" fitWidth="24"
+                           preserveRatio="true"
+                           styleClass="main-page-icon"/>
+                <Label fx:id="nomepage" styleClass="main-page-name"
+                       text="Dashboard"
+                       wrapText="true"/>
+            </HBox>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <!-- Área direita (Notificações, Usuário) -->
+            <HBox alignment="CENTER_RIGHT" spacing="10">
+                <!-- Notificação -->
+                <Button fx:id="btn_notificacao" mnemonicParsing="false"
+                        styleClass="main-header-icon-btn main-notification-btn">
+                    <graphic>
+                        <ImageView fx:id="imageNotificatio"
+                                   fitHeight="18" fitWidth="18"
+                                   preserveRatio="true"
+                                   styleClass="main-header-icon"/>
+                    </graphic>
+                </Button>
+
+                <!-- Divisor visual -->
+                <Separator orientation="VERTICAL" prefHeight="30"/>
+
+                <!-- Perfil do usuário -->
+                <HBox alignment="CENTER" spacing="8"
+                      styleClass="main-user-card">
+
+                    <!-- Informações do usuário -->
+                    <VBox alignment="CENTER_RIGHT" spacing="2"
+                          styleClass="main-user-info"
+                          HBox.hgrow="ALWAYS">
+                        <HBox alignment="BASELINE_RIGHT" spacing="4">
+                            <Label fx:id="timeLabel"
+                                   styleClass="main-time-display"
+                                   text="14:30"/>
+                            <Label fx:id="dateLabel"
+                                   styleClass="main-date-display"
+                                   text="15/12/24"/>
+                        </HBox>
+                        <HBox alignment="BASELINE_RIGHT" spacing="4">
+                            <Label fx:id="nameUser"
+                                   styleClass="main-user-name"
+                                   text="Administrador"
+                                   wrapText="true"/>
+                            <Label styleClass="main-user-status-dot"
+                                   text="●"/>
+                        </HBox>
+                    </VBox>
+
+                    <!-- Avatar -->
+                    <StackPane styleClass="main-avatar-container">
+                        <ImageView fx:id="imageUser"
+                                   fitHeight="36" fitWidth="36"
+                                   preserveRatio="true"
+                                   styleClass="main-avatar-image"/>
+                        <Rectangle arcHeight="20" arcWidth="20"
+                                   height="36" width="36"
+                                   styleClass="main-avatar-border"/>
+                    </StackPane>
+                </HBox>
+            </HBox>
+        </HBox>
+    </top>
+
+    <!-- ========== SIDEBAR ========== -->
+    <left>
+        <VBox fx:id="sidebar" styleClass="main-sidebar"
+              prefWidth="280"
+              BorderPane.alignment="CENTER">
+
+            <!-- Logo Area -->
+            <HBox alignment="CENTER_LEFT" spacing="8"
+                  styleClass="main-sidebar-header"
+                  prefHeight="70">
+                <ImageView fitHeight="32" fitWidth="32"
+                           preserveRatio="true"
+                           styleClass="main-sidebar-logo"/>
+                <Label styleClass="main-sidebar-title"
+                       text="TechManager Pro"
+                       wrapText="true"/>
+            </HBox>
+
+            <!-- Menu Container com Scroll -->
+            <ScrollPane fitToWidth="true"
+                        styleClass="main-sidebar-scroll"
+                        VBox.vgrow="ALWAYS">
+                <content>
+                    <VBox fx:id="menuContainer" spacing="4"
+                          styleClass="main-menu-container">
+
+                        <!-- Seções adaptativas -->
+                        <Label styleClass="main-menu-section" text="PRINCIPAL"/>
+
+                        <!-- Botões do menu -->
+                        <Button fx:id="btn_dashboard" mnemonicParsing="false"
+                                styleClass="main-menu-item"
+                                maxWidth="Infinity">
+                            <graphic>
+                                <ImageView fx:id="dashboardIcon"
+                                           fitHeight="20" fitWidth="20"
+                                           preserveRatio="true"
+                                           styleClass="main-menu-icon"/>
+                            </graphic>
+                            <text>Dashboard</text>
+                            <padding>
+                                <Insets left="12" right="12" top="8" bottom="8"/>
+                            </padding>
+                        </Button>
+
+                        <Separator styleClass="main-menu-separator"/>
+
+                        <!-- Seção Estoque -->
+                        <Label styleClass="main-menu-section" text="ESTOQUE"/>
+
+                        <Button fx:id="btn_catalogo" mnemonicParsing="false"
+                                styleClass="main-menu-item"
+                                maxWidth="Infinity">
+                            <graphic>
+                                <ImageView fx:id="catalogoIcon"
+                                           fitHeight="20" fitWidth="20"
+                                           preserveRatio="true"
+                                           styleClass="main-menu-icon"/>
+                            </graphic>
+                            <text>Catálogo Produtos</text>
+                            <padding>
+                                <Insets left="12" right="12" top="8" bottom="8"/>
+                            </padding>
+                        </Button>
+
+                        <Button fx:id="btn_estoque" mnemonicParsing="false"
+                                styleClass="main-menu-item"
+                                maxWidth="Infinity">
+                            <graphic>
+                                <ImageView fx:id="estoqueIcon"
+                                           fitHeight="20" fitWidth="20"
+                                           preserveRatio="true"
+                                           styleClass="main-menu-icon"/>
+                            </graphic>
+                            <text>Movimentações</text>
+                            <padding>
+                                <Insets left="12" right="12" top="8" bottom="8"/>
+                            </padding>
+                        </Button>
+
+                        <Button fx:id="btn_produtoStock" mnemonicParsing="false"
+                                styleClass="main-menu-item"
+                                maxWidth="Infinity">
+                            <graphic>
+                                <ImageView fx:id="produtoStockIcone"
+                                           fitHeight="20" fitWidth="20"
+                                           preserveRatio="true"
+                                           styleClass="main-menu-icon"/>
+                            </graphic>
+                            <text>Gestão De Produtos e Inventario</text>
+                            <padding>
+                                <Insets left="12" right="12" top="8" bottom="8"/>
+                            </padding>
+                        </Button>
+
+                        <Separator styleClass="main-menu-separator"/>
+
+                        <!-- Seção Equipamentos -->
+                        <Label styleClass="main-menu-section" text="EQUIPAMENTOS"/>
+
+                        <Button fx:id="btn_inventario" mnemonicParsing="false"
+                                styleClass="main-menu-item"
+                                maxWidth="Infinity">
+                            <graphic>
+                                <ImageView fx:id="inventarioIcon"
+                                           fitHeight="20" fitWidth="20"
+                                           preserveRatio="true"
+                                           styleClass="main-menu-icon"/>
+                            </graphic>
+                            <text>Inventário</text>
+                            <padding>
+                                <Insets left="12" right="12" top="8" bottom="8"/>
+                            </padding>
+                        </Button>
+
+                        <Button fx:id="btn_toners" mnemonicParsing="false"
+                                styleClass="main-menu-item"
+                                maxWidth="Infinity">
+                            <graphic>
+                                <ImageView fx:id="tonersIcon"
+                                           fitHeight="20" fitWidth="20"
+                                           preserveRatio="true"
+                                           styleClass="main-menu-icon"/>
+                            </graphic>
+                            <text>Gestão de Toners</text>
+                            <padding>
+                                <Insets left="12" right="12" top="8" bottom="8"/>
+                            </padding>
+                        </Button>
+
+                        <Separator styleClass="main-menu-separator"/>
+
+                        <!-- Seção Pessoal -->
+                        <Label styleClass="main-menu-section" text="PESSOAL"/>
+
+                        <Button fx:id="btn_funcionarios" mnemonicParsing="false"
+                                styleClass="main-menu-item"
+                                maxWidth="Infinity">
+                            <graphic>
+                                <ImageView fx:id="funcionariosIcon"
+                                           fitHeight="20" fitWidth="20"
+                                           preserveRatio="true"
+                                           styleClass="main-menu-icon"/>
+                            </graphic>
+                            <text>Funcionários</text>
+                            <padding>
+                                <Insets left="12" right="12" top="8" bottom="8"/>
+                            </padding>
+                        </Button>
+
+                        <Button fx:id="btn_usuarios" mnemonicParsing="false"
+                                styleClass="main-menu-item"
+                                maxWidth="Infinity">
+                            <graphic>
+                                <ImageView fx:id="addItemIcon"
+                                           fitHeight="20" fitWidth="20"
+                                           preserveRatio="true"
+                                           styleClass="main-menu-icon"/>
+                            </graphic>
+                            <text>Usuarios</text>
+                            <padding>
+                                <Insets left="12" right="12" top="8" bottom="8"/>
+                            </padding>
+                        </Button>
+
+                        <Separator styleClass="main-menu-separator"/>
+
+                        <!-- Seção Relatórios -->
+                        <Label styleClass="main-menu-section" text="RELATÓRIOS"/>
+
+                        <Button fx:id="btn_relatorio" mnemonicParsing="false"
+                                styleClass="main-menu-item"
+                                maxWidth="Infinity">
+                            <graphic>
+                                <ImageView fx:id="reportIcon"
+                                           fitHeight="20" fitWidth="20"
+                                           preserveRatio="true"
+                                           styleClass="main-menu-icon"/>
+                            </graphic>
+                            <text>Relatórios</text>
+                            <padding>
+                                <Insets left="12" right="12" top="8" bottom="8"/>
+                            </padding>
+                        </Button>
+
+                        <Button fx:id="btn_historico" mnemonicParsing="false"
+                                styleClass="main-menu-item"
+                                maxWidth="Infinity">
+                            <graphic>
+                                <ImageView fx:id="historicoIcon"
+                                           fitHeight="20" fitWidth="20"
+                                           preserveRatio="true"
+                                           styleClass="main-menu-icon"/>
+                            </graphic>
+                            <text>Histórico</text>
+                            <padding>
+                                <Insets left="12" right="12" top="8" bottom="8"/>
+                            </padding>
+                        </Button>
+                    </VBox>
+                </content>
+            </ScrollPane>
+
+            <!-- Status System -->
+            <VBox styleClass="main-sidebar-status" VBox.vgrow="NEVER"
+                  prefHeight="90">
+                <Label styleClass="main-status-title" text="STATUS DO SISTEMA"/>
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <StackPane styleClass="main-status-indicator">
+                        <Rectangle arcHeight="4" arcWidth="4"
+                                   height="8" width="8"
+                                   styleClass="main-status-dot"/>
+                    </StackPane>
+                    <Label styleClass="main-status-value" text="Operacional"/>
+                </HBox>
+                <Label styleClass="main-version-text" text="Versão 2.0.0"/>
+            </VBox>
+        </VBox>
+    </left>
+
+    <!-- ========== CENTRO - Área de Conteúdo ========== -->
+    <center>
+        <StackPane fx:id="multiploPanel" styleClass="main-content-area">
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </padding>
+        </StackPane>
+    </center>
+
+    <!-- ========== FOOTER ========== -->
+    <bottom>
+        <HBox alignment="CENTER" styleClass="main-footer"
+              prefHeight="50">
+            <Label fx:id="lblFooter" styleClass="main-footer-text"
+                   text="© 2024 Gestão de Equipamentos de TI - Todos os direitos reservados"
+                   wrapText="true"
+                   textAlignment="CENTER"/>
+        </HBox>
+    </bottom>
+
+    <!-- ========== PAINEL DIREITO ========== -->
+    <right>
+        <StackPane fx:id="stack_sistema" styleClass="main-right-panel"
+                   prefWidth="380"
+                   BorderPane.alignment="CENTER">
+            <BorderPane.margin>
+                <Insets bottom="10.0" left="0.0" right="10.0" top="10.0" />
+            </BorderPane.margin>
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </padding>
+        </StackPane>
+    </right>
+</BorderPane>

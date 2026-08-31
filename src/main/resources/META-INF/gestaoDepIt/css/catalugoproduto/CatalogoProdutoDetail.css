@@ -1,0 +1,155 @@
+/**
+ * detail.css v1.0
+ * Estilos visuais para CatalogoProdutoDetail.fxml
+ * Responsabilidades: Cores, sombras, bordas, fontes, padding visual, efeitos hover.
+ * NÃO contém regras de layout estrutural.
+ */
+
+/* ========== ROOT ========== */
+.detail-root {
+    -fx-background-color: #f5f6fa;
+    -fx-padding: 0;
+}
+
+/* ========== HEADER ========== */
+.detail-header {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 0 0 1 0;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 4, 0, 0, 2);
+}
+
+.detail-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+.detail-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #7f8c8d;
+}
+
+/* ========== CARDS ========== */
+.detail-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 8px;
+    -fx-padding: 16px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 6, 0, 0, 2);
+    -fx-border-color: #e8e8e8;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+}
+
+.detail-card-header {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #34495e;
+    -fx-padding: 0 0 8 0;
+    -fx-border-color: #ecf0f1;
+    -fx-border-width: 0 0 1 0;
+}
+
+/* ========== VALORES ========== */
+.detail-value {
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+/* ========== TEXTAREA READONLY ========== */
+.text-area:readonly .content {
+    -fx-background-color: #fafafa;
+    -fx-text-fill: #555555;
+}
+
+.text-area {
+    -fx-text-fill: #333333;
+    -fx-font-size: 13px;
+}
+
+.text-area .content {
+    -fx-background-radius: 4px;
+    -fx-border-color: #ddd;
+    -fx-border-radius: 4px;
+}
+
+/* ========== LABELS GENÉRICOS ========== */
+.label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #555555;
+}
+
+/* ========== BOTÕES ========== */
+.button {
+    -fx-background-radius: 4px;
+    -fx-padding: 6 14 6 14;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-opacity: 0.9;
+}
+
+/* Botão voltar - estilo texto */
+#voltarButton {
+    -fx-background-color: transparent;
+    -fx-text-fill: #3498db;
+    -fx-font-weight: bold;
+}
+
+#voltarButton:hover {
+    -fx-text-fill: #2980b9;
+    -fx-underline: true;
+}
+
+/* Botões de header (Editar, Desativar) */
+#editarButton {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+}
+
+#desativarButton {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+}
+
+/* Botões de ações rápidas */
+#btnAjustarEstoque,
+#btnAtualizarPreco,
+#btnMovimentar,
+#btnHistorico {
+    -fx-background-color: #ecf0f1;
+    -fx-text-fill: #2c3e50;
+    -fx-alignment: center-left;
+    -fx-max-width: infinity;
+}
+
+#btnAjustarEstoque:hover,
+#btnAtualizarPreco:hover,
+#btnMovimentar:hover,
+#btnHistorico:hover {
+    -fx-background-color: #dce4ec;
+}
+
+/* Estatísticas - labels de valor */
+#statValorTotal,
+#statPrecoUnitario {
+    -fx-font-weight: bold;
+    -fx-text-fill: #27ae60;
+}
+
+#statQuantidadeEstoque {
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+/* ScrollPane */
+.scroll-pane {
+    -fx-background: #f5f6fa;
+    -fx-border-color: transparent;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}

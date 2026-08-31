@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<!--
+    HistoricoEventoDetalhes.fxml v1.0
+    Estrutura do layout de detalhes de evento do histórico.
+    Responsabilidades: Hierarquia BorderPane (top/center/bottom), dimensões, constraints.
+    Estilização visual delegada ao CSS externo via styleClass semânticas.
+-->
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ossobo.gestaoDepIt.controllers.gestao.equipamentos.inventario.historico.HistoricoEventoDetalhesController"
+            prefHeight="750.0" prefWidth="1100.0"
+            styleClass="historico-detail-root">
+
+    <!-- ========== TOP: HEADER ========== -->
+    <top>
+        <VBox spacing="0">
+            <!-- Barra azul -->
+            <HBox alignment="CENTER_LEFT" spacing="15"
+                  styleClass="historico-detail-header-bar">
+                <Button fx:id="voltarButton" text="← Voltar"
+                        styleClass="historico-detail-btn-back"
+                        onAction="#handleVoltar" />
+                <VBox spacing="2">
+                    <Label fx:id="tituloLabel" text="Detalhes do Evento"
+                           styleClass="historico-detail-title" />
+                    <Label fx:id="subtituloLabel" text="ID: - | Tipo: -"
+                           styleClass="historico-detail-subtitle" />
+                </VBox>
+                <Region HBox.hgrow="ALWAYS" />
+                <Button fx:id="imprimirButton" text="🖨️ Imprimir"
+                        styleClass="historico-detail-btn-imprimir"
+                        onAction="#handleImprimir" />
+                <Button fx:id="exportarButton" text="📥 Exportar JSON"
+                        styleClass="historico-detail-btn-exportar"
+                        onAction="#handleExportarJson" />
+            </HBox>
+
+            <!-- Status rápido -->
+            <HBox spacing="30" styleClass="historico-detail-status-row">
+                <Label fx:id="mensagemStatusLabel" text=""
+                       styleClass="historico-detail-status-message" />
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- ========== CENTER: CONTEÚDO PRINCIPAL ========== -->
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="historico-detail-scroll">
+            <VBox spacing="20" styleClass="historico-detail-content">
+
+                <!-- ====== SEÇÃO 1: INFORMAÇÕES GERAIS ====== -->
+                <VBox spacing="12" styleClass="historico-detail-card">
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <Label text="📋" styleClass="historico-detail-card-icon" />
+                        <Label text="Informações do Evento"
+                               styleClass="historico-detail-card-title" />
+                    </HBox>
+
+                    <GridPane hgap="15" vgap="12">
+                        <columnConstraints>
+                            <ColumnConstraints halignment="RIGHT" prefWidth="130" />
+                            <ColumnConstraints prefWidth="280" />
+                            <ColumnConstraints halignment="RIGHT" prefWidth="130" />
+                            <ColumnConstraints prefWidth="280" />
+                        </columnConstraints>
+
+                        <Label text="ID do Evento:" styleClass="historico-detail-label"
+                               GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                        <Label fx:id="detailId" text="-" styleClass="historico-detail-value-bold"
+                               GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                        <Label text="Data/Hora:" styleClass="historico-detail-label"
+                               GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                        <Label fx:id="detailDataHora" text="-" styleClass="historico-detail-value"
+                               GridPane.columnIndex="3" GridPane.rowIndex="0" />
+
+                        <Label text="Tipo de Evento:" styleClass="historico-detail-label"
+                               GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                        <Label fx:id="detailTipo" text="-" styleClass="historico-detail-value-highlight"
+                               GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                        <Label text="Entidade:" styleClass="historico-detail-label"
+                               GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                        <Label fx:id="detailEntidade" text="-" styleClass="historico-detail-value"
+                               GridPane.columnIndex="3" GridPane.rowIndex="1" />
+
+                        <Label text="ID Entidade:" styleClass="historico-detail-label"
+                               GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                        <Label fx:id="detailEntidadeId" text="-" styleClass="historico-detail-value"
+                               GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                        <Label text="IP Origem:" styleClass="historico-detail-label"
+                               GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                        <Label fx:id="detailIpOrigem" text="-" styleClass="historico-detail-value"
+                               GridPane.columnIndex="3" GridPane.rowIndex="2" />
+
+                        <Label text="SKU / Referência:" styleClass="historico-detail-label"
+                               GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                        <Label fx:id="detailSkuProduto" text="-" styleClass="historico-detail-value-bold"
+                               GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                        <Label text="Funcionário:" styleClass="historico-detail-label"
+                               GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                        <Label fx:id="detailFuncionario" text="-" styleClass="historico-detail-value"
+                               GridPane.columnIndex="3" GridPane.rowIndex="3" />
+                    </GridPane>
+
+                    <!-- Descrição -->
+                    <VBox spacing="8">
+                        <Label text="Descrição do Evento:" styleClass="historico-detail-label" />
+                        <TextArea fx:id="detailDescricao" editable="false" wrapText="true"
+                                  prefRowCount="2" styleClass="historico-detail-textarea" />
+                    </VBox>
+                </VBox>
+
+                <!-- ====== SEÇÃO 2: USUÁRIO + DADOS (ABAS) ====== -->
+                <HBox spacing="20" VBox.vgrow="ALWAYS">
+
+                    <!-- Card: Usuário -->
+                    <VBox spacing="12" prefWidth="320" styleClass="historico-detail-card">
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Label text="👤" styleClass="historico-detail-card-icon" />
+                            <Label text="Usuário Responsável"
+                                   styleClass="historico-detail-card-title-secondary" />
+                        </HBox>
+                        <GridPane hgap="10" vgap="10">
+                            <Label text="ID:" styleClass="historico-detail-label"
+                                   GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                            <Label fx:id="detailUsuarioId" text="-" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                            <Label text="Nome:" styleClass="historico-detail-label"
+                                   GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                            <Label fx:id="detailUsuarioNome" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                            <Label text="Email:" styleClass="historico-detail-label"
+                                   GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                            <Label fx:id="detailUsuarioEmail" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        </GridPane>
+
+                        <Separator />
+
+                        <VBox spacing="8">
+                            <Button fx:id="btnVerEntidade" text="🔗 Ver Entidade Relacionada"
+                                    styleClass="historico-detail-action-blue"
+                                    onAction="#handleVerEntidade" />
+                            <Button fx:id="btnAuditarUsuario" text="🔍 Auditar Usuário"
+                                    styleClass="historico-detail-action-purple"
+                                    onAction="#handleAuditarUsuario" />
+                        </VBox>
+                    </VBox>
+
+                    <!-- Card: Dados (Abas) -->
+                    <VBox spacing="0" VBox.vgrow="ALWAYS" styleClass="historico-detail-card">
+                        <TabPane tabClosingPolicy="UNAVAILABLE"
+                                 styleClass="historico-detail-tab-pane">
+
+                            <!-- ABA 1: Dados Anteriores -->
+                            <Tab text="⬅️ Dados Anteriores">
+                                <VBox spacing="10" styleClass="historico-detail-tab-content">
+                                    <HBox spacing="10" alignment="CENTER_LEFT">
+                                        <Label fx:id="lblStatusAnteriores" text=""
+                                               styleClass="historico-detail-tab-status" />
+                                    </HBox>
+                                    <TextArea fx:id="detailDadosAnteriores"
+                                              editable="false" wrapText="true"
+                                              styleClass="historico-detail-json-area-red"
+                                              VBox.vgrow="ALWAYS" prefRowCount="15" />
+                                    <HBox spacing="10" alignment="CENTER_RIGHT">
+                                        <Button text="📋 Copiar" onAction="#handleCopiarDadosAnteriores"
+                                                styleClass="historico-detail-btn-copy" />
+                                    </HBox>
+                                </VBox>
+                            </Tab>
+
+                            <!-- ABA 2: Dados Novos -->
+                            <Tab text="➡️ Dados Novos">
+                                <VBox spacing="10" styleClass="historico-detail-tab-content">
+                                    <HBox spacing="10" alignment="CENTER_LEFT">
+                                        <Label fx:id="lblStatusNovos" text=""
+                                               styleClass="historico-detail-tab-status" />
+                                    </HBox>
+                                    <TextArea fx:id="detailDadosNovos"
+                                              editable="false" wrapText="true"
+                                              styleClass="historico-detail-json-area-green"
+                                              VBox.vgrow="ALWAYS" prefRowCount="15" />
+                                    <HBox spacing="10" alignment="CENTER_RIGHT">
+                                        <Button text="📋 Copiar" onAction="#handleCopiarDadosNovos"
+                                                styleClass="historico-detail-btn-copy" />
+                                        <Button text="✨ Formatar" onAction="#handleVisualizarFormatado"
+                                                styleClass="historico-detail-btn-format" />
+                                    </HBox>
+                                </VBox>
+                            </Tab>
+
+                            <!-- ABA 3: Comparação -->
+                            <Tab text="🔄 Comparação">
+                                <VBox spacing="10" styleClass="historico-detail-tab-content">
+                                    <Label text="Diferenças detectadas entre os dados:"
+                                           styleClass="historico-detail-tab-section-label" />
+                                    <TextArea fx:id="txtComparacao"
+                                              editable="false" wrapText="true"
+                                              styleClass="historico-detail-json-area-yellow"
+                                              VBox.vgrow="ALWAYS" prefRowCount="15" />
+                                    <HBox spacing="10" alignment="CENTER_RIGHT">
+                                        <Button text="📊 Gerar Relatório" onAction="#handleGerarRelatorioDiferencas"
+                                                styleClass="historico-detail-btn-report" />
+                                    </HBox>
+                                </VBox>
+                            </Tab>
+
+                            <!-- ABA 4: Funcionário -->
+                            <Tab text="👤 Funcionário">
+                                <VBox spacing="10" styleClass="historico-detail-tab-content">
+                                    <Label text="Dados do Funcionário (JSON):"
+                                           styleClass="historico-detail-tab-section-label" />
+                                    <TextArea fx:id="txtDetalhesFuncionario"
+                                              editable="false" wrapText="true"
+                                              styleClass="historico-detail-json-area-gray"
+                                              VBox.vgrow="ALWAYS" prefRowCount="15" />
+                                </VBox>
+                            </Tab>
+                        </TabPane>
+                    </VBox>
+                </HBox>
+
+                <!-- ====== SEÇÃO 3: INFORMAÇÕES ADICIONAIS ====== -->
+                <VBox spacing="8" styleClass="historico-detail-info-footer">
+                    <Label fx:id="lblInformacoesAdicionais"
+                           text="Este registro foi gerado automaticamente pelo sistema de auditoria do GestãoDepIt."
+                           wrapText="true"
+                           styleClass="historico-detail-info-footer-text" />
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <!-- ========== BOTTOM: BARRA DE AÇÕES ========== -->
+    <bottom>
+        <HBox spacing="10" alignment="CENTER_RIGHT"
+              styleClass="historico-detail-bottom-bar">
+            <Button text="🔍 Auditoria Relacionada" onAction="#handleAuditoriaRelacionada"
+                    styleClass="historico-detail-btn-auditoria" />
+            <Button text="📄 Exportar PDF" onAction="#handleExportarPDF"
+                    styleClass="historico-detail-btn-pdf" />
+            <Separator orientation="VERTICAL" />
+            <Button text="✕ Fechar" onAction="#handleFechar"
+                    styleClass="historico-detail-btn-fechar" />
+        </HBox>
+    </bottom>
+</BorderPane>
