@@ -1,39 +1,57 @@
 package com.ossobo.gestaoDepIt.db.services;
 
 import com.ossobo.gestaoDepIt.db.config.event.FuncionarioEvent;
+import com.ossobo.gestaoDepIt.db.config.DatabaseConnection;
 import com.ossobo.gestaoDepIt.db.models.Funcionarios;
+import com.ossobo.gestaoDepIt.db.models.HistoricoEventos;
 import com.ossobo.gestaoDepIt.db.repositories.FuncionariosRepository;
-
-
+import com.ossobo.gestaoDepIt.db.repositories.InventarioEquipamentosRepository;
+import com.ossobo.gestaoDepIt.db.repositories.HistoricoEventosRepository;
+import com.ossobo.gestaoDepIt.utils.gerarCodDep.GerarCodDepService;
 import com.ossobo.winterfx.anotations.Inject;
 import com.ossobo.winterfx.anotations.Service;
 import com.ossobo.winterfx.event.EventBus;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
- * FuncionariosService - Regras de negócio com EventBus
- * v2.0 - Migrado para Java 17+ com WinterFX
+ * FuncionariosService v2.3 - Regras de negócio com EventBus
  *
- * Responsabilidades:
- * - Gerenciar funcionários
- * - Gestão de imagem de perfil
- * - Publicar eventos (@FuncionarioEvent)
- * - Validações de negócio
+ * v2.3 — transferirDepartamento(codDepAtual, novoDepartamento, executor, descricao):
+ *        Operação TRANSACIONAL e composta:
+ *          1) gera novo cod_dep (GerarCodDepService)
+ *          2) atualiza funcionarios.cod_dep + cod_dep_anterior
+ *          3) reassocia inventario_equipamentos.funcionario_id
+ *          4) registra TRANSFERENCIA no historico_eventos
+ *        Tudo ou nada: rollback em qualquer falha.
+ *
+ * v2.2 — Alinhado ao FuncionariosRepository v2.2.
  */
 @Service
 public class FuncionariosService {
 
-    private static final Logger logger = LoggerFactory.getLogger(FuncionariosService.class);
+    private static final System.Logger LOGGER = System.getLogger(FuncionariosService.class.getName());
 
     @Inject
     private FuncionariosRepository repository;
+
+    @Inject
+    private InventarioEquipamentosRepository inventarioRepository;
+
+    @Inject
+    private HistoricoEventosRepository historicoRepository;
+
+    @Inject
+    private GerarCodDepService gerarCodDepService;
+
+    @Inject
+    private TransferenciaDepartamentoService transferenciaService;
+
+    @Inject
+    private DatabaseConnection dbConnection;
 
     @Inject
     private EventBus eventBus;
@@ -52,6 +70,10 @@ public class FuncionariosService {
     public List<Funcionarios> listarAtivos(int pagina, int tamanho) throws SQLException {
         int offset = (pagina - 1) * tamanho;
         return repository.findAllAtivos(tamanho, offset);
+    }
+
+    public Optional<Funcionarios> buscarPorId(String id) throws SQLException {
+        return repository.findById(id);
     }
 
     public Optional<Funcionarios> buscarPorCodDep(String codDep) throws SQLException {
@@ -75,12 +97,13 @@ public class FuncionariosService {
             }
         }
 
-        repository.insert(funcionario);
-        Funcionarios criado = repository.findByCodDep(funcionario.codDep())
+        String id = repository.insert(funcionario);
+        Funcionarios criado = repository.findById(id)
                 .orElseThrow(() -> new SQLException("Falha ao buscar funcionário criado"));
 
         eventBus.publish(new FuncionarioEvent<>(criado, "CRIADO"));
-        logger.info("✅ Funcionário criado: {} - {}", criado.codDep(), criado.nome());
+        LOGGER.log(System.Logger.Level.INFO, "Funcionário criado: {0} - {1}",
+                criado.codDep(), criado.nome());
 
         return criado;
     }
@@ -93,7 +116,6 @@ public class FuncionariosService {
             throw new IllegalArgumentException("Funcionário não encontrado: " + funcionario.codDep());
         }
 
-        // Verifica email duplicado (excluindo o próprio)
         if (funcionario.email() != null && !funcionario.email().isBlank()) {
             Optional<Funcionarios> porEmail = repository.findByEmail(funcionario.email());
             if (porEmail.isPresent() && !porEmail.get().codDep().equals(funcionario.codDep())) {
@@ -106,23 +128,50 @@ public class FuncionariosService {
                 .orElseThrow(() -> new SQLException("Falha ao buscar funcionário atualizado"));
 
         eventBus.publish(new FuncionarioEvent<>(atualizado, "ATUALIZADO"));
-        logger.info("✅ Funcionário atualizado: {}", atualizado.codDep());
+        LOGGER.log(System.Logger.Level.INFO, "Funcionário atualizado: {0}", atualizado.codDep());
 
         return atualizado;
     }
 
     public void excluir(String codDep) throws SQLException {
-        if (!repository.existsByCodDep(codDep)) {
+        Optional<Funcionarios> func = repository.findByCodDep(codDep);
+        if (func.isEmpty()) {
             throw new IllegalArgumentException("Funcionário não encontrado: " + codDep);
         }
 
-        Optional<Funcionarios> func = repository.findByCodDep(codDep);
-        repository.delete(codDep);
+        repository.marcarDeletado(func.get().id());
 
-        func.ifPresent(f -> {
-            eventBus.publish(new FuncionarioEvent<>(f, "EXCLUIDO"));
-            logger.info("✅ Funcionário excluído: {}", codDep);
-        });
+        eventBus.publish(new FuncionarioEvent<>(func.get(), "EXCLUIDO"));
+        LOGGER.log(System.Logger.Level.INFO, "Funcionário excluído: {0}", codDep);
+    }
+
+    // ===== TRANSFERÊNCIA DE DEPARTAMENTO (v2.3) =====
+
+    /**
+     * Transfere um funcionário para outro departamento.
+     *
+     * Operação atômica composta:
+     *  1. Valida que o funcionário existe e que o departamento é DIFERENTE.
+     *  2. Gera novo cod_dep via GerarCodDepService (persistido em `sequencias`).
+     *  3. Atualiza funcionarios.cod_dep + cod_dep_anterior (guarda o antigo).
+     *  4. Reassocia todos os inventario_equipamentos.funcionario_id
+     *     que apontavam para o cod_dep antigo.
+     *  5. Registra evento TRANSFERENCIA no historico_eventos (ledger).
+     *
+     * Tudo em UMA transação. Qualquer falha → rollback completo.
+     *
+     * @param codDepAtual      código atual do funcionário (chave estável até agora)
+     * @param novoDepartamento novo departamento ("" ou igual ao atual → erro)
+     * @param codDepExecutor   cod_dep do funcionário logado (para auditoria)
+     * @param descricao        JSON com dados do evento (opcional)
+     * @return novo cod_dep gerado
+     */
+    public String transferirDepartamento(String codDepAtual,
+                                         String novoDepartamento,
+                                         String codDepExecutor,
+                                         String descricao) throws SQLException {
+        return transferenciaService.transferir(
+                codDepAtual, novoDepartamento, codDepExecutor, descricao);
     }
 
     // ===== OPERAÇÕES DE IMAGEM =====
@@ -132,14 +181,12 @@ public class FuncionariosService {
             throw new IllegalArgumentException("Funcionário não encontrado: " + codDep);
         }
 
-        validarImagem(imagem, tipo);
-
         repository.updateImagemPerfil(codDep, imagem, tipo, imagem != null ? imagem.length : null);
 
         Optional<Funcionarios> func = repository.findByCodDep(codDep);
         func.ifPresent(f -> {
             eventBus.publish(new FuncionarioEvent<>(f, "IMAGEM_ATUALIZADA"));
-            logger.info("✅ Imagem atualizada: {}", codDep);
+            LOGGER.log(System.Logger.Level.INFO, "Imagem atualizada: {0}", codDep);
         });
     }
 
@@ -153,20 +200,12 @@ public class FuncionariosService {
         Optional<Funcionarios> func = repository.findByCodDep(codDep);
         func.ifPresent(f -> {
             eventBus.publish(new FuncionarioEvent<>(f, "IMAGEM_REMOVIDA"));
-            logger.info("✅ Imagem removida: {}", codDep);
+            LOGGER.log(System.Logger.Level.INFO, "Imagem removida: {0}", codDep);
         });
     }
 
     public Optional<byte[]> obterImagemPerfil(String codDep) throws SQLException {
         return repository.getImagemPerfil(codDep);
-    }
-
-    public List<Funcionarios> listarComImagem() throws SQLException {
-        return repository.findComImagemPerfil();
-    }
-
-    public List<Funcionarios> listarSemImagem() throws SQLException {
-        return repository.findSemImagemPerfil();
     }
 
     public boolean temImagemPerfil(String codDep) throws SQLException {
@@ -191,7 +230,7 @@ public class FuncionariosService {
                 .orElseThrow(() -> new SQLException("Falha ao buscar funcionário"));
 
         eventBus.publish(new FuncionarioEvent<>(atualizado, "ATIVADO"));
-        logger.info("✅ Funcionário ativado: {}", codDep);
+        LOGGER.log(System.Logger.Level.INFO, "Funcionário ativado: {0}", codDep);
     }
 
     public void desativar(String codDep) throws SQLException {
@@ -199,7 +238,7 @@ public class FuncionariosService {
         if (func.isEmpty()) {
             throw new IllegalArgumentException("Funcionário não encontrado: " + codDep);
         }
-        if (func.get().isInativo()) {
+        if (!func.get().isAtivo()) {
             throw new IllegalStateException("Funcionário já está inativo: " + codDep);
         }
 
@@ -209,92 +248,10 @@ public class FuncionariosService {
                 .orElseThrow(() -> new SQLException("Falha ao buscar funcionário"));
 
         eventBus.publish(new FuncionarioEvent<>(atualizado, "DESATIVADO"));
-        logger.info("✅ Funcionário desativado: {}", codDep);
-    }
-
-    // ===== FILTROS =====
-
-    public List<Funcionarios> buscarPorDepartamento(String departamento) throws SQLException {
-        return repository.findByDepartamento(departamento);
-    }
-
-    public List<Funcionarios> buscarPorFuncao(String funcao) throws SQLException {
-        return repository.findByFuncao(funcao);
-    }
-
-    public List<Funcionarios> buscarPorLocalTrabalho(String local) throws SQLException {
-        return repository.findByLocalTrabalho(local);
-    }
-
-    public List<Funcionarios> buscarPorNome(String nome) throws SQLException {
-        return repository.findByNomeContaining(nome);
-    }
-
-    public List<Funcionarios> buscarPorStatus(boolean ativo) throws SQLException {
-        return repository.findByStatus(ativo);
-    }
-
-    public List<Funcionarios> buscarComFiltros(
-            String departamento,
-            String funcao,
-            String localTrabalho,
-            Boolean ativo,
-            String nome
-    ) throws SQLException {
-        return repository.findWithFilters(departamento, funcao, localTrabalho, ativo, nome);
-    }
-
-    // ===== OPERAÇÕES DE NEGÓCIO =====
-
-    public void transferirDepartamento(String codDep, String novoDepartamento) throws SQLException {
-        Optional<Funcionarios> func = repository.findByCodDep(codDep);
-        if (func.isEmpty()) {
-            throw new IllegalArgumentException("Funcionário não encontrado: " + codDep);
-        }
-
-        Funcionarios atualizado = func.get().comDepartamento(novoDepartamento);
-        repository.update(atualizado);
-
-        Funcionarios salvo = repository.findByCodDep(codDep)
-                .orElseThrow(() -> new SQLException("Falha ao buscar funcionário"));
-
-        eventBus.publish(new FuncionarioEvent<>(salvo, "TRANSFERIDO"));
-        logger.info("✅ Funcionário transferido: {} → {}", codDep, novoDepartamento);
-    }
-
-    public void promover(String codDep, String novaFuncao) throws SQLException {
-        Optional<Funcionarios> func = repository.findByCodDep(codDep);
-        if (func.isEmpty()) {
-            throw new IllegalArgumentException("Funcionário não encontrado: " + codDep);
-        }
-
-        Funcionarios atualizado = func.get().comFuncao(novaFuncao);
-        repository.update(atualizado);
-
-        Funcionarios salvo = repository.findByCodDep(codDep)
-                .orElseThrow(() -> new SQLException("Falha ao buscar funcionário"));
-
-        eventBus.publish(new FuncionarioEvent<>(salvo, "PROMOVIDO"));
-        logger.info("✅ Funcionário promovido: {} → {}", codDep, novaFuncao);
+        LOGGER.log(System.Logger.Level.INFO, "Funcionário desativado: {0}", codDep);
     }
 
     // ===== ESTATÍSTICAS =====
-
-    public Map<String, Integer> obterEstatisticas() throws SQLException {
-        return repository.getEstatisticas();
-    }
-
-    public Map<String, Integer> obterContagemPorDepartamento() throws SQLException {
-        return repository.countByDepartamento();
-    }
-
-    public Map<String, Integer> obterContagemPorFuncao() throws SQLException {
-        return repository.countByFuncao();
-    }
-
-    public Map<String, Integer> obterEstatisticasImagem() throws SQLException {
-        return repository.getEstatisticasImagem();
-    }
 
     public int contarTotal() throws SQLException {
         return repository.countAll();
@@ -302,18 +259,6 @@ public class FuncionariosService {
 
     public int contarAtivos() throws SQLException {
         return repository.countAtivos();
-    }
-
-    public List<String> listarDepartamentos() throws SQLException {
-        return repository.findDepartamentos();
-    }
-
-    public List<String> listarFuncoes() throws SQLException {
-        return repository.findFuncoes();
-    }
-
-    public List<String> listarLocaisTrabalho() throws SQLException {
-        return repository.findLocaisTrabalho();
     }
 
     // ===== VALIDAÇÕES =====
@@ -334,49 +279,27 @@ public class FuncionariosService {
     // ===== MÉTODOS PRIVADOS =====
 
     private void validarFuncionario(Funcionarios f) {
-        if (!(f.codDep() instanceof String c) || c.isBlank()) {
+        if (f.codDep() == null || f.codDep().isBlank()) {
             throw new IllegalArgumentException("Código do funcionário é obrigatório");
         }
-        if (!(f.nome() instanceof String n) || n.isBlank()) {
+        if (f.nome() == null || f.nome().isBlank()) {
             throw new IllegalArgumentException("Nome é obrigatório");
         }
-        if (!(f.funcao() instanceof String func) || func.isBlank()) {
+        if (f.funcao() == null || f.funcao().isBlank()) {
             throw new IllegalArgumentException("Função é obrigatória");
         }
-        if (!(f.departamento() instanceof String dept) || dept.isBlank()) {
+        if (f.departamento() == null || f.departamento().isBlank()) {
             throw new IllegalArgumentException("Departamento é obrigatório");
         }
 
-        // Validação de email
         if (f.email() != null && !f.email().isBlank()) {
             if (!isValidEmail(f.email())) {
                 throw new IllegalArgumentException("Email inválido: " + f.email());
             }
         }
-
-        // Validação de imagem
-        if (f.temImagemPerfil()) {
-            validarImagem(f.imagemPerfil(), f.tipoImagem());
-        }
-    }
-
-    private void validarImagem(byte[] imagem, String tipo) {
-        if (imagem == null || imagem.length == 0) {
-            return;
-        }
-
-        if (!Funcionarios.isTamanhoImagemValido(imagem.length)) {
-            throw new IllegalArgumentException("Imagem muito grande. Tamanho máximo: " +
-                    Funcionarios.getMaxImageSize() / (1024 * 1024) + "MB");
-        }
-
-        if (!Funcionarios.isTipoImagemSuportado(tipo)) {
-            throw new IllegalArgumentException("Tipo de imagem não suportado: " + tipo +
-                    ". Tipos suportados: " + String.join(", ", Funcionarios.getTiposSuportados()));
-        }
     }
 
     private boolean isValidEmail(String email) {
-        return email.matches("^[A-Za-z0-9+_.-]+@(.+)$");
+        return email != null && email.matches("^[A-Za-z0-9+_.-]+@(.+)$");
     }
 }

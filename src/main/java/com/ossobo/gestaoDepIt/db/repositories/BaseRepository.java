@@ -4,8 +4,6 @@ import com.ossobo.gestaoDepIt.db.config.DatabaseConnection;
 
 
 import com.ossobo.winterfx.anotations.Inject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -13,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.lang.System.Logger.Level;
 
 /**
  * BaseRepository - Classe base para repositórios com WinterFX
@@ -25,7 +24,7 @@ import java.util.Optional;
  */
 public abstract class BaseRepository {
 
-    private static final Logger logger = LoggerFactory.getLogger(BaseRepository.class);
+    private static final System.Logger logger = System.getLogger(String.valueOf(BaseRepository.class));
 
     @Inject
     private DatabaseConnection dbConnection;
@@ -79,7 +78,7 @@ public abstract class BaseRepository {
             }
 
         } catch (SQLException e) {
-            logger.error("❌ Erro ao executar query: {}", sql, e);
+            logger.log(System.Logger.Level.ERROR,"❌ Erro ao executar query: {}", sql, e);
             throw new RuntimeException("Erro ao executar query", e);
         }
 
@@ -110,7 +109,7 @@ public abstract class BaseRepository {
             return pstmt.executeUpdate();
 
         } catch (SQLException e) {
-            logger.error("❌ Erro ao executar update: {}", sql, e);
+            logger.log(System.Logger.Level.ERROR,"❌ Erro ao executar update: {}", sql, e);
             throw new RuntimeException("Erro ao executar update", e);
         }
     }
@@ -139,7 +138,7 @@ public abstract class BaseRepository {
             return -1;
 
         } catch (SQLException e) {
-            logger.error("❌ Erro ao executar insert: {}", sql, e);
+            logger.log(Level.ERROR,"❌ Erro ao executar insert: {}", sql, e);
             throw new RuntimeException("Erro ao executar insert", e);
         }
     }
@@ -182,7 +181,7 @@ public abstract class BaseRepository {
             return results;
 
         } catch (SQLException e) {
-            logger.error("❌ Erro ao executar batch: {}", sql, e);
+            logger.log(Level.ERROR,"❌ Erro ao executar batch: {}", sql, e);
             throw new RuntimeException("Erro ao executar batch", e);
         }
     }
@@ -297,7 +296,7 @@ public abstract class BaseRepository {
         try {
             return Enum.valueOf(enumClass, value);
         } catch (IllegalArgumentException e) {
-            logger.warn("Valor inválido para enum {}: {}, usando fallback", enumClass.getSimpleName(), value);
+            logger.log(Level.WARNING,"Valor inválido para enum {}: {}, usando fallback", enumClass.getSimpleName(), value);
             return fallback;
         }
     }

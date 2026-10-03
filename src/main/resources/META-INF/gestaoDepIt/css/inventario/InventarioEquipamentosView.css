@@ -1,0 +1,189 @@
+/* ============================================================
+   InventarioEquipamentosView.css
+   Tela de listagem do inventário — tema claro, harmônico com o catálogo.
+   ============================================================ */
+
+.root {
+    -fx-background-color: #ffffff;
+    -fx-font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+    -fx-font-size: 13px;
+}
+
+/* ===== Header ===== */
+.list-header {
+    -fx-background-color: #ffffff;
+    -fx-border-color: transparent transparent #e5e7eb transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.list-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #111827;
+}
+
+/* ===== Card de filtros ===== */
+.list-card {
+    -fx-background-color: #f9fafb;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1;
+}
+
+.list-card-header {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #374151;
+}
+
+.filter-label {
+    -fx-text-fill: #6b7280;
+    -fx-font-size: 12px;
+}
+
+.filter-separator {
+    -fx-text-fill: #9ca3af;
+    -fx-font-size: 12px;
+}
+
+/* ===== Stats ===== */
+.stats-bar {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e5e7eb transparent #e5e7eb transparent;
+    -fx-border-width: 1 0 1 0;
+}
+
+.stat-label          { -fx-text-fill: #6b7280; -fx-font-size: 11px; }
+.stat-value          { -fx-text-fill: #111827; -fx-font-size: 16px; -fx-font-weight: bold; }
+.stat-label-active   { -fx-text-fill: #059669; -fx-font-size: 11px; }
+.stat-value-active   { -fx-text-fill: #10b981; -fx-font-size: 16px; -fx-font-weight: bold; }
+.stat-label-warning  { -fx-text-fill: #d97706; -fx-font-size: 11px; }
+.stat-value-warning  { -fx-text-fill: #f59e0b; -fx-font-size: 16px; -fx-font-weight: bold; }
+.stat-label-danger   { -fx-text-fill: #dc2626; -fx-font-size: 11px; }
+.stat-value-danger   { -fx-text-fill: #ef4444; -fx-font-size: 16px; -fx-font-weight: bold; }
+.stat-label-muted    { -fx-text-fill: #6b7280; -fx-font-size: 11px; }
+.stat-value-muted    { -fx-text-fill: #9ca3af; -fx-font-size: 16px; -fx-font-weight: bold; }
+
+/* ===== Tabela ===== */
+.table-view {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #f3f4f6;
+    -fx-background-radius: 8 8 0 0;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-font-weight: bold;
+    -fx-text-fill: #374151;
+    -fx-padding: 10 8 10 8;
+    -fx-border-color: transparent transparent #e5e7eb transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.table-view .table-row-cell {
+    -fx-background-color: #ffffff;
+    -fx-border-color: transparent transparent #f3f4f6 transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-cell-size: 36px;
+}
+
+.table-view .table-row-cell:odd {
+    -fx-background-color: #fafafa;
+}
+
+.table-view .table-row-cell:selected {
+    -fx-background-color: #dbeafe;
+}
+
+.table-view .table-cell {
+    -fx-text-fill: #1f2937;
+    -fx-padding: 0 8 0 8;
+}
+
+/* ===== Paginação ===== */
+.pagination-bar { -fx-padding: 10 0 10 0; }
+
+.btn-pagination {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-min-width: 36px;
+    -fx-padding: 4 8 4 8;
+    -fx-cursor: hand;
+    -fx-text-fill: #374151;
+}
+
+.btn-pagination:hover { -fx-background-color: #f3f4f6; }
+.btn-pagination:disabled { -fx-opacity: 0.4; }
+
+.pagination-label { -fx-text-fill: #6b7280; -fx-font-size: 12px; }
+
+/* ===== Status bar ===== */
+.status-bar {
+    -fx-background-color: #f9fafb;
+    -fx-border-color: #e5e7eb transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 8 20 8 20;
+}
+
+.status-text { -fx-text-fill: #6b7280; -fx-font-size: 12px; }
+
+/* ===== Botões ===== */
+.btn-primary {
+    -fx-background-color: #3b82f6;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-padding: 6 14 6 14;
+    -fx-cursor: hand;
+}
+.btn-primary:hover { -fx-background-color: #2563eb; }
+
+.btn-secondary {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #374151;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 6 14 6 14;
+    -fx-cursor: hand;
+}
+.btn-secondary:hover { -fx-background-color: #f3f4f6; }
+
+.btn-danger {
+    -fx-background-color: #ef4444;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-padding: 6 14 6 14;
+    -fx-cursor: hand;
+}
+.btn-danger:hover { -fx-background-color: #dc2626; }
+
+/* ===== Coluna de ações ===== */
+.action-btn-view,
+.action-btn-edit,
+.action-btn-history {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+    -fx-padding: 2 6 2 6;
+    -fx-font-size: 12px;
+    -fx-text-fill: #374151;
+}
+.action-btn-view:hover,
+.action-btn-edit:hover,
+.action-btn-history:hover {
+    -fx-background-color: #e5e7eb;
+    -fx-background-radius: 4;
+}

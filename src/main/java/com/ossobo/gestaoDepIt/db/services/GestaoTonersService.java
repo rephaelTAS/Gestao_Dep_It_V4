@@ -3,14 +3,11 @@ package com.ossobo.gestaoDepIt.db.services;
 import com.ossobo.gestaoDepIt.db.config.event.TonerEvent;
 import com.ossobo.gestaoDepIt.db.models.GestaoToners;
 import com.ossobo.gestaoDepIt.db.repositories.GestaoTonersRepository;
-
+import com.ossobo.gestaoDepIt.db.repositories.GestaoTonersRepository.VidaUtilSku;
 
 import com.ossobo.winterfx.anotations.Inject;
 import com.ossobo.winterfx.anotations.Service;
 import com.ossobo.winterfx.event.EventBus;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -20,18 +17,26 @@ import java.util.Optional;
 
 /**
  * GestaoTonersService - Regras de negócio com EventBus
- * v2.0 - Migrado para Java 17+ com WinterFX
+ * v2.2 - Alinhado ao GestaoToners v3.0 (PK/FKs String/UUID + colunas de sync)
  *
- * Responsabilidades:
- * - Gerenciar instalações e substituições de toners
- * - Validar regras de negócio
- * - Publicar eventos (@TonerEvent)
- * - Cálculo de vida útil e estatísticas
+ * Mudanças v2.1 → v2.2:
+ * - substituirToner(): a fábrica GestaoToners.substituicao(...) não existe no
+ *   model v3.0 (fonte da verdade). Trocada por novaInstalacaoComObservacoes(...)
+ *   — mesma assinatura de 4 argumentos, mesma semântica de "nova instalação".
+ *
+ * Mudanças v2.0 → v2.1 (mantidas):
+ * - TODAS as assinaturas com id/FK: Long → String (UUID v4)
+ * - validarToner() simplificado: o record JÁ valida no construtor
+ * - registrarInstalacao(): BUG corrigido — o toner anterior agora É marcado
+ *   como esgotado (antes só logava "Marcando como substituído")
+ * - excluir(): agora usa tombstone (marcarDeletado) para convergir no sync
+ * - calcularVidaUtilPorSku(): repassa List<VidaUtilSku>
+ * - requireToner(): helper que elimina findById→throw repetido
  */
 @Service
 public class GestaoTonersService {
 
-    private static final Logger logger = LoggerFactory.getLogger(GestaoTonersService.class);
+    private static final System.Logger logger = System.getLogger(GestaoTonersService.class.getName());
 
     @Inject
     private GestaoTonersRepository repository;
@@ -50,11 +55,11 @@ public class GestaoTonersService {
         return repository.findAll(tamanho, offset);
     }
 
-    public Optional<GestaoToners> buscarPorId(Long id) throws SQLException {
+    public Optional<GestaoToners> buscarPorId(String id) throws SQLException {
         return repository.findById(id);
     }
 
-    public List<GestaoToners> buscarPorInventario(Long inventarioId) throws SQLException {
+    public List<GestaoToners> buscarPorInventario(String inventarioId) throws SQLException {
         return repository.findByInventarioId(inventarioId);
     }
 
@@ -67,29 +72,28 @@ public class GestaoTonersService {
     public GestaoToners registrarInstalacao(GestaoToners toner) throws SQLException {
         validarToner(toner);
 
-        // Verifica se SKU existe no catálogo
         if (!repository.skuExistsInCatalogo(toner.skuProduto())) {
             throw new IllegalArgumentException("SKU não encontrado no catálogo: " + toner.skuProduto());
         }
 
-        // Verifica se inventário existe
         if (!repository.inventarioExists(toner.inventarioId())) {
             throw new IllegalArgumentException("Equipamento não encontrado: " + toner.inventarioId());
         }
 
-        // Verifica se já existe toner ativo
+        // Toner ativo anterior é esgotado para não haver dois ativos no mesmo equipamento
         Optional<GestaoToners> ativo = repository.findTonerAtivoByInventario(toner.inventarioId());
         if (ativo.isPresent()) {
-            logger.warn("Equipamento {} já possui toner ativo (ID: {}). Marcando como substituído.",
-                    toner.inventarioId(), ativo.get().id());
+            repository.marcarComoEsgotado(ativo.get().id());
+            logger.log(System.Logger.Level.INFO,
+                    "Toner anterior {0} (SKU {1}) marcado como esgotado pela nova instalação",
+                    ativo.get().id(), ativo.get().skuProduto());
         }
 
-        Long id = repository.insert(toner);
-        GestaoToners salvo = repository.findById(id)
-                .orElseThrow(() -> new SQLException("Falha ao buscar toner instalado"));
+        String id = repository.insert(toner);
+        GestaoToners salvo = requireToner(id);
 
         eventBus.publish(new TonerEvent<>(salvo, "INSTALADO"));
-        logger.info("✅ Toner instalado: ID={}, Equipamento={}, SKU={}",
+        logger.log(System.Logger.Level.INFO, "✅ Toner instalado: ID={0}, Equipamento={1}, SKU={2}",
                 salvo.id(), salvo.inventarioId(), salvo.skuProduto());
 
         return salvo;
@@ -98,72 +102,73 @@ public class GestaoTonersService {
     public GestaoToners atualizar(GestaoToners toner) throws SQLException {
         validarToner(toner);
 
-        if (toner.id() == null) {
-            throw new IllegalArgumentException("ID não pode ser nulo para atualização");
+        if (toner.id() == null || toner.id().isBlank()) {
+            throw new IllegalArgumentException("ID não pode ser vazio para atualização");
         }
-
-        if (!repository.existsById(toner.id())) {
-            throw new IllegalArgumentException("Toner não encontrado: " + toner.id());
-        }
+        requireToner(toner.id());
 
         repository.update(toner);
-        GestaoToners atualizado = repository.findById(toner.id())
-                .orElseThrow(() -> new SQLException("Falha ao buscar toner atualizado"));
+        GestaoToners atualizado = requireToner(toner.id());
 
         eventBus.publish(new TonerEvent<>(atualizado, "ATUALIZADO"));
-        logger.info("✅ Toner atualizado: ID={}", atualizado.id());
+        logger.log(System.Logger.Level.INFO, "✅ Toner atualizado: ID={0}", atualizado.id());
 
         return atualizado;
     }
 
-    public void excluir(Long id) throws SQLException {
-        if (!repository.existsById(id)) {
-            throw new IllegalArgumentException("Toner não encontrado: " + id);
-        }
+    /**
+     * Exclusão LÓGICA (tombstone de sync): o registro permanece com
+     * deleted = 1 e updatedAt novo — todos os devices convergem.
+     * Para DELETE físico (limpeza administrativa), use o repository diretamente.
+     */
+    public void excluir(String id) throws SQLException {
+        GestaoToners toner = requireToner(id);
+        repository.marcarDeletado(id);
 
-        Optional<GestaoToners> toner = repository.findById(id);
-        repository.delete(id);
-
-        toner.ifPresent(t -> {
-            eventBus.publish(new TonerEvent<>(t, "EXCLUIDO"));
-            logger.info("✅ Toner excluído: ID={}", id);
-        });
+        eventBus.publish(new TonerEvent<>(toner, "EXCLUIDO"));
+        logger.log(System.Logger.Level.INFO, "✅ Toner excluído (tombstone): ID={0}", id);
     }
 
     // ===== OPERAÇÕES DE SUBSTITUIÇÃO =====
 
-    public GestaoToners substituirToner(Long inventarioId, String novoSku, Long usuarioId, String observacoes)
-            throws SQLException {
-        logger.info("Substituindo toner do equipamento {} pelo SKU {}", inventarioId, novoSku);
+    /**
+     * Substitui o toner ativo do equipamento por um novo SKU.
+     *
+     * Usa {@link GestaoToners#novaInstalacaoComObservacoes(String, String, String, String)}
+     * — fábrica do model (fonte da verdade) com assinatura idêntica à antiga
+     * "substituicao(...)" que nunca existiu no record v3.0.
+     */
+    public GestaoToners substituirToner(String inventarioId, String novoSku,
+                                        String usuarioId, String observacoes) throws SQLException {
+        logger.log(System.Logger.Level.INFO,
+                "Substituindo toner do equipamento {0} pelo SKU {1}", inventarioId, novoSku);
 
-        // Verifica equipamento
         if (!repository.inventarioExists(inventarioId)) {
             throw new IllegalArgumentException("Equipamento não encontrado: " + inventarioId);
         }
 
-        // Verifica SKU
         if (!repository.skuExistsInCatalogo(novoSku)) {
             throw new IllegalArgumentException("SKU não encontrado no catálogo: " + novoSku);
         }
 
-        // Marca toner atual como esgotado
+        // Marca toner atual como esgotado antes de instalar o novo
         Optional<GestaoToners> tonerAtual = repository.findTonerAtivoByInventario(inventarioId);
         if (tonerAtual.isPresent()) {
             repository.marcarComoEsgotado(tonerAtual.get().id());
-            logger.info("Toner anterior {} marcado como esgotado", tonerAtual.get().id());
+            logger.log(System.Logger.Level.INFO,
+                    "Toner anterior {0} marcado como esgotado", tonerAtual.get().id());
         }
 
-        // Cria nova instalação
-        GestaoToners novaInstalacao = GestaoToners.substituicao(
+        // Fábrica do model — gera UUID + timestamps + percentagem=100 + ciclos=0
+        GestaoToners novaInstalacao = GestaoToners.novaInstalacaoComObservacoes(
                 inventarioId, novoSku, usuarioId, observacoes
         );
 
-        Long id = repository.insert(novaInstalacao);
-        GestaoToners salvo = repository.findById(id)
-                .orElseThrow(() -> new SQLException("Falha ao buscar toner instalado"));
+        String id = repository.insert(novaInstalacao);
+        GestaoToners salvo = requireToner(id);
 
         eventBus.publish(new TonerEvent<>(salvo, "SUBSTITUIDO"));
-        logger.info("✅ Toner substituído: ID={}, Equipamento={}, SKU={}",
+        logger.log(System.Logger.Level.INFO, "✅ Toner substituído: ID={0}, Equipamento={1}, SKU={2}",
                 salvo.id(), salvo.inventarioId(), salvo.skuProduto());
 
         return salvo;
@@ -171,79 +176,70 @@ public class GestaoTonersService {
 
     // ===== OPERAÇÕES DE USO =====
 
-    public void registrarUso(Long id, int ciclosUtilizados) throws SQLException {
+    /**
+     * Registra uso do toner em ciclos de impressão.
+     *
+     * Conversão: 100 ciclos = 1% de percentagem (divisão inteira — usos
+     * menores que 100 ciclos não reduzem a percentagem). Para granularidade
+     * fina, migre a percentagem para double ou use ciclos como métrica.
+     */
+    public void registrarUso(String id, int ciclosUtilizados) throws SQLException {
         if (ciclosUtilizados <= 0) {
             throw new IllegalArgumentException("Ciclos utilizados devem ser positivos");
         }
 
-        Optional<GestaoToners> toner = repository.findById(id);
-        if (toner.isEmpty()) {
-            throw new IllegalArgumentException("Toner não encontrado: " + id);
-        }
+        GestaoToners toner = requireToner(id);
 
-        // Calcula redução da percentagem
         int reducao = ciclosUtilizados / 100;
-        int novaPercentagem = Math.max(0, toner.get().percentagemRestante() - reducao);
+        int novaPercentagem = Math.max(0,
+                (toner.percentagemRestante() != null ? toner.percentagemRestante() : 100) - reducao);
 
         repository.updatePercentagem(id, novaPercentagem);
         repository.incrementarCiclos(id, ciclosUtilizados);
 
-        // Se esgotou, publica evento
+        GestaoToners atualizado = requireToner(id);
         if (novaPercentagem == 0) {
-            Optional<GestaoToners> atualizado = repository.findById(id);
-            atualizado.ifPresent(t -> {
-                eventBus.publish(new TonerEvent<>(t, "ESGOTADO"));
-                logger.info("🔴 Toner esgotado: ID={}, Equipamento={}", id, t.inventarioId());
-            });
+            eventBus.publish(new TonerEvent<>(atualizado, "ESGOTADO"));
+            logger.log(System.Logger.Level.INFO, "🔴 Toner esgotado: ID={0}, Equipamento={1}",
+                    id, atualizado.inventarioId());
         } else {
-            Optional<GestaoToners> atualizado = repository.findById(id);
-            atualizado.ifPresent(t -> {
-                eventBus.publish(new TonerEvent<>(t, "USO_REGISTRADO"));
-                logger.info("✅ Uso registrado: ID={}, Ciclos=+{}, Percentagem={}%",
-                        id, ciclosUtilizados, novaPercentagem);
-            });
+            eventBus.publish(new TonerEvent<>(atualizado, "USO_REGISTRADO"));
+            logger.log(System.Logger.Level.INFO, "✅ Uso registrado: ID={0}, Ciclos=+{1}, Percentagem={2}%",
+                    id, ciclosUtilizados, novaPercentagem);
         }
     }
 
-    public void atualizarPercentagem(Long id, int percentagem) throws SQLException {
+    public void atualizarPercentagem(String id, int percentagem) throws SQLException {
         if (percentagem < 0 || percentagem > 100) {
             throw new IllegalArgumentException("Percentagem deve estar entre 0 e 100");
         }
 
-        if (!repository.existsById(id)) {
-            throw new IllegalArgumentException("Toner não encontrado: " + id);
-        }
+        requireToner(id);
 
         repository.updatePercentagem(id, percentagem);
+        GestaoToners atualizado = requireToner(id);
 
-        Optional<GestaoToners> atualizado = repository.findById(id);
-        atualizado.ifPresent(t -> {
-            eventBus.publish(new TonerEvent<>(t, "PERCENTAGEM_ATUALIZADA"));
-            logger.info("✅ Percentagem atualizada: ID={} → {}%", id, percentagem);
-        });
+        eventBus.publish(new TonerEvent<>(atualizado, "PERCENTAGEM_ATUALIZADA"));
+        logger.log(System.Logger.Level.INFO, "✅ Percentagem atualizada: ID={0} → {1}%", id, percentagem);
     }
 
-    public void marcarComoEsgotado(Long id) throws SQLException {
-        if (!repository.existsById(id)) {
-            throw new IllegalArgumentException("Toner não encontrado: " + id);
-        }
+    public void marcarComoEsgotado(String id) throws SQLException {
+        requireToner(id);
 
         repository.marcarComoEsgotado(id);
+        GestaoToners atualizado = requireToner(id);
 
-        Optional<GestaoToners> atualizado = repository.findById(id);
-        atualizado.ifPresent(t -> {
-            eventBus.publish(new TonerEvent<>(t, "ESGOTADO"));
-            logger.info("🔴 Toner marcado como esgotado: ID={}", id);
-        });
+        eventBus.publish(new TonerEvent<>(atualizado, "ESGOTADO"));
+        logger.log(System.Logger.Level.INFO, "🔴 Toner marcado como esgotado: ID={0}", id);
     }
 
     // ===== CONSULTAS ESPECIALIZADAS =====
 
-    public Optional<GestaoToners> buscarTonerAtivo(Long inventarioId) throws SQLException {
+    public Optional<GestaoToners> buscarTonerAtivo(String inventarioId) throws SQLException {
         return repository.findTonerAtivoByInventario(inventarioId);
     }
 
-    public Optional<GestaoToners> buscarUltimoToner(Long inventarioId) throws SQLException {
+    public Optional<GestaoToners> buscarUltimoToner(String inventarioId) throws SQLException {
         return repository.findUltimoByInventario(inventarioId);
     }
 
@@ -255,7 +251,7 @@ public class GestaoTonersService {
         return repository.findEsgotados();
     }
 
-    public List<GestaoToners> buscarPorUsuario(Long usuarioId) throws SQLException {
+    public List<GestaoToners> buscarPorUsuario(String usuarioId) throws SQLException {
         return repository.findByUsuarioResponsavel(usuarioId);
     }
 
@@ -264,9 +260,9 @@ public class GestaoTonersService {
     }
 
     public List<GestaoToners> buscarComFiltros(
-            Long inventarioId,
+            String inventarioId,
             String sku,
-            Long usuarioId,
+            String usuarioId,
             LocalDate dataInicio,
             LocalDate dataFim,
             Integer percentagemMin,
@@ -282,7 +278,8 @@ public class GestaoTonersService {
 
     // ===== ESTATÍSTICAS E RELATÓRIOS =====
 
-    public Map<String, Object[]> calcularVidaUtilPorSku() throws SQLException {
+    /** Tipo forte — consumidores usam r.sku(), r.mediaCiclos() etc. */
+    public List<VidaUtilSku> calcularVidaUtilPorSku() throws SQLException {
         return repository.calcularVidaUtilPorSku();
     }
 
@@ -306,36 +303,57 @@ public class GestaoTonersService {
         return repository.countEsgotados();
     }
 
-    public int contarPorInventario(Long inventarioId) throws SQLException {
+    public int contarPorInventario(String inventarioId) throws SQLException {
         return repository.countByInventario(inventarioId);
     }
 
     // ===== VALIDAÇÕES =====
 
-    public boolean existePorId(Long id) throws SQLException {
+    public boolean existePorId(String id) throws SQLException {
         return repository.existsById(id);
     }
 
-    public boolean equipamentoTemTonerAtivo(Long inventarioId) throws SQLException {
+    public boolean equipamentoTemTonerAtivo(String inventarioId) throws SQLException {
         return repository.findTonerAtivoByInventario(inventarioId).isPresent();
     }
 
     // ===== MÉTODOS PRIVADOS =====
 
+    /**
+     * Busca o toner ou lança — elimina o padrão findById→isEmpty→throw
+     * que se repetia em ~8 métodos.
+     */
+    private GestaoToners requireToner(String id) throws SQLException {
+        if (id == null || id.isBlank()) {
+            throw new IllegalArgumentException("ID do toner é obrigatório");
+        }
+        return repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Toner não encontrado: " + id));
+    }
+
+    /**
+     * Defesa em profundidade: o construtor do record JÁ valida tudo isto.
+     * Mantido para dar a mensagem de negócio certa antes de validar
+     * existência de SKU/inventário (falha rápida, sem bater no banco).
+     */
     private void validarToner(GestaoToners t) {
-        if (t.inventarioId() == null || t.inventarioId() <= 0) {
+        if (t == null) {
+            throw new IllegalArgumentException("Toner não pode ser nulo");
+        }
+        if (t.inventarioId() == null || t.inventarioId().isBlank()) {
             throw new IllegalArgumentException("ID do inventário é obrigatório");
         }
-        if (!(t.skuProduto() instanceof String sku) || sku.isBlank()) {
+        if (t.skuProduto() == null || t.skuProduto().isBlank()) {
             throw new IllegalArgumentException("SKU do produto é obrigatório");
         }
-        if (t.usuarioResponsavel() == null || t.usuarioResponsavel() <= 0) {
+        if (t.usuarioResponsavel() == null || t.usuarioResponsavel().isBlank()) {
             throw new IllegalArgumentException("Usuário responsável é obrigatório");
         }
-        if (t.percentagemRestante() < 0 || t.percentagemRestante() > 100) {
+        if (t.percentagemRestante() != null
+                && (t.percentagemRestante() < 0 || t.percentagemRestante() > 100)) {
             throw new IllegalArgumentException("Percentagem deve estar entre 0 e 100");
         }
-        if (t.ciclosImpressao() < 0) {
+        if (t.ciclosImpressao() != null && t.ciclosImpressao() < 0) {
             throw new IllegalArgumentException("Ciclos de impressão não pode ser negativo");
         }
     }

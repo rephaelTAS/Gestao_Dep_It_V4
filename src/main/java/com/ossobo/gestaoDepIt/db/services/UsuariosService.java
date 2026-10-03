@@ -1,16 +1,14 @@
 package com.ossobo.gestaoDepIt.db.services;
 
 import com.ossobo.gestaoDepIt.db.config.event.UsuarioEvent;
+import com.ossobo.gestaoDepIt.db.enums.Hierarquia;
 import com.ossobo.gestaoDepIt.db.models.Usuario;
 import com.ossobo.gestaoDepIt.db.repositories.UsuariosRepository;
-import com.ossobo.gestaoDepIt.utils.crypthash.BCryptHash;
 
+import com.ossobo.gestaoDepIt.utils.crypthash.BCryptHash;
 import com.ossobo.winterfx.anotations.Inject;
 import com.ossobo.winterfx.anotations.Service;
 import com.ossobo.winterfx.event.EventBus;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -21,31 +19,25 @@ import java.util.UUID;
 
 /**
  * UsuariosService - Regras de negócio com EventBus
- * v2.0 - Migrado para Java 17+ com WinterFX
+ * v2.3 - Alinhado ao Usuario v3.2 e ao enum Hierarquia v1.0
  *
- * Responsabilidades:
- * - Gerenciar usuários do sistema
- * - Autenticação com BCrypt
- * - Gestão de sessão com UUID
- * - Publicar eventos (@UsuarioEvent)
+ * Mudanças v2.2 → v2.3:
+ * - Assinaturas de nível: String → Hierarquia (fonte única)
+ * - promover/rebaixar usam Hierarquia.proximo()/anterior() (aritmética de ordinal)
+ * - verificarPermissao delega a Hierarquia.temPermissao()
+ * - Removida constante NIVEL_* do Service — quem define nível é o enum
+ * - getNiveisAcesso()/getHierarquiaPermissoes() passam a delegar ao enum
  */
 @Service
 public class UsuariosService {
 
-    private static final Logger logger = LoggerFactory.getLogger(UsuariosService.class);
+    private static final System.Logger logger = System.getLogger(UsuariosService.class.getName());
 
     @Inject
     private UsuariosRepository repository;
 
     @Inject
     private EventBus eventBus;
-
-    // ===== CONSTANTES =====
-    public static final String NIVEL_ADMIN = Usuario.NIVEL_ADMIN;
-    public static final String NIVEL_GESTOR = Usuario.NIVEL_GESTOR;
-    public static final String NIVEL_SUPERVISOR = Usuario.NIVEL_SUPERVISOR;
-    public static final String NIVEL_OPERADOR = Usuario.NIVEL_OPERADOR;
-    public static final String NIVEL_READONLY = Usuario.NIVEL_READONLY;
 
     public static final int SESSAO_DURACAO_MINUTOS = 480; // 8 horas
 
@@ -65,7 +57,7 @@ public class UsuariosService {
         return repository.findAllAtivos(tamanho, offset);
     }
 
-    public Optional<Usuario> buscarPorId(Long id) throws SQLException {
+    public Optional<Usuario> buscarPorId(String id) throws SQLException {
         return repository.findById(id);
     }
 
@@ -91,22 +83,22 @@ public class UsuariosService {
             throw new IllegalArgumentException("Funcionário já possui usuário: " + usuario.funcionarioId());
         }
 
-        // Hash da senha com BCrypt
         String senhaHash = usuario.senhaHash();
-        if (senhaHash != null && !senhaHash.startsWith("$2a$")) {
-            senhaHash = BCryptHash.hash(senhaHash);
-        } else if (senhaHash == null || senhaHash.isBlank()) {
+        if (senhaHash == null || senhaHash.isBlank()) {
             throw new IllegalArgumentException("Senha é obrigatória");
+        }
+        if (!senhaHash.startsWith("$2a$")) {
+            senhaHash = BCryptHash.hash(senhaHash);
         }
 
         Usuario comHash = usuario.comSenhaHash(senhaHash);
 
-        Long id = repository.insert(comHash);
+        String id = repository.insert(comHash);
         Usuario criado = repository.findById(id)
                 .orElseThrow(() -> new SQLException("Falha ao buscar usuário criado"));
 
         eventBus.publish(new UsuarioEvent<>(criado, "CRIADO"));
-        logger.info("✅ Usuário criado: ID={}, Email={}, Nível={}",
+        logger.log(System.Logger.Level.INFO,"✅ Usuário criado: ID={}, Email={}, Nível={}",
                 criado.id(), criado.email(), criado.nivelAcesso());
 
         return criado;
@@ -115,40 +107,45 @@ public class UsuariosService {
     public Usuario atualizar(Usuario usuario) throws SQLException {
         validarUsuario(usuario);
 
-        if (usuario.id() == null) {
-            throw new IllegalArgumentException("ID não pode ser nulo para atualização");
+        if (usuario.id() == null || usuario.id().isBlank()) {
+            throw new IllegalArgumentException("ID não pode ser vazio para atualização");
         }
 
-        Optional<Usuario> existente = repository.findById(usuario.id());
-        if (existente.isEmpty()) {
-            throw new IllegalArgumentException("Usuário não encontrado: " + usuario.id());
-        }
+        Usuario existente = requireUsuario(usuario.id());
 
-        // Verifica email duplicado
         Optional<Usuario> porEmail = repository.findByEmail(usuario.email());
         if (porEmail.isPresent() && !porEmail.get().id().equals(usuario.id())) {
             throw new IllegalArgumentException("Email já utilizado por outro usuário: " + usuario.email());
         }
 
-        // Verifica funcionário duplicado
         Optional<Usuario> porFunc = repository.findByFuncionarioId(usuario.funcionarioId());
         if (porFunc.isPresent() && !porFunc.get().id().equals(usuario.id())) {
             throw new IllegalArgumentException("Funcionário já possui outro usuário: " + usuario.funcionarioId());
         }
 
-        // Mantém a senha existente se não for fornecida nova
         String senhaHash = usuario.senhaHash();
         if (senhaHash == null || senhaHash.isBlank() || senhaHash.startsWith("$2a$")) {
-            senhaHash = existente.get().senhaHash();
+            senhaHash = existente.senhaHash();
         } else {
             senhaHash = BCryptHash.hash(senhaHash);
         }
 
         Usuario paraAtualizar = new Usuario(
-                usuario.id(), usuario.funcionarioId(), usuario.nome(),
-                usuario.email(), senhaHash, usuario.nivelAcesso(),
-                usuario.isAtivo(), null, null, null, null,
-                null, LocalDateTime.now()
+                usuario.id(),
+                usuario.funcionarioId(),
+                usuario.nome(),
+                usuario.email(),
+                senhaHash,
+                usuario.nivelAcesso(),
+                usuario.isAtivo(),
+                existente.ultimoLogin(),
+                existente.ipUltimoLogin(),
+                null,
+                null,
+                existente.createdAt(),
+                LocalDateTime.now(),
+                null,
+                existente.deletado()
         );
 
         repository.update(paraAtualizar);
@@ -156,12 +153,12 @@ public class UsuariosService {
                 .orElseThrow(() -> new SQLException("Falha ao buscar usuário atualizado"));
 
         eventBus.publish(new UsuarioEvent<>(atualizado, "ATUALIZADO"));
-        logger.info("✅ Usuário atualizado: ID={}", atualizado.id());
+        logger.log(System.Logger.Level.INFO,"✅ Usuário atualizado: ID={}", atualizado.id());
 
         return atualizado;
     }
 
-    public void excluir(Long id) throws SQLException {
+    public void excluir(String id) throws SQLException {
         if (!repository.existsById(id)) {
             throw new IllegalArgumentException("Usuário não encontrado: " + id);
         }
@@ -172,20 +169,20 @@ public class UsuariosService {
 
         usuario.ifPresent(u -> {
             eventBus.publish(new UsuarioEvent<>(u, "EXCLUIDO"));
-            logger.info("✅ Usuário excluído: ID={}", id);
+            logger.log(System.Logger.Level.INFO,"✅ Usuário excluído: ID={}", id);
         });
     }
 
     // ===== AUTENTICAÇÃO =====
 
     public Optional<Usuario> autenticar(String identificador, String senhaTextoPuro) throws SQLException {
-        logger.debug("Autenticando: {}", identificador);
+        logger.log(System.Logger.Level.DEBUG,"Autenticando: {}", identificador);
 
-        if (identificador == null || identificador.isBlank()) {
+        if (identificador == null || identificador.isBlank()
+                || senhaTextoPuro == null || senhaTextoPuro.isBlank()) {
             return Optional.empty();
         }
 
-        // Tenta buscar por funcionario_id ou email
         Optional<Usuario> usuarioOpt = repository.findByFuncionarioId(identificador.trim());
         if (usuarioOpt.isEmpty() && identificador.contains("@")) {
             usuarioOpt = repository.findByEmail(identificador.trim());
@@ -193,53 +190,57 @@ public class UsuariosService {
 
         if (usuarioOpt.isPresent()) {
             Usuario user = usuarioOpt.get();
+
+            if (user.isDeletado()) {
+                logger.log(System.Logger.Level.WARNING,"Usuário deletado (tombstone): {}", identificador);
+                return Optional.empty();
+            }
             if (!user.isAtivo()) {
-                logger.warn("Usuário inativo: {}", identificador);
+                logger.log(System.Logger.Level.WARNING,"Usuário inativo: {}", identificador);
                 return Optional.empty();
             }
 
             if (BCryptHash.verify(senhaTextoPuro, user.senhaHash())) {
-                logger.info("✅ Autenticação bem-sucedida: {}", user.nome());
+                logger.log(System.Logger.Level.WARNING,"✅ Autenticação bem-sucedida: {}", user.nome());
                 return usuarioOpt;
-            } else {
-                logger.warn("Senha incorreta para: {}", identificador);
             }
+            logger.log(System.Logger.Level.WARNING,"Senha incorreta para: {}", identificador);
         } else {
-            logger.warn("Usuário não encontrado: {}", identificador);
+            logger.log(System.Logger.Level.WARNING,"Usuário não encontrado: {}", identificador);
         }
 
         return Optional.empty();
     }
 
-    public void registrarLogin(Long usuarioId, String ip) throws SQLException {
+    public void registrarLogin(String usuarioId, String ip) throws SQLException {
         if (!repository.existsById(usuarioId)) {
             throw new IllegalArgumentException("Usuário não encontrado: " + usuarioId);
         }
 
         repository.updateLogin(usuarioId, ip);
-        logger.info("Login registrado: Usuário={}, IP={}", usuarioId, ip);
+        logger.log(System.Logger.Level.INFO,"Login registrado: Usuário={}, IP={}", usuarioId, ip);
     }
 
     // ===== SESSÃO =====
 
-    public String criarSessao(Long usuarioId) throws SQLException {
+    public String criarSessao(String usuarioId) throws SQLException {
         return criarSessao(usuarioId, SESSAO_DURACAO_MINUTOS);
     }
 
-    public String criarSessao(Long usuarioId, int duracaoMinutos) throws SQLException {
-        Optional<Usuario> usuario = repository.findById(usuarioId);
-        if (usuario.isEmpty()) {
-            throw new IllegalArgumentException("Usuário não encontrado: " + usuarioId);
-        }
-        if (!usuario.get().isAtivo()) {
+    public String criarSessao(String usuarioId, int duracaoMinutos) throws SQLException {
+        Usuario usuario = requireUsuario(usuarioId);
+        if (!usuario.isAtivo()) {
             throw new IllegalStateException("Usuário inativo: " + usuarioId);
+        }
+        if (usuario.isDeletado()) {
+            throw new IllegalStateException("Usuário deletado: " + usuarioId);
         }
 
         String token = UUID.randomUUID().toString();
         LocalDateTime expiracao = LocalDateTime.now().plusMinutes(duracaoMinutos);
         repository.updateSessao(usuarioId, token, expiracao);
 
-        logger.info("Sessão criada: Usuário={}, Expiração={}", usuarioId, expiracao);
+        logger.log(System.Logger.Level.INFO,"Sessão criada: Usuário={}, Expiração={}", usuarioId, expiracao);
         return token;
     }
 
@@ -247,44 +248,39 @@ public class UsuariosService {
         return repository.findBySessao(token);
     }
 
-    public void invalidarSessao(Long usuarioId) throws SQLException {
+    public void invalidarSessao(String usuarioId) throws SQLException {
         if (repository.existsById(usuarioId)) {
             repository.invalidarSessao(usuarioId);
-            logger.info("Sessão invalidada: Usuário={}", usuarioId);
+            logger.log(System.Logger.Level.INFO,"Sessão invalidada: Usuário={}", usuarioId);
         }
     }
 
     public void invalidarTodasSessoes() throws SQLException {
         repository.invalidarTodasSessoes();
-        logger.info("Todas as sessões foram invalidadas");
+        logger.log(System.Logger.Level.INFO,"Todas as sessões foram invalidadas");
     }
 
     public void limparSessoesExpiradas() throws SQLException {
         repository.invalidarSessoesExpiradas();
-        logger.info("Sessões expiradas foram limpas");
+        logger.log(System.Logger.Level.INFO,"Sessões expiradas foram limpas");
     }
 
     // ===== SENHA =====
 
-    public void alterarSenha(Long usuarioId, String novaSenhaTextoPuro) throws SQLException {
-        if (!repository.existsById(usuarioId)) {
-            throw new IllegalArgumentException("Usuário não encontrado: " + usuarioId);
-        }
+    public void alterarSenha(String usuarioId, String novaSenhaTextoPuro) throws SQLException {
+        requireUsuario(usuarioId);
 
         String novoHash = BCryptHash.hash(novaSenhaTextoPuro);
         repository.updateSenha(usuarioId, novoHash);
         repository.invalidarSessao(usuarioId);
 
-        logger.info("Senha alterada para usuário: {}", usuarioId);
+        logger.log(System.Logger.Level.INFO,"Senha alterada para usuário: {}", usuarioId);
     }
 
-    public void alterarSenhaComValidacao(Long usuarioId, String senhaAtual, String novaSenha) throws SQLException {
-        Optional<Usuario> usuario = repository.findById(usuarioId);
-        if (usuario.isEmpty()) {
-            throw new IllegalArgumentException("Usuário não encontrado: " + usuarioId);
-        }
+    public void alterarSenhaComValidacao(String usuarioId, String senhaAtual, String novaSenha) throws SQLException {
+        Usuario usuario = requireUsuario(usuarioId);
 
-        if (!BCryptHash.verify(senhaAtual, usuario.get().senhaHash())) {
+        if (!BCryptHash.verify(senhaAtual, usuario.senhaHash())) {
             throw new IllegalArgumentException("Senha atual incorreta");
         }
 
@@ -292,101 +288,82 @@ public class UsuariosService {
         repository.updateSenha(usuarioId, novoHash);
         repository.invalidarSessao(usuarioId);
 
-        logger.info("Senha alterada com validação: Usuário={}", usuarioId);
+        logger.log(System.Logger.Level.INFO,"Senha alterada com validação: Usuário={}", usuarioId);
     }
 
     // ===== ATIVAÇÃO/DESATIVAÇÃO =====
 
-    public void ativar(Long usuarioId) throws SQLException {
-        Optional<Usuario> usuario = repository.findById(usuarioId);
-        if (usuario.isEmpty()) {
-            throw new IllegalArgumentException("Usuário não encontrado: " + usuarioId);
-        }
-        if (usuario.get().isAtivo()) {
+    public void ativar(String usuarioId) throws SQLException {
+        Usuario usuario = requireUsuario(usuarioId);
+        if (usuario.isAtivo()) {
             throw new IllegalStateException("Usuário já está ativo: " + usuarioId);
         }
 
         repository.ativar(usuarioId);
-        Usuario atualizado = repository.findById(usuarioId)
-                .orElseThrow(() -> new SQLException("Falha ao buscar usuário"));
+        Usuario atualizado = requireUsuario(usuarioId);
 
         eventBus.publish(new UsuarioEvent<>(atualizado, "ATIVADO"));
-        logger.info("✅ Usuário ativado: ID={}", usuarioId);
+        logger.log(System.Logger.Level.INFO,"✅ Usuário ativado: ID={}", usuarioId);
     }
 
-    public void desativar(Long usuarioId) throws SQLException {
-        Optional<Usuario> usuario = repository.findById(usuarioId);
-        if (usuario.isEmpty()) {
-            throw new IllegalArgumentException("Usuário não encontrado: " + usuarioId);
-        }
-        if (usuario.get().isInativo()) {
+    public void desativar(String usuarioId) throws SQLException {
+        Usuario usuario = requireUsuario(usuarioId);
+        if (!usuario.isAtivo()) {
             throw new IllegalStateException("Usuário já está inativo: " + usuarioId);
         }
 
         repository.desativar(usuarioId);
-        Usuario atualizado = repository.findById(usuarioId)
-                .orElseThrow(() -> new SQLException("Falha ao buscar usuário"));
+        Usuario atualizado = requireUsuario(usuarioId);
 
         eventBus.publish(new UsuarioEvent<>(atualizado, "DESATIVADO"));
-        logger.info("✅ Usuário desativado: ID={}", usuarioId);
+        logger.log(System.Logger.Level.INFO,"✅ Usuário desativado: ID={}", usuarioId);
     }
 
     // ===== NÍVEL DE ACESSO =====
 
-    public void atualizarNivelAcesso(Long usuarioId, String nivel) throws SQLException {
-        if (!Usuario.NIVEIS_VALIDOS.contains(nivel)) {
-            throw new IllegalArgumentException("Nível inválido: " + nivel);
+    public void atualizarNivelAcesso(String usuarioId, Hierarquia nivel) throws SQLException {
+        if (nivel == null) {
+            throw new IllegalArgumentException("Nível é obrigatório");
         }
 
-        if (!repository.existsById(usuarioId)) {
-            throw new IllegalArgumentException("Usuário não encontrado: " + usuarioId);
-        }
+        requireUsuario(usuarioId);
 
-        repository.updateNivelAcesso(usuarioId, nivel);
+        repository.updateNivelAcesso(usuarioId, nivel.name());
 
-        Usuario atualizado = repository.findById(usuarioId)
-                .orElseThrow(() -> new SQLException("Falha ao buscar usuário"));
+        Usuario atualizado = requireUsuario(usuarioId);
 
         eventBus.publish(new UsuarioEvent<>(atualizado, "NIVEL_ALTERADO"));
-        logger.info("✅ Nível alterado: Usuário={} → {}", usuarioId, nivel);
+        logger.log(System.Logger.Level.INFO,"✅ Nível alterado: Usuário={} → {}", usuarioId, nivel);
     }
 
-    public void promover(Long usuarioId) throws SQLException {
-        Optional<Usuario> usuario = repository.findById(usuarioId);
-        if (usuario.isEmpty()) {
-            throw new IllegalArgumentException("Usuário não encontrado");
-        }
+    public void promover(String usuarioId) throws SQLException {
+        Usuario usuario = requireUsuario(usuarioId);
 
-        List<String> hierarquia = Usuario.getHierarquia();
-        int indiceAtual = hierarquia.indexOf(usuario.get().nivelAcesso());
-        if (indiceAtual >= hierarquia.size() - 1) {
+        if (usuario.nivelAcesso().isTopo()) {
             throw new IllegalStateException("Usuário já está no nível máximo");
         }
 
-        atualizarNivelAcesso(usuarioId, hierarquia.get(indiceAtual + 1));
-        logger.info("✅ Usuário promovido: {} → {}", usuarioId, hierarquia.get(indiceAtual + 1));
+        Hierarquia novoNivel = usuario.nivelAcesso().proximo();
+        atualizarNivelAcesso(usuarioId, novoNivel);
+        logger.log(System.Logger.Level.INFO,"✅ Usuário promovido: {} → {}", usuarioId, novoNivel);
     }
 
-    public void rebaixar(Long usuarioId) throws SQLException {
-        Optional<Usuario> usuario = repository.findById(usuarioId);
-        if (usuario.isEmpty()) {
-            throw new IllegalArgumentException("Usuário não encontrado");
-        }
+    public void rebaixar(String usuarioId) throws SQLException {
+        Usuario usuario = requireUsuario(usuarioId);
 
-        List<String> hierarquia = Usuario.getHierarquia();
-        int indiceAtual = hierarquia.indexOf(usuario.get().nivelAcesso());
-        if (indiceAtual <= 0) {
+        if (usuario.nivelAcesso().isMinimo()) {
             throw new IllegalStateException("Usuário já está no nível mínimo");
         }
 
-        atualizarNivelAcesso(usuarioId, hierarquia.get(indiceAtual - 1));
-        logger.info("✅ Usuário rebaixado: {} → {}", usuarioId, hierarquia.get(indiceAtual - 1));
+        Hierarquia novoNivel = usuario.nivelAcesso().anterior();
+        atualizarNivelAcesso(usuarioId, novoNivel);
+        logger.log(System.Logger.Level.INFO,"✅ Usuário rebaixado: {} → {}", usuarioId, novoNivel);
     }
 
     // ===== CONSULTAS =====
 
-    public List<Usuario> buscarPorNivel(String nivel) throws SQLException {
-        return repository.findByNivelAcesso(nivel);
+    public List<Usuario> buscarPorNivel(Hierarquia nivel) throws SQLException {
+        return repository.findByNivelAcesso(nivel.name());
     }
 
     public List<Usuario> buscarPorStatus(boolean ativo) throws SQLException {
@@ -420,13 +397,13 @@ public class UsuariosService {
     public List<Usuario> buscarComFiltros(
             String nome,
             String email,
-            String nivelAcesso,
+            Hierarquia nivelAcesso,
             Boolean ativo,
             Boolean comSessaoAtiva,
             LocalDateTime dataLoginInicio,
             LocalDateTime dataLoginFim
     ) throws SQLException {
-        return repository.findWithFilters(nome, email, nivelAcesso, ativo,
+        return repository.findWithFilters(nome, email, nivelAcesso.name(), ativo,
                 comSessaoAtiva, dataLoginInicio, dataLoginFim);
     }
 
@@ -440,7 +417,8 @@ public class UsuariosService {
         return repository.getEstatisticasAtividade();
     }
 
-    public List<Object[]> obterLoginsPorPeriodo(LocalDateTime inicio, LocalDateTime fim) throws SQLException {
+    public List<UsuariosRepository.LoginPorDia> obterLoginsPorPeriodo(
+            LocalDateTime inicio, LocalDateTime fim) throws SQLException {
         return repository.getLoginsPorPeriodo(inicio, fim);
     }
 
@@ -454,7 +432,7 @@ public class UsuariosService {
 
     // ===== VERIFICAÇÕES =====
 
-    public boolean existePorId(Long id) throws SQLException {
+    public boolean existePorId(String id) throws SQLException {
         return repository.existsById(id);
     }
 
@@ -466,58 +444,68 @@ public class UsuariosService {
         return repository.existsByFuncionarioId(funcionarioId);
     }
 
-    public boolean isUsuarioAtivo(Long id) throws SQLException {
-        Optional<Usuario> usuario = repository.findById(id);
-        return usuario.map(Usuario::isAtivo).orElse(false);
+    public boolean isUsuarioAtivo(String id) throws SQLException {
+        return repository.findById(id).map(Usuario::isAtivo).orElse(false);
     }
 
     // ===== PERMISSÕES =====
 
-    public boolean verificarPermissao(Long usuarioId, String nivelRequerido) throws SQLException {
+    public boolean verificarPermissao(String usuarioId, Hierarquia nivelRequerido) throws SQLException {
         Optional<Usuario> usuario = repository.findById(usuarioId);
-        if (usuario.isEmpty() || !usuario.get().isAtivo()) return false;
-        return usuario.get().hasPermissao(nivelRequerido);
+        if (usuario.isEmpty() || usuario.get().isDeletado() || !usuario.get().isAtivo()) {
+            return false;
+        }
+        return usuario.get().temPermissao(nivelRequerido);
     }
 
-    public boolean isAdmin(Long usuarioId) throws SQLException {
-        return verificarPermissao(usuarioId, NIVEL_ADMIN);
+    public boolean isAdmin(String usuarioId) throws SQLException {
+        return verificarPermissao(usuarioId, Hierarquia.NIVEL_ADMIN);
     }
 
-    public boolean isGestorOuSuperior(Long usuarioId) throws SQLException {
-        return verificarPermissao(usuarioId, NIVEL_GESTOR);
+    public boolean isGestorOuSuperior(String usuarioId) throws SQLException {
+        return verificarPermissao(usuarioId, Hierarquia.NIVEL_GESTOR);
     }
 
-    public boolean isSupervisorOuSuperior(Long usuarioId) throws SQLException {
-        return verificarPermissao(usuarioId, NIVEL_SUPERVISOR);
+    public boolean isSupervisorOuSuperior(String usuarioId) throws SQLException {
+        return verificarPermissao(usuarioId, Hierarquia.NIVEL_SUPERVISOR);
     }
 
     // ===== UTILITÁRIOS =====
 
     public List<String> getNiveisAcesso() {
-        return Usuario.getNiveisValidos();
+        return Hierarquia.todos();
     }
 
     public List<String> getHierarquiaPermissoes() {
-        return Usuario.getHierarquia();
+        return Hierarquia.todos();
     }
 
-    // ===== MÉTODO PRIVADO =====
+    // ===== MÉTODOS PRIVADOS =====
+
+    private Usuario requireUsuario(String id) throws SQLException {
+        if (id == null || id.isBlank()) {
+            throw new IllegalArgumentException("ID do usuário é obrigatório");
+        }
+        return repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado: " + id));
+    }
 
     private void validarUsuario(Usuario u) {
-        if (!(u.funcionarioId() instanceof String f) || f.isBlank()) {
+        if (u == null) {
+            throw new IllegalArgumentException("Usuário não pode ser nulo");
+        }
+        if (u.funcionarioId() == null || u.funcionarioId().isBlank()) {
             throw new IllegalArgumentException("ID do funcionário é obrigatório");
         }
-        if (!(u.nome() instanceof String n) || n.isBlank()) {
+        if (u.nome() == null || u.nome().isBlank()) {
             throw new IllegalArgumentException("Nome é obrigatório");
         }
-        if (!(u.email() instanceof String e) || e.isBlank()) {
+        if (u.email() == null || u.email().isBlank()) {
             throw new IllegalArgumentException("Email é obrigatório");
         }
-        if (!Usuario.isValidEmail(e)) {
-            throw new IllegalArgumentException("Email inválido: " + e);
+        if (!Usuario.isValidEmail(u.email())) {
+            throw new IllegalArgumentException("Email inválido: " + u.email());
         }
-        if (u.nivelAcesso() != null && !Usuario.NIVEIS_VALIDOS.contains(u.nivelAcesso())) {
-            throw new IllegalArgumentException("Nível de acesso inválido: " + u.nivelAcesso());
-        }
+        // nivelAcesso não precisa ser validado — é Hierarquia, tipo forte
     }
 }

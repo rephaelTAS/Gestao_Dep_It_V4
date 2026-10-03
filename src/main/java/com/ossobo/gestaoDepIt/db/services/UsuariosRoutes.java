@@ -1,24 +1,15 @@
 package com.ossobo.gestaoDepIt.db.services;
 
+import com.ossobo.gestaoDepIt.db.enums.Hierarquia;
 import com.ossobo.gestaoDepIt.db.models.Usuario;
-import com.ossobo.winterfx.anotations.Component;
-import com.ossobo.winterfx.anotations.DeleteMapping;
-import com.ossobo.winterfx.anotations.ExecMapping;
-import com.ossobo.winterfx.anotations.GetMapping;
-import com.ossobo.winterfx.anotations.Inject;
-import com.ossobo.winterfx.anotations.Payload;
-import com.ossobo.winterfx.anotations.PutMapping;
-import com.ossobo.winterfx.anotations.RequestMapping;
-import com.ossobo.winterfx.anotations.RouteVar;
+import com.ossobo.winterfx.anotations.*;
 import com.ossobo.winterfx.router.model.ResponseData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -51,7 +42,7 @@ import java.util.Optional;
 @RequestMapping("usuarios/service")
 public class UsuariosRoutes {
 
-    private static final Logger logger = LoggerFactory.getLogger(UsuariosRoutes.class);
+    private static final System.Logger logger = System.getLogger(UsuariosRoutes.class.getName());
 
     @Inject
     private UsuariosService service;
@@ -88,7 +79,7 @@ public class UsuariosRoutes {
 
     /** Busca por ID (hash mascarado). */
     @GetMapping("por/id")
-    public ResponseData buscarPorId(@RouteVar("id") Long id) {
+    public ResponseData buscarPorId(@RouteVar("id") String id) {
         return optional(() -> service.buscarPorId(id), "usuario",
                 "Usuário não encontrado: ID " + id);
     }
@@ -121,7 +112,7 @@ public class UsuariosRoutes {
 
     /** Usuários de um nível de acesso. */
     @GetMapping("por/nivel")
-    public ResponseData porNivel(@RouteVar("nivel") String nivel) {
+    public ResponseData porNivel(@RouteVar("nivel") Hierarquia nivel) {
         return listaMascarada(() -> service.buscarPorNivel(nivel), "usuarios");
     }
 
@@ -178,7 +169,7 @@ public class UsuariosRoutes {
     @GetMapping("com-filtros")
     public ResponseData comFiltros(@RouteVar("nome") String nome,
                                    @RouteVar("email") String email,
-                                   @RouteVar("nivel") String nivel,
+                                   @RouteVar("nivel") Hierarquia nivel,
                                    @RouteVar("ativo") Boolean ativo,
                                    @RouteVar("comsessao") Boolean comSessaoAtiva,
                                    @RouteVar("logininicio") String loginInicio,
@@ -232,13 +223,13 @@ public class UsuariosRoutes {
      * Consolida verificarPermissao/isAdmin/isGestor/isSupervisor em um contrato.
      */
     @GetMapping("permissao/check")
-    public ResponseData permissaoCheck(@RouteVar("id") Long id,
-                                       @RouteVar("nivel") String nivelRequerido) {
+    public ResponseData permissaoCheck(@RouteVar("id") String id,
+                                       @RouteVar("nivel") Hierarquia nivelRequerido) {
         return valor(() -> service.verificarPermissao(id, nivelRequerido), "permitido");
     }
 
     @GetMapping("exists/id")
-    public ResponseData existeId(@RouteVar("id") Long id) {
+    public ResponseData existeId(@RouteVar("id") String id) {
         return valor(() -> service.existePorId(id), "exists");
     }
 
@@ -253,7 +244,7 @@ public class UsuariosRoutes {
     }
 
     @GetMapping("ativo/check")
-    public ResponseData isAtivo(@RouteVar("id") Long id) {
+    public ResponseData isAtivo(@RouteVar("id") String id) {
         return valor(() -> service.isUsuarioAtivo(id), "ativo");
     }
 
@@ -286,16 +277,16 @@ public class UsuariosRoutes {
             Optional<Usuario> opt = service.autenticar(identificador.trim(), senha);
 
             if (opt.isEmpty()) {
-                logger.warn("🔐 Login recusado para '{}'", identificador);
+                logger.log(System.Logger.Level.WARNING,"🔐 Login recusado para '{}'", identificador);
                 return ResponseData.error("Credenciais inválidas")
                         .withData("conectado", false);
             }
 
             Usuario user = opt.get();
-            service.registrarLogin(Long.valueOf(user.id()), ip);
-            String token = service.criarSessao(Long.valueOf(user.id()));
+            service.registrarLogin(user.id(), ip);
+            String token = service.criarSessao(user.id());
 
-            logger.info("✅ Login concluído: {} (sessão emitida)", user.nome());
+            logger.log(System.Logger.Level.INFO,"✅ Login concluído: {} (sessão emitida)", user.nome());
             return ResponseData.success()
                     .withData("conectado", true)
                     .withData("token", token)
@@ -309,14 +300,14 @@ public class UsuariosRoutes {
 
     /** Registra apenas o login (IP/último acesso). Executar após auth externa. */
     @ExecMapping("auth/registrar-login")
-    public ResponseData registrarLogin(@RouteVar("id") Long id,
+    public ResponseData registrarLogin(@RouteVar("id") String id,
                                        @RouteVar("ip") String ip) {
         return escrita(() -> { service.registrarLogin(id, ip); return "Login registrado"; }, "mensagem");
     }
 
     /** Cria sessão. Chave "duracaomin" OPCIONAL (default: 480). Retorna token. */
     @ExecMapping("sessao/criar")
-    public ResponseData criarSessao(@RouteVar("id") Long id,
+    public ResponseData criarSessao(@RouteVar("id") String id,
                                     @RouteVar("duracaomin") Integer duracaoMin) {
         return escrita(() ->
                         (duracaoMin == null)
@@ -340,7 +331,7 @@ public class UsuariosRoutes {
 
     /** Invalida a sessão do usuário (logout). */
     @ExecMapping("sessao/invalidar")
-    public ResponseData invalidarSessao(@RouteVar("id") Long id) {
+    public ResponseData invalidarSessao(@RouteVar("id") String id) {
         return escrita(() -> {
             service.invalidarSessao(id);
             return "Sessão invalidada";
@@ -375,7 +366,7 @@ public class UsuariosRoutes {
 
     /** Troca direta (uso administrativo). Chaves: id, "senha". */
     @PutMapping("senha/alterar")
-    public ResponseData alterarSenha(@RouteVar("id") Long id,
+    public ResponseData alterarSenha(@RouteVar("id") String id,
                                      @Payload("senha") String novaSenha) {
         if (novaSenha == null || novaSenha.isBlank()) {
             return ResponseData.error("Nova senha é obrigatória").withError("senha", "ausente");
@@ -388,7 +379,7 @@ public class UsuariosRoutes {
 
     /** Troca segura: valida senha atual. Chaves: id, "atual", "nova". */
     @PutMapping("senha/com-validacao")
-    public ResponseData alterarSenhaValidada(@RouteVar("id") Long id,
+    public ResponseData alterarSenhaValidada(@RouteVar("id") String id,
                                              @Payload("atual") String senhaAtual,
                                              @Payload("nova") String novaSenha) {
         if (senhaAtual == null || senhaAtual.isBlank()) {
@@ -421,20 +412,20 @@ public class UsuariosRoutes {
 
     /** Ativa usuário. Publica UsuarioEvent ATIVADO. */
     @PutMapping("ativar")
-    public ResponseData ativar(@RouteVar("id") Long id) {
+    public ResponseData ativar(@RouteVar("id") String id) {
         return escrita(() -> { service.ativar(id); return "Usuário ativado"; }, "mensagem");
     }
 
     /** Desativa usuário (mantém histórico/vínculos). */
     @PutMapping("desativar")
-    public ResponseData desativar(@RouteVar("id") Long id) {
+    public ResponseData desativar(@RouteVar("id") String id) {
         return escrita(() -> { service.desativar(id); return "Usuário desativado"; }, "mensagem");
     }
 
     /** Define nível direto. Chave "valor": veja GET niveis-validos. */
     @PutMapping("nivel/atualizar")
-    public ResponseData atualizarNivel(@RouteVar("id") Long id,
-                                       @RouteVar("valor") String nivel) {
+    public ResponseData atualizarNivel(@RouteVar("id") String id,
+                                       @RouteVar("valor") Hierarquia nivel) {
         return escrita(() -> {
             service.atualizarNivelAcesso(id, nivel);
             return "Nível atualizado";
@@ -443,19 +434,22 @@ public class UsuariosRoutes {
 
     /** Sobe um degrau na hierarquia. */
     @PutMapping("promover")
-    public ResponseData promover(@RouteVar("id") Long id) {
+    public ResponseData promover(@RouteVar("id") String id) {
         return escrita(() -> { service.promover(id); return "Usuário promovido"; }, "mensagem");
     }
 
     /** Desce um degrau na hierarquia. */
     @PutMapping("rebaixar")
-    public ResponseData rebaixar(@RouteVar("id") Long id) {
+    public ResponseData rebaixar(@RouteVar("id") String id) {
         return escrita(() -> { service.rebaixar(id); return "Usuário rebaixado"; }, "mensagem");
     }
 
-    /** Exclui usuário (invalida sessão antes). Publica EXCLUIDO. */
-    @DeleteMapping("por/id")
-    public ResponseData excluir(@RouteVar("id") Long id) {
+    /**
+     * Exclui usuário (invalida sessão antes). Publica EXCLUIDO.
+     * Path renomeado para evitar colisão com GET /por/id
+     */
+    @DeleteMapping("deletar/por/id")
+    public ResponseData excluir(@RouteVar("id") String id) {
         return escrita(() -> {
             service.excluir(id);
             return "Usuário excluído";
@@ -475,7 +469,7 @@ public class UsuariosRoutes {
         try {
             return ResponseData.success().withData(chave, acao.executar());
         } catch (IllegalArgumentException | IllegalStateException e) {
-            logger.warn("⚠️ Regra de negócio violada: {}", e.getMessage());
+            logger.log(System.Logger.Level.WARNING,"⚠️ Regra de negócio violada: {}", e.getMessage());
             return ResponseData.error(e.getMessage()).withError("negocio", e.getMessage());
         } catch (SQLException e) {
             return erroBanco(e);
@@ -491,7 +485,7 @@ public class UsuariosRoutes {
     }
 
     private ResponseData erroBanco(SQLException e) {
-        logger.error("❌ Erro de banco de dados: {}", e.getMessage(), e);
+        logger.log(System.Logger.Level.ERROR,"❌ Erro de banco de dados: {}", e.getMessage(), e);
         return ResponseData.error("Erro de banco de dados: " + e.getMessage())
                 .withError("banco", e.getMessage());
     }
@@ -532,7 +526,7 @@ public class UsuariosRoutes {
             Object seguro = (resultado instanceof Usuario u) ? u.comSenhaHash(null) : resultado;
             return ResponseData.success().withData(chave, seguro);
         } catch (IllegalArgumentException | IllegalStateException e) {
-            logger.warn("⚠️ Regra de negócio violada: {}", e.getMessage());
+            logger.log(System.Logger.Level.WARNING,"⚠️ Regra de negócio violada: {}", e.getMessage());
             return ResponseData.error(e.getMessage()).withError("negocio", e.getMessage());
         } catch (SQLException e) {
             return erroBanco(e);

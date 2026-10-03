@@ -1,343 +1,547 @@
 package com.ossobo.gestaoDepIt.db.config;
 
+import com.ossobo.winterfx.anotations.Component;
 import com.ossobo.winterfx.anotations.Inject;
 import com.ossobo.winterfx.anotations.PostConstruct;
-import com.ossobo.winterfx.anotations.Service;
-import com.ossobo.winterfx.anotations.Value;
-import com.ossobo.winterfx.router.model.ResponseData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.mindrot.jbcrypt.BCrypt;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
-
+import java.util.HashSet;
+import java.util.Set;
 /**
- * DatabaseInitializer v2.0
+ * DatabaseInitializer v2.2
  *
- * Responsabilidade: Inicializar e versionar o banco de dados SQLite
+ * Inicialização do banco SQLite local: PRAGMAs, schema (idempotente)
+ * e seed do par guest. Roda uma única vez via @PostConstruct.
  *
- * Padrões: Service + Migration + Versionamento
+ * v2.1 — Correções estruturais no executor de DDL:
+ *   1. Splitter de statements que respeita comentários (-- e /* *​/) e
+ *      strings ('...' e "...") — antes split(";") quebrava em qualquer ';'
+ *      dentro de comentário ou literal.
+ *   2. Marcação incremental de user_version.
+ *   3. Log individual por statement.
+ *   4. Leitura de recurso com remoção de BOM UTF-8.
  *
- * v2.0 - Migração para WinterFX
- * - @Service para injeção e gerenciamento
- * - @PostConstruct para inicialização automática
- * - @Value para configurações externalizadas
- * - Suporte a migrações versionadas
- * - ResponseData para respostas padronizadas
+ * v2.2 — Transação dos scripts de bootstrap controlada via JDBC:
+ *   - O executarScriptSePendente agora abre/fecha a transação ele mesmo,
+ *     ignorando os BEGIN TRANSACTION/COMMIT internos dos scripts SQL.
+ *   - Rollback explícito em caso de falha — nunca deixa transação aberta,
+ *     evitando o bug de "script reporta sucesso mas não commita".
+ *   - Autocommit resetado antes de cada script (imune a estado residual).
  */
-@Service
-public class DatabaseInitializer {
+@Component
+public final class DatabaseInitializer {
 
-    private static final Logger logger = LoggerFactory.getLogger(DatabaseInitializer.class);
+    private static final Logger LOGGER = System.getLogger(DatabaseInitializer.class.getName());
 
-    // ============================================================
-    // CONFIGURAÇÕES INJETADAS
-    // ============================================================
+    private static final String SCHEMA_RESOURCE = "/db/schema_v2.sql";
+    private static final int SCHEMA_VERSION_TARGET = 2;
 
-    @Value("${database.initializer.schema.path:/db/schema.sql}")
-    private String schemaPath;
+    // =========================================================================
+// BOOTSTRAP DE SCRIPTS SQL — controle de idempotência
+// =========================================================================
 
-    @Value("${database.initializer.migrations.path:/db/migrations}")
-    private String migrationsPath;
+    /** Tabela de controle: 1 linha por script já aplicado. */
+    private static final String BOOTSTRAP_TABLE = "_bootstrap_scripts";
 
-    @Value("${database.initializer.auto-create:true}")
-    private boolean autoCreate;
-
-    @Value("${database.initializer.version:1.0.0}")
-    private String versionAtual;
-
-    // ============================================================
-    // DEPENDÊNCIAS INJETADAS
-    // ============================================================
+    /**
+     * Scripts de bootstrap, NA ORDEM de execução.
+     * Cada um é aplicado UMA ÚNICA VEZ (registrado em _bootstrap_scripts).
+     * Para re-importar: DELETE FROM _bootstrap_scripts WHERE nome = '...';
+     * ou apague a tabela inteira (ver resetBootstrap()).
+     */
+    private static final List<String> SCRIPTS_BOOTSTRAP = List.of(
+            "/db/insert_catalogo.sql",
+            "/db/insert_funcionarios.sql",
+            "/db/insert_inventario.sql",
+            "/db/HISTORICO_EVENTOS.sql"
+    );
 
     @Inject
-    private DatabaseConfig databaseConfig;
-
-    // ============================================================
-    // ESTADO INTERNO
-    // ============================================================
-
-    private final AtomicBoolean initialized = new AtomicBoolean(false);
-    private String appliedVersion;
-    private List<String> migrationHistory = new ArrayList<>();
-
-    // ============================================================
-    // INICIALIZAÇÃO
-    // ============================================================
+    private DatabaseConnection databaseConnection;
 
     @PostConstruct
     public void init() {
-        logger.info("🗄️ DatabaseInitializer v2.0 inicializando...");
-        logger.info("   Schema: {}", schemaPath);
-        logger.info("   Migrations: {}", migrationsPath);
-        logger.info("   Auto-create: {}", autoCreate);
-        logger.info("   Versão atual: {}", versionAtual);
+        LOGGER.log(Level.INFO, "📦 Inicializando banco de dados...");
 
-        if (autoCreate) {
-            try {
-                initialize();
-                logger.info("✅ DatabaseInitializer v2.0 pronto");
-            } catch (SQLException e) {
-                logger.error("❌ Falha ao inicializar banco: {}", e.getMessage());
-            }
-        } else {
-            logger.info("ℹ️ Auto-create desabilitado, pulando inicialização");
+        try (Connection conn = databaseConnection.getConnection()) {
+            configurePragmas(conn);
+            createTables(conn);
+            seedInitialData(conn);
+            executarBootstrapScripts(conn);
+
+            LOGGER.log(Level.INFO, "✅ Banco de dados inicializado com sucesso!");
+        } catch (SQLException e) {
+            LOGGER.log(Level.ERROR, "❌ Erro ao inicializar banco de dados", e);
+            throw new RuntimeException("Falha na inicialização do banco", e);
         }
     }
 
-    // ============================================================
-    // MÉTODO PRINCIPAL DE INICIALIZAÇÃO
-    // ============================================================
+    // =========================================================================
+    // PRAGMAS
+    // =========================================================================
 
-    /**
-     * Inicializa o banco de dados com o schema e migrações.
-     * Executa apenas uma vez por execução da aplicação.
-     *
-     * @throws SQLException em caso de erro na execução do SQL
-     */
-    public synchronized ResponseData initialize() throws SQLException {
-        if (initialized.get()) {
-            return ResponseData.success()
-                    .withData("jaInicializado", true)
-                    .withData("versao", appliedVersion)
-                    .withData("mensagem", "Banco já inicializado");
-        }
-
-        try (Connection conn = databaseConfig.getConnection();
-             Statement stmt = conn.createStatement()) {
-
-            // 1. Executa schema base
-            String schema = loadSchema(schemaPath);
-            stmt.execute(schema);
-            logger.info("✅ Schema base aplicado");
-
-            // 2. Cria tabela de versões (se não existir)
-            criarTabelaVersao(stmt);
-
-            // 3. Verifica versão atual
-            String versaoAtual = getVersaoAtual(stmt);
-
-            if (versaoAtual == null) {
-                // Primeira execução - marca versão inicial
-                setVersao(stmt, versionAtual);
-                appliedVersion = versionAtual;
-                logger.info("✅ Versão inicial registrada: {}", versionAtual);
-            } else {
-                appliedVersion = versaoAtual;
-                logger.info("📌 Versão atual do banco: {}", versaoAtual);
-
-                // 4. Aplica migrações pendentes
-                if (!versionAtual.equals(versaoAtual)) {
-                    aplicarMigracoes(stmt, versaoAtual, versionAtual);
-                }
+    private void configurePragmas(Connection conn) throws SQLException {
+        try (Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery("PRAGMA journal_mode=WAL")) {
+            if (rs.next()) {
+                LOGGER.log(Level.INFO, "✅ journal_mode = {0}", rs.getString(1));
             }
-
-            // 5. Marca como inicializado
-            initialized.set(true);
-            migrationHistory.add("Inicialização em " + versionAtual);
-
-            logger.info("✅ Banco inicializado com sucesso!");
-            logger.info("📁 Localização: {}", databaseConfig.getDbPath());
-
-            return ResponseData.success()
-                    .withData("inicializado", true)
-                    .withData("versao", appliedVersion)
-                    .withData("versaoEsperada", versionAtual)
-                    .withData("migracoes", migrationHistory.size())
-                    .withData("mensagem", "Banco inicializado com sucesso");
-
-        } catch (Exception e) {
-            logger.error("❌ Falha ao inicializar banco: {}", e.getMessage());
-            throw new SQLException("Falha ao inicializar o banco de dados", e);
+        }
+        try (Statement st = conn.createStatement()) {
+            st.execute("PRAGMA synchronous = NORMAL");
         }
     }
 
-    // ============================================================
-    // MÉTODOS DE MIGRAÇÃO
-    // ============================================================
+    // =========================================================================
+    // SCHEMA — execução idempotente e incremental
+    // =========================================================================
 
-    /**
-     * Aplica migrações pendentes entre versões.
-     */
-    private void aplicarMigracoes(Statement stmt, String de, String para) throws SQLException {
-        logger.info("🔄 Aplicando migrações de {} para {}...", de, para);
+    private void createTables(Connection conn) throws SQLException {
+        int versionAtual = lerUserVersion(conn);
 
-        List<String> arquivos = listarArquivosMigracao(de, para);
-
-        if (arquivos.isEmpty()) {
-            logger.info("ℹ️ Nenhuma migração pendente");
+        if (versionAtual >= SCHEMA_VERSION_TARGET) {
+            LOGGER.log(Level.INFO, "✅ Schema v{0} já aplicado (user_version={1})",
+                    SCHEMA_VERSION_TARGET, versionAtual);
             return;
         }
 
-        for (String arquivo : arquivos) {
-            try {
-                String sql = loadSchema(migrationsPath + "/" + arquivo);
-                stmt.execute(sql);
-                migrationHistory.add("Migração: " + arquivo);
-                logger.info("✅ Migração aplicada: {}", arquivo);
-            } catch (Exception e) {
-                logger.error("❌ Falha na migração {}: {}", arquivo, e.getMessage());
-                throw new SQLException("Falha na migração: " + arquivo, e);
+        String schema = readClasspathResource(SCHEMA_RESOURCE);
+        List<String> statements = splitSqlStatements(schema);
+
+        LOGGER.log(Level.INFO, "📜 Executando {0} statement(s) de {1} (user_version atual={2})",
+                statements.size(), SCHEMA_RESOURCE, versionAtual);
+
+        int executados = 0;
+        for (int i = 0; i < statements.size(); i++) {
+            String sql = statements.get(i);
+            String rotulo = rotuloDoStatement(sql);
+
+            try (Statement st = conn.createStatement()) {
+                st.execute(sql);
+                executados++;
+
+                if (ehCreateTable(sql)) {
+                    LOGGER.log(Level.INFO, "  ✅ [{0}/{1}] {2}",
+                            i + 1, statements.size(), rotulo);
+                }
+            } catch (SQLException e) {
+                LOGGER.log(Level.ERROR,
+                        "❌ Falha no statement [{0}/{1}] — {2}\nSQL:\n{3}",
+                        i + 1, statements.size(), rotulo, sql);
+                throw new SQLException(
+                        "Falha ao executar statement " + (i + 1) + "/" + statements.size()
+                                + " (" + rotulo + "): " + e.getMessage()
+                                + "\nSQL:\n" + sql,
+                        e);
             }
         }
 
-        // Atualiza versão
-        setVersao(stmt, para);
-        appliedVersion = para;
-        logger.info("✅ Migrações concluídas. Versão atual: {}", para);
+        try (Statement st = conn.createStatement()) {
+            st.execute("PRAGMA user_version = " + SCHEMA_VERSION_TARGET);
+        }
+
+        LOGGER.log(Level.INFO, "✅ Schema v{0} aplicado ({1} statement(s) executado(s))",
+                SCHEMA_VERSION_TARGET, executados);
     }
 
-    // ============================================================
-    // MÉTODOS DE VERSÃO
-    // ============================================================
-
-    private void criarTabelaVersao(Statement stmt) throws SQLException {
-        String sql = """
-                CREATE TABLE IF NOT EXISTS versao_banco (
-                    id INTEGER PRIMARY KEY CHECK (id = 1),
-                    versao TEXT NOT NULL,
-                    data_atualizacao DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    historico TEXT
-                )
-                """;
-        stmt.execute(sql);
-    }
-
-    private String getVersaoAtual(Statement stmt) throws SQLException {
-        try (var rs = stmt.executeQuery(
-                "SELECT versao FROM versao_banco WHERE id = 1")) {
-            if (rs.next()) {
-                return rs.getString("versao");
-            }
-            return null;
+    private int lerUserVersion(Connection conn) throws SQLException {
+        try (Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery("PRAGMA user_version")) {
+            return rs.next() ? rs.getInt(1) : 0;
         }
     }
 
-    private void setVersao(Statement stmt, String versao) throws SQLException {
-        String sql = String.format("""
-                INSERT OR REPLACE INTO versao_banco (id, versao, historico) 
-                VALUES (1, '%s', '%s')
-                """, versao, String.join("; ", migrationHistory));
-
-        stmt.execute(sql);
-        logger.info("📌 Versão atualizada para: {}", versao);
-    }
-
-    // ============================================================
-    // MÉTODOS AUXILIARES
-    // ============================================================
+    // =========================================================================
+    // SPLITTER DE SQL — respeita comentários e strings
+    // =========================================================================
 
     /**
-     * Carrega o schema SQL do arquivo de recursos.
+     * Divide o script SQL em statements, respeitando:
+     *   - Comentários de linha:      -- até fim de linha
+     *   - Comentários de bloco:      /* ... *​/
+     *   - Strings com aspas simples: '...'  (com escape '' dentro)
+     *   - Strings com aspas duplas:  "..."  (com escape "" dentro)
      */
-    private String loadSchema(String path) {
-        try (InputStream is = getClass().getResourceAsStream(path)) {
-            if (is == null) {
-                throw new RuntimeException("Arquivo não encontrado: " + path);
+    static List<String> splitSqlStatements(String script) {
+        List<String> out = new ArrayList<>();
+        if (script == null) return out;
+
+        StringBuilder atual = new StringBuilder();
+        int i = 0;
+        int n = script.length();
+
+        while (i < n) {
+            char c = script.charAt(i);
+            char next = (i + 1 < n) ? script.charAt(i + 1) : '\0';
+
+            // Comentário de linha
+            if (c == '-' && next == '-') {
+                int fim = script.indexOf('\n', i);
+                i = (fim < 0) ? n : fim + 1;
+                continue;
             }
 
-            try (BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(is, StandardCharsets.UTF_8))) {
-
-                return reader.lines()
-                        .filter(line -> !line.trim().startsWith("--"))
-                        .collect(Collectors.joining("\n"));
+            // Comentário de bloco
+            if (c == '/' && next == '*') {
+                int fim = script.indexOf("*/", i + 2);
+                i = (fim < 0) ? n : fim + 2;
+                continue;
             }
 
-        } catch (Exception e) {
-            throw new RuntimeException("Falha ao carregar arquivo: " + path, e);
+            // String com aspas simples
+            if (c == '\'') {
+                atual.append(c);
+                i++;
+                while (i < n) {
+                    char cur = script.charAt(i);
+                    atual.append(cur);
+                    if (cur == '\'') {
+                        if (i + 1 < n && script.charAt(i + 1) == '\'') {
+                            atual.append('\'');
+                            i += 2;
+                            continue;
+                        }
+                        break;
+                    }
+                    i++;
+                }
+                i++;
+                continue;
+            }
+
+            // String com aspas duplas
+            if (c == '"') {
+                atual.append(c);
+                i++;
+                while (i < n) {
+                    char cur = script.charAt(i);
+                    atual.append(cur);
+                    if (cur == '"') {
+                        if (i + 1 < n && script.charAt(i + 1) == '"') {
+                            atual.append('"');
+                            i += 2;
+                            continue;
+                        }
+                        break;
+                    }
+                    i++;
+                }
+                i++;
+                continue;
+            }
+
+            // Fim de statement
+            if (c == ';') {
+                String stmt = atual.toString().trim();
+                if (!stmt.isEmpty()) {
+                    out.add(stmt);
+                }
+                atual.setLength(0);
+                i++;
+                continue;
+            }
+
+            atual.append(c);
+            i++;
         }
-    }
 
-    /**
-     * Lista arquivos de migração entre versões.
-     * (Implementação simplificada - em produção, ler do classpath)
-     */
-    private List<String> listarArquivosMigracao(String de, String para) {
-        List<String> migracoes = new ArrayList<>();
-
-        // Exemplo de migrações
-        if (de.compareTo("1.0.0") < 0 && para.compareTo("1.1.0") >= 0) {
-            migracoes.add("v1.0.0_to_v1.1.0.sql");
+        String ultimo = atual.toString().trim();
+        if (!ultimo.isEmpty()) {
+            out.add(ultimo);
         }
 
-        return migracoes;
+        return out;
     }
 
-    // ============================================================
-    // MÉTODOS PÚBLICOS
-    // ============================================================
-
-    /**
-     * Verifica se o banco já foi inicializado.
-     */
-    public boolean isInitialized() {
-        return initialized.get();
+    /** Rótulo humano-legível do statement (nome da tabela/índice) para log. */
+    private String rotuloDoStatement(String sql) {
+        String head = sql.trim().toUpperCase();
+        if (head.startsWith("CREATE TABLE")) {
+            return "CREATE TABLE " + extrairNomeIdentificador(sql, "CREATE TABLE");
+        }
+        if (head.startsWith("CREATE INDEX") || head.startsWith("CREATE UNIQUE INDEX")) {
+            String[] partes = sql.trim().split("\\s+");
+            return "CREATE INDEX " + (partes.length >= 3 ? partes[partes.length - 1] : "?");
+        }
+        if (head.startsWith("ALTER TABLE")) {
+            return "ALTER TABLE " + extrairNomeIdentificador(sql, "ALTER TABLE");
+        }
+        if (head.startsWith("INSERT"))  return "INSERT";
+        if (head.startsWith("PRAGMA"))  return "PRAGMA";
+        String primeiraLinha = sql.trim().split("\\R", 2)[0];
+        return primeiraLinha.length() > 60 ? primeiraLinha.substring(0, 57) + "..." : primeiraLinha;
     }
 
-    /**
-     * Obtém a versão atual do banco.
-     */
-    public String getAppliedVersion() {
-        return appliedVersion;
+    private boolean ehCreateTable(String sql) {
+        return sql.trim().toUpperCase().startsWith("CREATE TABLE");
     }
 
-    /**
-     * Obtém o histórico de migrações.
-     */
-    public List<String> getMigrationHistory() {
-        return new ArrayList<>(migrationHistory);
+    private String extrairNomeIdentificador(String sql, String prefixo) {
+        String resto = sql.trim().substring(prefixo.length()).trim();
+        if (resto.toUpperCase().startsWith("IF NOT EXISTS")) {
+            resto = resto.substring("IF NOT EXISTS".length()).trim();
+        }
+        int fim = 0;
+        while (fim < resto.length()) {
+            char c = resto.charAt(fim);
+            if (Character.isLetterOrDigit(c) || c == '_' || c == '.') fim++;
+            else break;
+        }
+        return resto.substring(0, fim);
     }
 
-    /**
-     * Recria o banco do zero (perigoso!).
-     * Use com cuidado.
-     */
-    public synchronized ResponseData resetDatabase() {
-        if (!initialized.get()) {
-            return ResponseData.error("Banco não inicializado");
+    // =========================================================================
+    // SEED GUEST
+    // =========================================================================
+
+    private void seedInitialData(Connection conn) throws SQLException {
+        try (PreparedStatement ps = conn.prepareStatement(
+                "SELECT 1 FROM usuarios WHERE id = ? LIMIT 1")) {
+            ps.setString(1, GuestConstants.GUEST_ID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    LOGGER.log(Level.INFO, "✅ Usuário guest já existe");
+                    return;
+                }
+            }
         }
 
-        try (Connection conn = databaseConfig.getConnection();
-             Statement stmt = conn.createStatement()) {
+        String guestPassword = System.getProperty("guest.password", "guest123");
+        String hash = BCrypt.hashpw(guestPassword, BCrypt.gensalt());
 
-            // Obtém todas as tabelas
-            var rs = stmt.executeQuery(
-                    "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'");
-
-            List<String> tables = new ArrayList<>();
-            while (rs.next()) {
-                tables.add(rs.getString("name"));
+        conn.setAutoCommit(false);
+        try {
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "INSERT INTO funcionarios (cod_dep, nome, departamento, funcao, ativo) " +
+                            "VALUES (?, ?, ?, ?, ?)")) {
+                ps.setString(1, GuestConstants.GUEST_FUNC_ID);
+                ps.setString(2, GuestConstants.GUEST_FUNC_NAME);
+                ps.setString(3, GuestConstants.GUEST_DEPARTMENT);
+                ps.setString(4, GuestConstants.GUEST_ROLE);
+                ps.setInt(5, 1);
+                ps.executeUpdate();
             }
 
-            // Remove todas as tabelas
-            for (String table : tables) {
-                stmt.execute("DROP TABLE IF EXISTS " + table);
-                logger.debug("🗑️ Tabela removida: {}", table);
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "INSERT INTO usuarios (id, funcionario_id, nome, email, senha_hash, nivel_acesso, ativo) " +
+                            "VALUES (?, ?, ?, ?, ?, ?, ?)")) {
+                ps.setString(1, GuestConstants.GUEST_ID);
+                ps.setString(2, GuestConstants.GUEST_FUNC_ID);
+                ps.setString(3, GuestConstants.GUEST_NAME);
+                ps.setString(4, GuestConstants.GUEST_EMAIL);
+                ps.setString(5, hash);
+                ps.setString(6, GuestConstants.GUEST_LEVEL);
+                ps.setInt(7, 1);
+                ps.executeUpdate();
             }
 
-            // Reinicializa
-            initialized.set(false);
-            migrationHistory.clear();
-            initialize();
-
-            return ResponseData.success()
-                    .withData("resetado", true)
-                    .withData("mensagem", "Banco resetado com sucesso")
-                    .withData("tabelasRemovidas", tables.size());
+            conn.commit();
+            LOGGER.log(Level.INFO, "✅ Usuário guest criado com sucesso!");
 
         } catch (SQLException e) {
-            logger.error("❌ Falha ao resetar banco: {}", e.getMessage());
-            return ResponseData.error("Falha ao resetar: " + e.getMessage());
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(true);
+        }
+    }
+
+    // =========================================================================
+    // LEITURA DE RECURSO
+    // =========================================================================
+
+    /**
+     * Lê o recurso como UTF-8 e remove BOM se presente.
+     */
+    private String readClasspathResource(String path) {
+        try (var is = getClass().getResourceAsStream(path)) {
+            if (is == null) {
+                throw new IllegalStateException(
+                        "Recurso não encontrado no classpath: " + path
+                                + " — verifique se schema_v2.sql está em src/main/resources/db/");
+            }
+            byte[] bytes = is.readAllBytes();
+
+            // Remove BOM UTF-8 se presente
+            if (bytes.length >= 3
+                    && (bytes[0] & 0xFF) == 0xEF
+                    && (bytes[1] & 0xFF) == 0xBB
+                    && (bytes[2] & 0xFF) == 0xBF) {
+                byte[] semBom = new byte[bytes.length - 3];
+                System.arraycopy(bytes, 3, semBom, 0, semBom.length);
+                bytes = semBom;
+                LOGGER.log(Level.WARNING, "⚠️ BOM UTF-8 detectado em {0} — removido", path);
+            }
+
+            return new String(bytes, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            throw new IllegalStateException("Falha ao ler recurso: " + path, e);
+        }
+    }
+
+
+    // =========================================================================
+// BOOTSTRAP DE SCRIPTS SQL
+// =========================================================================
+
+    /**
+     * Executa os scripts de bootstrap pendentes, na ordem de SCRIPTS_BOOTSTRAP.
+     *
+     * - Idempotente: cada script é aplicado 1x (controle em _bootstrap_scripts).
+     * - Transação controlada via JDBC (ignora BEGIN/COMMIT internos do script).
+     * - Rollback automático em caso de falha — nunca deixa transação aberta.
+     * - Autocommit resetado antes de cada script.
+     *
+     * Para re-importar um script específico:
+     *   DELETE FROM _bootstrap_scripts WHERE nome = '/db/insert_catalogo.sql';
+     *
+     * Para re-importar TODOS (apaga tudo):
+     *   ver método estático resetBootstrap(Connection).
+     */
+    private void executarBootstrapScripts(Connection conn) throws SQLException {
+        garantirTabelaBootstrap(conn);
+
+        Set<String> aplicados = lerScriptsAplicados(conn);
+
+        List<String> pendentes = SCRIPTS_BOOTSTRAP.stream()
+                .filter(s -> !aplicados.contains(s))
+                .toList();
+
+        if (pendentes.isEmpty()) {
+            LOGGER.log(Level.INFO, "✅ Todos os {0} scripts de bootstrap já aplicados",
+                    SCRIPTS_BOOTSTRAP.size());
+            return;
+        }
+
+        LOGGER.log(Level.INFO, "📜 Executando {0} script(s) de bootstrap pendente(s)",
+                pendentes.size());
+
+        for (String recurso : pendentes) {
+            executarScriptSePendente(conn, recurso);
+        }
+    }
+
+    /**
+     * Executa um único script, registrando-o em _bootstrap_scripts ao final.
+     * Tudo dentro de UMA transação JDBC — se falhar, rollback completo.
+     */
+    private void executarScriptSePendente(Connection conn, String recurso) throws SQLException {
+        String sql = readClasspathResource(recurso);
+        List<String> statements = splitSqlStatements(sql);
+
+        LOGGER.log(Level.INFO, "📜 [{0}] {1} statement(s)", recurso, statements.size());
+
+        // Estado limpo: nunca herda autocommit de outro trecho
+        conn.setAutoCommit(true);
+
+        try {
+            conn.setAutoCommit(false);
+
+            int executados = 0;
+            for (int i = 0; i < statements.size(); i++) {
+                String stmt = statements.get(i);
+                try (Statement st = conn.createStatement()) {
+                    st.execute(stmt);
+                    executados++;
+                } catch (SQLException e) {
+                    LOGGER.log(Level.ERROR,
+                            "❌ Falha [{0}] no statement {1}/{2}\nSQL:\n{3}",
+                            recurso, i + 1, statements.size(), stmt);
+                    throw e;
+                }
+            }
+
+            // Registra como aplicado (mesma transação → atômico)
+            registrarScriptAplicado(conn, recurso);
+
+            conn.commit();
+            LOGGER.log(Level.INFO, "✅ [{0}] {1} statement(s) executado(s) e registrado(s)",
+                    recurso, executados);
+
+        } catch (SQLException e) {
+            try {
+                conn.rollback();
+                LOGGER.log(Level.WARNING, "↩️ Rollback aplicado em {0}", recurso);
+            } catch (SQLException rb) {
+                LOGGER.log(Level.ERROR, "❌ Falha no rollback de " + recurso, rb);
+            }
+            throw new SQLException(
+                    "Falha ao executar bootstrap " + recurso + ": " + e.getMessage(), e);
+        } finally {
+            conn.setAutoCommit(true);
+        }
+    }
+
+// =========================================================================
+// TABELA DE CONTROLE
+// =========================================================================
+
+    private void garantirTabelaBootstrap(Connection conn) throws SQLException {
+        try (Statement st = conn.createStatement()) {
+            st.execute("""
+            CREATE TABLE IF NOT EXISTS %s (
+                nome        TEXT PRIMARY KEY,
+                aplicado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )
+            """.formatted(BOOTSTRAP_TABLE));
+        }
+    }
+
+    private Set<String> lerScriptsAplicados(Connection conn) throws SQLException {
+        Set<String> out = new HashSet<>();
+        try (Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery("SELECT nome FROM " + BOOTSTRAP_TABLE)) {
+            while (rs.next()) {
+                out.add(rs.getString(1));
+            }
+        }
+        return out;
+    }
+
+    private void registrarScriptAplicado(Connection conn, String nome) throws SQLException {
+        try (PreparedStatement ps = conn.prepareStatement(
+                "INSERT OR IGNORE INTO " + BOOTSTRAP_TABLE + " (nome) VALUES (?)")) {
+            ps.setString(1, nome);
+            ps.executeUpdate();
+        }
+    }
+
+// =========================================================================
+// RESET — apaga o controle de bootstrap
+// =========================================================================
+
+    /**
+     * Remove o controle de bootstrap (opcionalmente de UM script específico).
+     *
+     * Uso típico:
+     *   - resetBootstrap(conn, null)            → todos os scripts rodarão de novo
+     *   - resetBootstrap(conn, "/db/insert_inventario.sql") → só esse rodará
+     *
+     * IMPORTANTE: os dados em si NÃO são apagados — apenas o registro de "já apliquei".
+     * Como os scripts usam INSERT OR IGNORE, rodar de novo NÃO duplica.
+     * Se quiser apagar os dados também, faça DELETE das tabelas antes.
+     */
+    public static void resetBootstrap(Connection conn, String nomeScript) throws SQLException {
+        try (Statement st = conn.createStatement()) {
+            if (nomeScript == null) {
+                st.execute("DROP TABLE IF EXISTS " + BOOTSTRAP_TABLE);
+            } else {
+                try (PreparedStatement ps = conn.prepareStatement(
+                        "DELETE FROM " + BOOTSTRAP_TABLE + " WHERE nome = ?")) {
+                    ps.setString(1, nomeScript);
+                    ps.executeUpdate();
+                }
+            }
         }
     }
 }

@@ -1,399 +1,164 @@
 package com.ossobo.gestaoDepIt.db.config;
 
-import com.ossobo.gestaoDepIt.db.config.event.ConexaoEvent;
-import com.ossobo.gestaoDepIt.db.config.event.ConexaoStatus;
-import com.ossobo.gestaoDepIt.db.models.ConfigServidorRemoto;
-import com.ossobo.gestaoDepIt.db.repositories.ConfigServidorRemotoRepository;
-import com.ossobo.winterfx.anotations.Inject;
-import com.ossobo.winterfx.anotations.PostConstruct;
-import com.ossobo.winterfx.anotations.Service;
-import com.ossobo.winterfx.anotations.Value;
-import com.ossobo.winterfx.event.EventBus;
-import com.ossobo.winterfx.router.model.ResponseData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.ossobo.winterfx.anotations.Component;
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.sql.Statement;
 
 /**
- * DatabaseConnection v3.2
+ * DatabaseConnection v1.1
  *
- * Responsabilidade: Gerenciar conexão dual SQLite/MySQL com fallback automático
+ * Responsabilidade: Resolver o caminho do banco por SO, garantir o diretório
+ *                   de dados e abrir conexões SQLite com os pragmas corretos
+ *                   (foreign_keys=ON, busy_timeout=5000).
  *
- * Padrões: Service + EventBus + Configuration
+ * v1.1 — Transações explícitas para operações compostas entre domínios:
+ *        - beginTransaction() → getConnection + setAutoCommit(false)
+ *        - commit(conn)        → commit + close
+ *        - rollback(conn)      → rollback + close (tolerante a conn já fechada)
  *
- * v3.2 - Corrigido para usar Record (acesso direto aos campos) e Optional
- * v3.1 - Migração para WinterFX Nativo
+ *        Contrato: quem chama beginTransaction() é dono do ciclo e DEVE fechar
+ *        via commit() ou rollback(). Métodos que recebem Connection externa
+ *        (overloads nos repositories) NÃO fecham a conexão.
  */
-@Service
-public class DatabaseConnection {
+@Component
+public final class DatabaseConnection {
 
-    private static final Logger logger = LoggerFactory.getLogger(DatabaseConnection.class);
+    private static final Logger LOGGER = System.getLogger(DatabaseConnection.class.getName());
+    private static final String APP_NAME = "GestaoDepIt";
+    private static final String DB_FILE = "inventario.db";
 
-    // ============================================================
-    // CONFIGURAÇÕES INJETADAS
-    // ============================================================
+    private final Path dbFile;
+    private final String databaseUrl;
 
-    @Value("${database.sqlite.diretorio:dados}")
-    private String sqliteDiretorio;
+    public DatabaseConnection() {
+        Path baseDir = resolveBaseDirectory();
+        this.dbFile = baseDir.resolve(DB_FILE);
+        this.databaseUrl = "jdbc:sqlite:" + dbFile;
 
-    @Value("${database.sqlite.arquivo:inventario.db}")
-    private String sqliteArquivo;
-
-    // ============================================================
-    // DEPENDÊNCIAS INJETADAS
-    // ============================================================
-
-    @Inject
-    private DatabaseConfig databaseConfig;
-
-    @Inject
-    private ConfigServidorRemotoRepository configRepository;
-
-    @Inject
-    private EventBus eventBus;  // ✅ WinterFX EventBus
-
-    // ============================================================
-    // ESTADO INTERNO
-    // ============================================================
-
-    private ConfigServidorRemoto configAtiva;
-    private String jdbcUrl;
-    private String usuario;
-    private String senha;
-    private final AtomicBoolean usandoRemoto = new AtomicBoolean(false);
-    private volatile LocalDateTime ultimaMudanca;
-
-    // ============================================================
-    // INICIALIZAÇÃO
-    // ============================================================
-
-    @PostConstruct
-    public void init() {
-        logger.info("🔌 DatabaseConnection v3.2 inicializando...");
-        carregarConfiguracaoAtiva();
-        logger.info("✅ DatabaseConnection v3.2 pronta");
-        logger.info("   Modo: {}", usandoRemoto.get() ? "REMOTO" : "SQLITE");
-        logger.info("   SQLite: {}/{}", sqliteDiretorio, sqliteArquivo);
+        LOGGER.log(Level.INFO, "📁 Banco de dados: {0}", dbFile);
+        LOGGER.log(Level.INFO, "🖥️  SO: {0}", System.getProperty("os.name"));
     }
 
-    // ============================================================
-    // CARREGAMENTO DA CONFIGURAÇÃO
-    // ============================================================
-
     /**
-     * Carrega a configuração ativa do repositório.
-     * Notifica via EventBus em caso de mudança.
+     * Resolve o diretório de dados por SO, seguindo convenções modernas:
+     *   Linux  → $XDG_DATA_HOME/GestaoDepIt (fallback: ~/.local/share/GestaoDepIt)
+     *   macOS  → ~/Library/Application Support/GestaoDepIt
+     *   Windows→ %APPDATA%\GestaoDepIt (fallback: ~\AppData\Roaming\GestaoDepIt)
      */
-    public synchronized void carregarConfiguracaoAtiva() {
-        try {
-            // ✅ CORRIGIDO: Optional<ConfigServidorRemoto> → ConfigServidorRemoto
-            Optional<ConfigServidorRemoto> optConfig = configRepository.findAtivo();
+    private static Path resolveBaseDirectory() {
+        String os = System.getProperty("os.name").toLowerCase();
+        String userHome = System.getProperty("user.home");
 
-            if (optConfig.isPresent()) {
-                ConfigServidorRemoto novaConfig = optConfig.get();
-                boolean mudou = configMudou(novaConfig);
-
-                // Configura conexão remota
-                this.configAtiva = novaConfig;
-                this.jdbcUrl = novaConfig.gerarUrlConexao();
-                // ✅ Record: acesso direto aos campos
-                this.usuario = novaConfig.usuario();
-                this.senha = novaConfig.senha();
-                this.usandoRemoto.set(true);
-
-                // Adiciona parâmetros extras
-                String parametrosExtra = novaConfig.parametrosExtra();
-                if (parametrosExtra != null && !parametrosExtra.isEmpty()) {
-                    jdbcUrl += "?" + parseParams(parametrosExtra);
-                }
-
-                carregarDriver(novaConfig.tipoBanco());
-
-                logger.info("✅ Configuração remota carregada: {} @ {}:{}",
-                        novaConfig.nomeConfig(),
-                        novaConfig.host(),
-                        novaConfig.porta());
-
-                // Notifica mudança
-                if (mudou) {
-                    notificarMudanca(ConexaoStatus.REMOTO);
-                }
-
-            } else {
-                // Fallback para SQLite
-                boolean mudou = this.usandoRemoto.get();
-                usarFallbackSqlite();
-
-                if (mudou) {
-                    notificarMudanca(ConexaoStatus.SQLITE);
-                }
-            }
-
-        } catch (Exception e) {
-            logger.error("❌ Erro ao carregar configuração: {}", e.getMessage());
-            usarFallbackSqlite();
-            notificarMudanca(ConexaoStatus.ERRO);
+        Path base;
+        if (os.contains("win")) {
+            String appData = System.getenv("APPDATA");
+            base = (appData != null && !appData.isBlank())
+                    ? Paths.get(appData, APP_NAME)
+                    : Paths.get(userHome, "AppData", "Roaming", APP_NAME);
+        } else if (os.contains("mac")) {
+            base = Paths.get(userHome, "Library", "Application Support", APP_NAME);
+        } else {
+            // Linux/Unix: prioriza XDG_DATA_HOME, fallback para ~/.local/share
+            String xdg = System.getenv("XDG_DATA_HOME");
+            base = (xdg != null && !xdg.isBlank())
+                    ? Paths.get(xdg, APP_NAME)
+                    : Paths.get(userHome, ".local", "share", APP_NAME);
         }
+        return base;
     }
-
-    private boolean configMudou(ConfigServidorRemoto novaConfig) {
-        if (configAtiva == null) return true;
-        // ✅ Record: acesso direto aos campos
-        return !configAtiva.host().equals(novaConfig.host())
-                || !configAtiva.porta().equals(novaConfig.porta())
-                || !configAtiva.databaseName().equals(novaConfig.databaseName());
-    }
-
-    private void usarFallbackSqlite() {
-        this.configAtiva = null;
-        this.jdbcUrl = databaseConfig.getDbUrl();
-        this.usuario = null;
-        this.senha = null;
-        this.usandoRemoto.set(false);
-        this.ultimaMudanca = LocalDateTime.now();
-
-        logger.info("📁 Usando SQLite local: {}", databaseConfig.getDbPath());
-    }
-
-    private void carregarDriver(String tipoBanco) {
-        try {
-            String driverClass = switch (tipoBanco) {
-                case "MYSQL", "MARIADB" -> "com.mysql.cj.jdbc.Driver";
-                case "POSTGRESQL" -> "org.postgresql.Driver";
-                case "SQLSERVER" -> "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-                case "ORACLE" -> "oracle.jdbc.OracleDriver";
-                default -> null;
-            };
-
-            if (driverClass != null) {
-                Class.forName(driverClass);
-                logger.debug("✅ Driver {} carregado", driverClass);
-            }
-
-        } catch (ClassNotFoundException e) {
-            logger.error("❌ Driver não encontrado para {}: {}", tipoBanco, e.getMessage());
-        }
-    }
-
-    private String parseParams(String params) {
-        if (params == null || params.isEmpty()) return "";
-        return params.replace("{", "")
-                .replace("}", "")
-                .replace("\"", "")
-                .replace(" ", "");
-    }
-
-    // ============================================================
-    // MÉTODOS DE CONEXÃO
-    // ============================================================
 
     /**
-     * Obtém conexão com fallback automático.
-     * Tenta remoto primeiro, se falhar usa SQLite.
+     * Garante que o diretório de dados existe e é gravável.
+     * Log apenas na criação real (evita spam por conexão).
+     */
+    public void ensureDataDirectory() {
+        try {
+            Path parent = dbFile.getParent();
+            boolean criou = !Files.exists(parent);
+            Files.createDirectories(parent);
+            if (!Files.isWritable(parent)) {
+                throw new IllegalStateException("Sem permissão de escrita em: " + parent);
+            }
+            if (criou) {
+                LOGGER.log(Level.INFO, "📁 Diretório de dados criado: {0}", parent);
+            }
+        } catch (Exception e) {
+            throw new IllegalStateException("Falha ao preparar diretório de dados: " + dbFile, e);
+        }
+    }
+
+    /**
+     * Abre conexão garantindo:
+     *   1. Diretório existente (SQLite cria o ARQUIVO, jamais os diretórios pais)
+     *   2. foreign_keys = ON → default OFF em CADA conexão do SQLite; sem isto,
+     *      RESTRICT/CASCADE/SET NULL do DDL v2 são decorativos
+     *   3. busy_timeout → espera 5s por lock em vez de falhar com SQLITE_BUSY
      */
     public Connection getConnection() throws SQLException {
-        if (usandoRemoto.get() && usuario != null && senha != null) {
-            try {
-                return DriverManager.getConnection(jdbcUrl, usuario, senha);
-            } catch (SQLException e) {
-                logger.warn("❌ Erro no remoto, fallback SQLite: {}", e.getMessage());
-                return databaseConfig.getConnection();
-            }
+        ensureDataDirectory();
+        Connection conn = DriverManager.getConnection(databaseUrl);
+        try (Statement st = conn.createStatement()) {
+            st.execute("PRAGMA foreign_keys = ON");
+            st.execute("PRAGMA busy_timeout = 5000");
         }
-        return databaseConfig.getConnection();
+        return conn;
     }
 
-    /**
-     * Obtém conexão remota (sem fallback).
-     */
-    public Connection getConnectionRemota() throws SQLException {
-        if (!usandoRemoto.get() || usuario == null || senha == null) {
-            throw new SQLException("Nenhuma configuração remota ativa");
-        }
-        return DriverManager.getConnection(jdbcUrl, usuario, senha);
-    }
+    // ============================================================
+    // TRANSAÇÕES EXPLÍCITAS (v1.1)
+    // ============================================================
 
     /**
-     * Obtém conexão SQLite forçada.
+     * Abre conexão com auto-commit desligado — o chamador é dono do ciclo
+     * transacional e DEVE fechar via {@link #commit(Connection)} ou
+     * {@link #rollback(Connection)}.
+     *
+     * Usado por operações compostas entre domínios (ex.: inventário + histórico),
+     * garantindo atomicidade real: ou os dois gravam, ou nenhum grava.
      */
-    public Connection getConnectionSqlite() throws SQLException {
-        return databaseConfig.getConnection();
-    }
-
-    /**
-     * Obtém conexão com gerenciamento automático (withConnection).
-     */
-    public <T> T withConnection(ConnectionAction<T> action) throws SQLException {
+    public Connection beginTransaction() throws SQLException {
         Connection conn = getConnection();
+        conn.setAutoCommit(false);
+        return conn;
+    }
+
+    /**
+     * Comita a transação e fecha a conexão.
+     * Se o commit falhar, tenta rollback defensivo antes de propagar a exceção.
+     */
+    public void commit(Connection conn) throws SQLException {
+        if (conn == null) return;
         try {
-            return action.execute(conn);
+            conn.commit();
+        } catch (SQLException e) {
+            try { conn.rollback(); } catch (SQLException ignored) { /* best-effort */ }
+            throw e;
         } finally {
-            if (conn != null && !conn.isClosed()) {
-                conn.close();
-            }
-        }
-    }
-
-    @FunctionalInterface
-    public interface ConnectionAction<T> {
-        T execute(Connection conn) throws SQLException;
-    }
-
-    // ============================================================
-    // MÉTODOS DE TESTE (COM RESPONSEDATA)
-    // ============================================================
-
-    /**
-     * Testa a conexão ativa.
-     */
-    public ResponseData testarConexao() {
-        try (Connection conn = getConnection()) {
-            boolean isValid = conn.isValid(2);
-            return ResponseData.success()
-                    .withData("conectado", isValid)
-                    .withData("modo", usandoRemoto.get() ? "REMOTO" : "SQLITE")
-                    .withData("host", getHost())
-                    .withData("database", getDatabase());
-        } catch (SQLException e) {
-            return ResponseData.error("Falha na conexão: " + e.getMessage())
-                    .withData("conectado", false);
+            try { conn.close(); } catch (SQLException ignored) { /* best-effort */ }
         }
     }
 
     /**
-     * Testa especificamente a conexão remota.
+     * Desfaz a transação e fecha a conexão.
+     * Tolerante: conexão já fechada ou nula não propaga erro — rollback é
+     * caminho de exceção, nunca deve mascarar a exceção original.
      */
-    public ResponseData testarConexaoRemota() {
-        if (!usandoRemoto.get() || configAtiva == null) {
-            return ResponseData.error("Nenhuma configuração remota ativa")
-                    .withData("conectado", false);
+    public void rollback(Connection conn) {
+        if (conn == null) return;
+        try {
+            conn.rollback();
+        } catch (SQLException ignored) {
+            // best-effort: rollback é caminho de falha, não deve propagar
+        } finally {
+            try { conn.close(); } catch (SQLException ignored) { /* best-effort */ }
         }
-
-        try (Connection conn = getConnectionRemota()) {
-            boolean isValid = conn.isValid(2);
-            // ✅ Record: acesso direto aos campos
-            return ResponseData.success()
-                    .withData("conectado", isValid)
-                    .withData("host", configAtiva.host())
-                    .withData("database", configAtiva.databaseName())
-                    .withData("usuario", configAtiva.usuario());
-        } catch (SQLException e) {
-            return ResponseData.error("Falha na conexão remota: " + e.getMessage())
-                    .withData("conectado", false)
-                    .withData("host", configAtiva != null ? configAtiva.host() : "n/a");
-        }
-    }
-
-    // ============================================================
-    // RECARREGAMENTO E CONTROLE
-    // ============================================================
-
-    /**
-     * Recarrega configuração ativa do banco.
-     */
-    public synchronized ResponseData recarregarConfiguracao() {
-        logger.info("🔄 Recarregando configuração...");
-        carregarConfiguracaoAtiva();
-
-        return ResponseData.success()
-                .withData("modo", usandoRemoto.get() ? "REMOTO" : "SQLITE")
-                .withData("host", getHost())
-                .withData("database", getDatabase())
-                .withData("mensagem", "Configuração recarregada");
-    }
-
-    /**
-     * Força uso de SQLite.
-     */
-    public synchronized ResponseData forcarSqlite() {
-        boolean estavaRemoto = usandoRemoto.get();
-        usarFallbackSqlite();
-
-        if (estavaRemoto) {
-            notificarMudanca(ConexaoStatus.SQLITE);
-        }
-
-        return ResponseData.success()
-                .withData("modo", "SQLITE")
-                .withData("mensagem", "SQLite forçado com sucesso");
-    }
-
-    // ============================================================
-    // NOTIFICAÇÕES VIA EVENTBUS (WINTERFX NATIVO)
-    // ============================================================
-
-    private void notificarMudanca(ConexaoStatus status) {
-        this.ultimaMudanca = LocalDateTime.now();
-
-        ConexaoEvent event = new ConexaoEvent(
-                ConexaoEvent.Type.MUDOU,
-                status,
-                configAtiva,
-                String.format("Conexão alterada para: %s", status.getDescricao())
-        );
-
-        eventBus.publish(event);
-        logger.info("📢 Evento de conexão publicado: {}", status.getDescricao());
-    }
-
-    // ============================================================
-    // GETTERS
-    // ============================================================
-
-    public boolean isUsandoRemoto() {
-        return usandoRemoto.get();
-    }
-
-    public ConfigServidorRemoto getConfigAtiva() {
-        return configAtiva;
-    }
-
-    public String getJdbcUrl() {
-        return jdbcUrl;
-    }
-
-    // ✅ CORRIGIDO: Acesso direto aos campos do Record
-    public String getHost() {
-        return configAtiva != null ? configAtiva.host() : "localhost";
-    }
-
-    public String getPorta() {
-        return configAtiva != null ? configAtiva.porta() : "3306";
-    }
-
-    public String getDatabase() {
-        return configAtiva != null ? configAtiva.databaseName() : "inventario.db";
-    }
-
-    public String getUsuario() {
-        return configAtiva != null ? configAtiva.usuario() : null;
-    }
-
-    public LocalDateTime getUltimaMudanca() {
-        return ultimaMudanca;
-    }
-
-    public String getStatusDescricao() {
-        if (usandoRemoto.get() && configAtiva != null) {
-            // ✅ Record: acesso direto aos campos
-            return String.format("REMOTO: %s@%s:%s",
-                    configAtiva.usuario(),
-                    configAtiva.host(),
-                    configAtiva.porta());
-        }
-        return "SQLITE: " + databaseConfig.getDbPath();
-    }
-
-    /**
-     * Obtém o caminho do SQLite
-     */
-    public String getSqlitePath() {
-        return databaseConfig.getDbPath();
     }
 }

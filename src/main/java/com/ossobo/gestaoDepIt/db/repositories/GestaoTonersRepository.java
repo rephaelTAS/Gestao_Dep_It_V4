@@ -3,38 +3,64 @@ package com.ossobo.gestaoDepIt.db.repositories;
 import com.ossobo.gestaoDepIt.db.config.DatabaseConnection;
 import com.ossobo.gestaoDepIt.db.models.GestaoToners;
 
-
 import com.ossobo.winterfx.anotations.Inject;
 import com.ossobo.winterfx.anotations.Repository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.*;
 
 /**
  * GestaoTonersRepository - Acesso a dados com WinterFX
- * v2.0 - Migrado para Java 17+ com Records e Text Blocks
+ * v2.1 - Alinhado ao GestaoToners v3.0 (PK/FKs String/UUID + colunas de sync)
  *
- * Responsabilidades:
- * - CRUD para GestaoToners
- * - Filtros por inventário, SKU, percentagem, período
- * - Cálculo de vida útil e estatísticas
+ * Mudanças v2.0 → v2.1:
+ * - id, inventarioId e usuarioResponsavel: Long → String (UUID) em TODAS as
+ *   assinaturas e setters
+ * - INSERT inclui id (da fábrica), device_id, deleted, created_at, updated_at
+ * - UPDATE grava device_id (origem da última mutação — sync LWW)
+ * - +marcarDeletado(): tombstone de sync (DELETE físico continua disponível,
+ *   mas para convergência entre devices o tombstone é o caminho)
+ * - DATE_FORMAT/YEAR() (MySQL) → agrupamento por mês calculado no Java
+ *   (SQLite não tem essas funções)
+ * - getIntegerNullable: NULL no banco não vira mais 0 silenciosamente
+ *   (0% = "esgotado" — um NULL virar 0 corrompia o dado!)
+ * - calcularVidaUtilPorSku retorna record VidaUtilSku (antes: Object[])
+ * - Queries de alerta/substituição filtram deleted = 0 (tombstones não
+ *   devem disparar alertas de troca de toner)
+ * - save() decide insert/update por existsById (a fábrica SEMPRE gera id,
+ *   então id != null não significa mais "já persistido")
  */
 @Repository
 public class GestaoTonersRepository {
 
-    private static final Logger logger = LoggerFactory.getLogger(GestaoTonersRepository.class);
+    private static final System.Logger logger = System.getLogger(GestaoTonersRepository.class.getName());
 
     @Inject
     private DatabaseConnection dbConnection;
 
     private static final String TABLE = "gestao_toners";
 
-    // ===== SQL COM TEXT BLOCKS =====
+    // ============================================================
+    // TIPOS AUXILIARES
+    // ============================================================
+
+    /** Estatísticas de vida útil agregadas por SKU (substitui o antigo Object[]). */
+    public record VidaUtilSku(
+            String sku,
+            double mediaCiclos,
+            double mediaPercentagem,
+            int totalInstalacoes,
+            int maxCiclos,
+            int minCiclos
+    ) {}
+
+    // ============================================================
+    // SQL COM TEXT BLOCKS
+    // ============================================================
 
     private static final String SQL_FIND_ALL = """
             SELECT * FROM %s
@@ -82,21 +108,22 @@ public class GestaoTonersRepository {
             ORDER BY percentagem_restante ASC
             """.formatted(TABLE);
 
+    // ✅ deleted = 0: toner tombado não pode disparar alerta de reposição
     private static final String SQL_FIND_BAIXA_PERCENTAGEM = """
             SELECT * FROM %s
-            WHERE percentagem_restante <= ?
+            WHERE percentagem_restante <= ? AND deleted = 0
             ORDER BY percentagem_restante ASC
             """.formatted(TABLE);
 
     private static final String SQL_FIND_ESGOTADOS = """
             SELECT * FROM %s
-            WHERE percentagem_restante = 0
+            WHERE percentagem_restante = 0 AND deleted = 0
             ORDER BY data_instalacao DESC
             """.formatted(TABLE);
 
     private static final String SQL_FIND_CHEIOS = """
             SELECT * FROM %s
-            WHERE percentagem_restante = 100
+            WHERE percentagem_restante = 100 AND deleted = 0
             ORDER BY data_instalacao DESC
             """.formatted(TABLE);
 
@@ -106,9 +133,10 @@ public class GestaoTonersRepository {
             ORDER BY data_instalacao DESC
             """.formatted(TABLE);
 
+    // ✅ "toner ATIVO do equipamento" — exclui tombstones por definição
     private static final String SQL_FIND_ATIVO_BY_INVENTARIO = """
             SELECT * FROM %s
-            WHERE inventario_id = ? AND percentagem_restante > 0
+            WHERE inventario_id = ? AND percentagem_restante > 0 AND deleted = 0
             ORDER BY data_instalacao DESC
             LIMIT 1
             """.formatted(TABLE);
@@ -120,42 +148,52 @@ public class GestaoTonersRepository {
             LIMIT 1
             """.formatted(TABLE);
 
+    // ✅ lista de "quem trocar" — tombstones fora
     private static final String SQL_FIND_PARA_SUBSTITUICAO = """
             SELECT * FROM %s
-            WHERE percentagem_restante <= ? AND percentagem_restante > 0
+            WHERE percentagem_restante <= ? AND percentagem_restante > 0 AND deleted = 0
             ORDER BY percentagem_restante ASC, data_instalacao ASC
             """.formatted(TABLE);
 
+    // ✅ id/device_id/deleted/timestamps incluídos — a fábrica já os gerou
     private static final String SQL_INSERT = """
             INSERT INTO %s (
-                inventario_id, sku_produto, data_instalacao,
-                usuario_responsavel, percentagem_restante, ciclos_impressao, observacoes
-            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                id, inventario_id, sku_produto, data_instalacao,
+                usuario_responsavel, percentagem_restante, ciclos_impressao,
+                observacoes, device_id, deleted, created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """.formatted(TABLE);
 
     private static final String SQL_UPDATE = """
             UPDATE %s
             SET inventario_id = ?, sku_produto = ?, data_instalacao = ?,
                 usuario_responsavel = ?, percentagem_restante = ?, ciclos_impressao = ?,
-                observacoes = ?, updated_at = CURRENT_TIMESTAMP
+                observacoes = ?, device_id = ?, updated_at = ?
             WHERE id = ?
             """.formatted(TABLE);
 
     private static final String SQL_UPDATE_PERCENTAGEM = """
             UPDATE %s
-            SET percentagem_restante = ?, updated_at = CURRENT_TIMESTAMP
+            SET percentagem_restante = ?, device_id = ?, updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
             """.formatted(TABLE);
 
     private static final String SQL_INCREMENT_CICLOS = """
             UPDATE %s
-            SET ciclos_impressao = ciclos_impressao + ?, updated_at = CURRENT_TIMESTAMP
+            SET ciclos_impressao = ciclos_impressao + ?, device_id = ?, updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
             """.formatted(TABLE);
 
     private static final String SQL_MARCAR_ESGOTADO = """
             UPDATE %s
-            SET percentagem_restante = 0, updated_at = CURRENT_TIMESTAMP
+            SET percentagem_restante = 0, device_id = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+            """.formatted(TABLE);
+
+    /** ✅ Tombstone de sync — a exclusão que CONVERGE entre devices. */
+    private static final String SQL_MARCAR_DELETADO = """
+            UPDATE %s
+            SET deleted = 1, device_id = ?, updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
             """.formatted(TABLE);
 
@@ -164,134 +202,72 @@ public class GestaoTonersRepository {
             WHERE id = ?
             """.formatted(TABLE);
 
+    // ⚠️ DELETE físico em massa — com sync, prefira tombar cada registro
     private static final String SQL_DELETE_BY_INVENTARIO = """
             DELETE FROM %s
             WHERE inventario_id = ?
             """.formatted(TABLE);
 
-    // ===== CRUD =====
+    // ============================================================
+    // CRUD — LEITURAS
+    // ============================================================
 
     public List<GestaoToners> findAll() throws SQLException {
         return executeQuery(SQL_FIND_ALL);
     }
 
     public List<GestaoToners> findAll(int limit, int offset) throws SQLException {
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_FIND_ALL_PAGINATED)) {
-
-            stmt.setInt(1, limit);
-            stmt.setInt(2, offset);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return mapResultSetList(rs);
-            }
-        }
+        return executeQuery(SQL_FIND_ALL_PAGINATED, limit, offset);
     }
 
-    public Optional<GestaoToners> findById(Long id) throws SQLException {
-        if (id == null || id <= 0) {
+    public Optional<GestaoToners> findById(String id) throws SQLException {
+        if (id == null || id.isBlank()) {
             return Optional.empty();
         }
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_FIND_BY_ID)) {
-
-            stmt.setLong(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next() ? Optional.of(mapResultSet(rs)) : Optional.empty();
-            }
-        }
+        List<GestaoToners> resultado = executeQuery(SQL_FIND_BY_ID, id);
+        return resultado.isEmpty() ? Optional.empty() : Optional.of(resultado.get(0));
     }
 
-    public List<GestaoToners> findByInventarioId(Long inventarioId) throws SQLException {
-        if (inventarioId == null || inventarioId <= 0) {
+    public List<GestaoToners> findByInventarioId(String inventarioId) throws SQLException {
+        if (inventarioId == null || inventarioId.isBlank()) {
             return List.of();
         }
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_FIND_BY_INVENTARIO)) {
-
-            stmt.setLong(1, inventarioId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return mapResultSetList(rs);
-            }
-        }
+        return executeQuery(SQL_FIND_BY_INVENTARIO, inventarioId);
     }
 
     public List<GestaoToners> findBySkuProduto(String sku) throws SQLException {
-        if (!(sku instanceof String s) || s.isBlank()) {
+        if (sku == null || sku.isBlank()) {
             return List.of();
         }
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_FIND_BY_SKU)) {
-
-            stmt.setString(1, sku);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return mapResultSetList(rs);
-            }
-        }
+        return executeQuery(SQL_FIND_BY_SKU, sku);
     }
 
     public List<GestaoToners> findByDataInstalacao(LocalDate data) throws SQLException {
         if (data == null) {
             return List.of();
         }
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_FIND_BY_DATA)) {
-
-            stmt.setDate(1, Date.valueOf(data));
-            try (ResultSet rs = stmt.executeQuery()) {
-                return mapResultSetList(rs);
-            }
-        }
+        return executeQuery(SQL_FIND_BY_DATA, Date.valueOf(data));
     }
 
     public List<GestaoToners> findByPeriodoInstalacao(LocalDate inicio, LocalDate fim) throws SQLException {
         if (inicio == null || fim == null) {
             return List.of();
         }
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_FIND_BY_PERIODO)) {
-
-            stmt.setDate(1, Date.valueOf(inicio));
-            stmt.setDate(2, Date.valueOf(fim));
-            try (ResultSet rs = stmt.executeQuery()) {
-                return mapResultSetList(rs);
-            }
-        }
+        return executeQuery(SQL_FIND_BY_PERIODO, Date.valueOf(inicio), Date.valueOf(fim));
     }
 
     public List<GestaoToners> findByPercentagemRange(int min, int max) throws SQLException {
         if (min < 0 || max > 100 || min > max) {
             return List.of();
         }
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_FIND_BY_PERCENTAGEM_RANGE)) {
-
-            stmt.setInt(1, min);
-            stmt.setInt(2, max);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return mapResultSetList(rs);
-            }
-        }
+        return executeQuery(SQL_FIND_BY_PERCENTAGEM_RANGE, min, max);
     }
 
     public List<GestaoToners> findBaixaPercentagem(int limite) throws SQLException {
         if (limite < 0) {
             return List.of();
         }
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_FIND_BAIXA_PERCENTAGEM)) {
-
-            stmt.setInt(1, limite);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return mapResultSetList(rs);
-            }
-        }
+        return executeQuery(SQL_FIND_BAIXA_PERCENTAGEM, limite);
     }
 
     public List<GestaoToners> findEsgotados() throws SQLException {
@@ -302,225 +278,186 @@ public class GestaoTonersRepository {
         return executeQuery(SQL_FIND_CHEIOS);
     }
 
-    public List<GestaoToners> findByUsuarioResponsavel(Long usuarioId) throws SQLException {
-        if (usuarioId == null || usuarioId <= 0) {
+    public List<GestaoToners> findByUsuarioResponsavel(String usuarioId) throws SQLException {
+        if (usuarioId == null || usuarioId.isBlank()) {
             return List.of();
         }
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_FIND_BY_USUARIO)) {
-
-            stmt.setLong(1, usuarioId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return mapResultSetList(rs);
-            }
-        }
+        return executeQuery(SQL_FIND_BY_USUARIO, usuarioId);
     }
 
     public List<GestaoToners> findParaSubstituicao(int percentagemAlerta) throws SQLException {
         if (percentagemAlerta < 0) {
             return List.of();
         }
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_FIND_PARA_SUBSTITUICAO)) {
-
-            stmt.setInt(1, percentagemAlerta);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return mapResultSetList(rs);
-            }
-        }
+        return executeQuery(SQL_FIND_PARA_SUBSTITUICAO, percentagemAlerta);
     }
 
-    public Optional<GestaoToners> findTonerAtivoByInventario(Long inventarioId) throws SQLException {
-        if (inventarioId == null || inventarioId <= 0) {
+    public Optional<GestaoToners> findTonerAtivoByInventario(String inventarioId) throws SQLException {
+        if (inventarioId == null || inventarioId.isBlank()) {
             return Optional.empty();
         }
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_FIND_ATIVO_BY_INVENTARIO)) {
-
-            stmt.setLong(1, inventarioId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next() ? Optional.of(mapResultSet(rs)) : Optional.empty();
-            }
-        }
+        List<GestaoToners> resultado = executeQuery(SQL_FIND_ATIVO_BY_INVENTARIO, inventarioId);
+        return resultado.isEmpty() ? Optional.empty() : Optional.of(resultado.get(0));
     }
 
-    public Optional<GestaoToners> findUltimoByInventario(Long inventarioId) throws SQLException {
-        if (inventarioId == null || inventarioId <= 0) {
+    public Optional<GestaoToners> findUltimoByInventario(String inventarioId) throws SQLException {
+        if (inventarioId == null || inventarioId.isBlank()) {
             return Optional.empty();
         }
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_FIND_ULTIMO_BY_INVENTARIO)) {
-
-            stmt.setLong(1, inventarioId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next() ? Optional.of(mapResultSet(rs)) : Optional.empty();
-            }
-        }
+        List<GestaoToners> resultado = executeQuery(SQL_FIND_ULTIMO_BY_INVENTARIO, inventarioId);
+        return resultado.isEmpty() ? Optional.empty() : Optional.of(resultado.get(0));
     }
 
-    public Long insert(GestaoToners toner) throws SQLException {
-        if (!(toner instanceof GestaoToners t)) {
+    // ============================================================
+    // CRUD — ESCRITAS
+    // ============================================================
+
+    /**
+     * Insere o toner. O id (UUID v4) JÁ veio da fábrica — não há
+     * "generated keys" a recuperar.
+     *
+     * @return o id do toner inserido (o mesmo que veio no objeto)
+     */
+    public String insert(GestaoToners toner) throws SQLException {
+        if (toner == null) {
             throw new IllegalArgumentException("Toner inválido");
         }
 
         try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_INSERT,
-                     PreparedStatement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement stmt = conn.prepareStatement(SQL_INSERT)) {
 
-            stmt.setLong(1, t.inventarioId());
-            stmt.setString(2, t.skuProduto());
-            stmt.setDate(3, Date.valueOf(t.dataInstalacao()));
-            stmt.setLong(4, t.usuarioResponsavel());
-            stmt.setInt(5, t.percentagemRestante());
-            stmt.setInt(6, t.ciclosImpressao());
-            stmt.setString(7, t.observacoes());
+            LocalDateTime agora = LocalDateTime.now();
+            stmt.setString(1, toner.id());
+            stmt.setString(2, toner.inventarioId());
+            stmt.setString(3, toner.skuProduto());
+            stmt.setDate(4, Date.valueOf(
+                    toner.dataInstalacao() != null ? toner.dataInstalacao() : LocalDate.now()));
+            stmt.setString(5, toner.usuarioResponsavel());
+            stmt.setInt(6, toner.percentagemRestante() != null ? toner.percentagemRestante() : 100);
+            stmt.setInt(7, toner.ciclosImpressao() != null ? toner.ciclosImpressao() : 0);
+            stmt.setString(8, toner.observacoes());
+            stmt.setString(9, getDeviceId());
+            stmt.setBoolean(10, toner.isDeletado());
+            stmt.setTimestamp(11, Timestamp.valueOf(
+                    toner.createdAt() != null ? toner.createdAt() : agora));
+            stmt.setTimestamp(12, Timestamp.valueOf(
+                    toner.updatedAt() != null ? toner.updatedAt() : agora));
 
             stmt.executeUpdate();
-
-            try (ResultSet rs = stmt.getGeneratedKeys()) {
-                if (rs.next()) {
-                    return rs.getLong(1);
-                }
-                throw new SQLException("Falha ao obter ID gerado");
-            }
+            return toner.id();
         }
     }
 
     public void update(GestaoToners toner) throws SQLException {
-        if (!(toner instanceof GestaoToners t)) {
+        if (toner == null) {
             throw new IllegalArgumentException("Toner inválido");
         }
-        if (t.id() == null) {
-            throw new SQLException("ID não pode ser nulo para atualização");
+        if (toner.id() == null || toner.id().isBlank()) {
+            throw new SQLException("ID não pode ser vazio para atualização");
         }
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE)) {
 
-            stmt.setLong(1, t.inventarioId());
-            stmt.setString(2, t.skuProduto());
-            stmt.setDate(3, Date.valueOf(t.dataInstalacao()));
-            stmt.setLong(4, t.usuarioResponsavel());
-            stmt.setInt(5, t.percentagemRestante());
-            stmt.setInt(6, t.ciclosImpressao());
-            stmt.setString(7, t.observacoes());
-            stmt.setLong(8, t.id());
+            stmt.setString(1, toner.inventarioId());
+            stmt.setString(2, toner.skuProduto());
+            stmt.setDate(3, Date.valueOf(
+                    toner.dataInstalacao() != null ? toner.dataInstalacao() : LocalDate.now()));
+            stmt.setString(4, toner.usuarioResponsavel());
+            stmt.setInt(5, toner.percentagemRestante() != null ? toner.percentagemRestante() : 100);
+            stmt.setInt(6, toner.ciclosImpressao() != null ? toner.ciclosImpressao() : 0);
+            stmt.setString(7, toner.observacoes());
+            stmt.setString(8, getDeviceId());
+            stmt.setTimestamp(9, Timestamp.valueOf(
+                    toner.updatedAt() != null ? toner.updatedAt() : LocalDateTime.now()));
+            stmt.setString(10, toner.id());
 
             int affected = stmt.executeUpdate();
             if (affected == 0) {
-                throw new SQLException("Toner com ID " + t.id() + " não encontrado");
+                throw new SQLException("Toner com ID " + toner.id() + " não encontrado");
             }
         }
     }
 
-    public void updatePercentagem(Long id, int percentagem) throws SQLException {
-        if (id == null || id <= 0) {
-            throw new IllegalArgumentException("ID inválido");
+    /**
+     * Insere ou atualiza conforme o id já existir no banco.
+     * ✅ A fábrica SEMPRE gera id — id != null não significa mais "já persistido",
+     * então a decisão é por consulta (custo: 1 COUNT, segurança: total).
+     */
+    public String save(GestaoToners toner) throws SQLException {
+        if (toner == null || toner.id() == null || toner.id().isBlank()) {
+            throw new IllegalArgumentException("Toner com ID inválido");
         }
+        if (existsById(toner.id())) {
+            update(toner);
+        } else {
+            insert(toner);
+        }
+        return toner.id();
+    }
+
+    public void updatePercentagem(String id, int percentagem) throws SQLException {
         if (percentagem < 0 || percentagem > 100) {
             throw new IllegalArgumentException("Percentagem deve estar entre 0 e 100");
         }
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE_PERCENTAGEM)) {
-
-            stmt.setInt(1, percentagem);
-            stmt.setLong(2, id);
-            int affected = stmt.executeUpdate();
-
-            if (affected == 0) {
-                throw new SQLException("Toner com ID " + id + " não encontrado");
-            }
+        int affected = executeUpdate(SQL_UPDATE_PERCENTAGEM, percentagem, getDeviceId(), id);
+        if (affected == 0) {
+            throw new SQLException("Toner com ID " + id + " não encontrado");
         }
     }
 
-    public void incrementarCiclos(Long id, int ciclosAdicionais) throws SQLException {
-        if (id == null || id <= 0) {
-            throw new IllegalArgumentException("ID inválido");
-        }
+    public void incrementarCiclos(String id, int ciclosAdicionais) throws SQLException {
         if (ciclosAdicionais <= 0) {
             throw new IllegalArgumentException("Ciclos adicionais devem ser positivos");
         }
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_INCREMENT_CICLOS)) {
-
-            stmt.setInt(1, ciclosAdicionais);
-            stmt.setLong(2, id);
-            int affected = stmt.executeUpdate();
-
-            if (affected == 0) {
-                throw new SQLException("Toner com ID " + id + " não encontrado");
-            }
+        int affected = executeUpdate(SQL_INCREMENT_CICLOS, ciclosAdicionais, getDeviceId(), id);
+        if (affected == 0) {
+            throw new SQLException("Toner com ID " + id + " não encontrado");
         }
     }
 
-    public void marcarComoEsgotado(Long id) throws SQLException {
-        if (id == null || id <= 0) {
-            throw new IllegalArgumentException("ID inválido");
-        }
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_MARCAR_ESGOTADO)) {
-
-            stmt.setLong(1, id);
-            int affected = stmt.executeUpdate();
-
-            if (affected == 0) {
-                throw new SQLException("Toner com ID " + id + " não encontrado");
-            }
+    public void marcarComoEsgotado(String id) throws SQLException {
+        int affected = executeUpdate(SQL_MARCAR_ESGOTADO, getDeviceId(), id);
+        if (affected == 0) {
+            throw new SQLException("Toner com ID " + id + " não encontrado");
         }
     }
 
-    public void delete(Long id) throws SQLException {
-        if (id == null || id <= 0) {
-            throw new IllegalArgumentException("ID inválido");
-        }
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_DELETE)) {
-
-            stmt.setLong(1, id);
-            int affected = stmt.executeUpdate();
-
-            if (affected == 0) {
-                throw new SQLException("Toner com ID " + id + " não encontrado");
-            }
+    /**
+     * ✅ Exclusão lógica para sync (tombstone + updatedAt novo = LWW converge).
+     * Preferir este método ao DELETE físico enquanto o sync estiver ativo.
+     */
+    public void marcarDeletado(String id) throws SQLException {
+        int affected = executeUpdate(SQL_MARCAR_DELETADO, getDeviceId(), id);
+        if (affected == 0) {
+            throw new SQLException("Toner com ID " + id + " não encontrado");
         }
     }
 
-    public void deleteByInventario(Long inventarioId) throws SQLException {
-        if (inventarioId == null || inventarioId <= 0) {
+    /** DELETE físico individual. Com sync ativo, prefira {@link #marcarDeletado(String)}. */
+    public void delete(String id) throws SQLException {
+        int affected = executeUpdate(SQL_DELETE, id);
+        if (affected == 0) {
+            throw new SQLException("Toner com ID " + id + " não encontrado");
+        }
+    }
+
+    /** ⚠️ DELETE físico em massa. Com sync ativo, tombe cada registro em vez disto. */
+    public void deleteByInventario(String inventarioId) throws SQLException {
+        if (inventarioId == null || inventarioId.isBlank()) {
             throw new IllegalArgumentException("ID do inventário inválido");
         }
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_DELETE_BY_INVENTARIO)) {
-
-            stmt.setLong(1, inventarioId);
-            stmt.executeUpdate();
-        }
+        executeUpdate(SQL_DELETE_BY_INVENTARIO, inventarioId);
     }
 
-    public Long save(GestaoToners toner) throws SQLException {
-        if (toner.id() == null) {
-            return insert(toner);
-        } else {
-            update(toner);
-            return toner.id();
-        }
-    }
-
-    // ===== FILTROS COMBINADOS =====
+    // ============================================================
+    // FILTROS COMBINADOS
+    // ============================================================
 
     public List<GestaoToners> findWithFilters(
-            Long inventarioId,
+            String inventarioId,
             String skuProduto,
-            Long usuarioId,
+            String usuarioId,
             LocalDate dataInicio,
             LocalDate dataFim,
             Integer percentagemMin,
@@ -529,7 +466,7 @@ public class GestaoTonersRepository {
         StringBuilder sql = new StringBuilder("SELECT * FROM " + TABLE + " WHERE 1=1");
         List<Object> params = new ArrayList<>();
 
-        if (inventarioId != null && inventarioId > 0) {
+        if (inventarioId != null && !inventarioId.isBlank()) {
             sql.append(" AND inventario_id = ?");
             params.add(inventarioId);
         }
@@ -537,14 +474,14 @@ public class GestaoTonersRepository {
             sql.append(" AND sku_produto = ?");
             params.add(skuProduto);
         }
-        if (usuarioId != null && usuarioId > 0) {
+        if (usuarioId != null && !usuarioId.isBlank()) {
             sql.append(" AND usuario_responsavel = ?");
             params.add(usuarioId);
         }
         if (dataInicio != null && dataFim != null) {
             sql.append(" AND data_instalacao BETWEEN ? AND ?");
-            params.add(dataInicio);
-            params.add(dataFim);
+            params.add(Date.valueOf(dataInicio));   // ✅ explícito, não setObject(LocalDate)
+            params.add(Date.valueOf(dataFim));
         }
         if (percentagemMin != null && percentagemMax != null) {
             sql.append(" AND percentagem_restante BETWEEN ? AND ?");
@@ -560,100 +497,59 @@ public class GestaoTonersRepository {
 
         sql.append(" ORDER BY data_instalacao DESC, created_at DESC");
 
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
-
-            for (int i = 0; i < params.size(); i++) {
-                stmt.setObject(i + 1, params.get(i));
-            }
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                return mapResultSetList(rs);
-            }
-        }
+        return executeQuery(sql.toString(), params.toArray());
     }
 
-    // ===== VERIFICAÇÕES =====
+    // ============================================================
+    // VERIFICAÇÕES
+    // ============================================================
 
-    public boolean existsById(Long id) throws SQLException {
-        if (id == null) return false;
-        String sql = "SELECT COUNT(*) FROM %s WHERE id = ?".formatted(TABLE);
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setLong(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next() && rs.getInt(1) > 0;
-            }
-        }
+    public boolean existsById(String id) throws SQLException {
+        if (id == null || id.isBlank()) return false;
+        return count("SELECT COUNT(*) FROM " + TABLE + " WHERE id = ?", id) > 0;
     }
 
-    public boolean existsByInventarioAndSku(Long inventarioId, String sku) throws SQLException {
-        if (inventarioId == null || sku == null || sku.isBlank()) {
+    public boolean existsByInventarioAndSku(String inventarioId, String sku) throws SQLException {
+        if (inventarioId == null || inventarioId.isBlank() || sku == null || sku.isBlank()) {
             return false;
         }
-        String sql = "SELECT COUNT(*) FROM %s WHERE inventario_id = ? AND sku_produto = ?".formatted(TABLE);
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setLong(1, inventarioId);
-            stmt.setString(2, sku);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next() && rs.getInt(1) > 0;
-            }
-        }
+        return count("SELECT COUNT(*) FROM " + TABLE
+                + " WHERE inventario_id = ? AND sku_produto = ?", inventarioId, sku) > 0;
     }
 
     public boolean skuExistsInCatalogo(String sku) throws SQLException {
         if (sku == null || sku.isBlank()) return false;
-        String sql = "SELECT COUNT(*) FROM catalogo_produtos WHERE sku = ? AND ativo = 1";
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, sku);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next() && rs.getInt(1) > 0;
-            }
-        }
+        return count("SELECT COUNT(*) FROM catalogo_produtos WHERE sku = ? AND ativo = 1", sku) > 0;
     }
 
-    public boolean inventarioExists(Long inventarioId) throws SQLException {
-        if (inventarioId == null) return false;
-        String sql = "SELECT COUNT(*) FROM inventario_equipamentos WHERE id = ?";
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setLong(1, inventarioId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next() && rs.getInt(1) > 0;
-            }
-        }
+    /** ✅ FK agora é UUID (String). */
+    public boolean inventarioExists(String inventarioId) throws SQLException {
+        if (inventarioId == null || inventarioId.isBlank()) return false;
+        return count("SELECT COUNT(*) FROM inventario_equipamentos WHERE id = ?", inventarioId) > 0;
     }
 
-    // ===== ESTATÍSTICAS =====
+    // ============================================================
+    // ESTATÍSTICAS
+    // ============================================================
 
     public int countAll() throws SQLException {
         return count("SELECT COUNT(*) FROM " + TABLE);
     }
 
     public int countAtivos() throws SQLException {
-        return count("SELECT COUNT(*) FROM " + TABLE + " WHERE percentagem_restante > 0");
+        return count("SELECT COUNT(*) FROM " + TABLE + " WHERE percentagem_restante > 0 AND deleted = 0");
     }
 
     public int countEsgotados() throws SQLException {
-        return count("SELECT COUNT(*) FROM " + TABLE + " WHERE percentagem_restante = 0");
+        return count("SELECT COUNT(*) FROM " + TABLE + " WHERE percentagem_restante = 0 AND deleted = 0");
     }
 
-    public int countByInventario(Long inventarioId) throws SQLException {
-        if (inventarioId == null) return 0;
+    public int countByInventario(String inventarioId) throws SQLException {
+        if (inventarioId == null || inventarioId.isBlank()) return 0;
         return count("SELECT COUNT(*) FROM " + TABLE + " WHERE inventario_id = ?", inventarioId);
     }
 
-    public Map<String, Object[]> calcularVidaUtilPorSku() throws SQLException {
+    public List<VidaUtilSku> calcularVidaUtilPorSku() throws SQLException {
         String sql = """
                 SELECT sku_produto,
                     AVG(ciclos_impressao) as media_ciclos,
@@ -670,20 +566,17 @@ public class GestaoTonersRepository {
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
-            Map<String, Object[]> resultado = new LinkedHashMap<>();
+            List<VidaUtilSku> resultado = new ArrayList<>();
             while (rs.next()) {
-                resultado.put(
+                resultado.add(new VidaUtilSku(
                         rs.getString("sku_produto"),
-                        new Object[]{
-                                rs.getDouble("media_ciclos"),
-                                rs.getDouble("media_percentagem"),
-                                rs.getInt("total_instalacoes"),
-                                rs.getInt("max_ciclos"),
-                                rs.getInt("min_ciclos")
-                        }
-                );
+                        rs.getDouble("media_ciclos"),
+                        rs.getDouble("media_percentagem"),
+                        rs.getInt("total_instalacoes"),
+                        rs.getInt("max_ciclos"),
+                        rs.getInt("min_ciclos")));
             }
-            return Map.copyOf(resultado);
+            return List.copyOf(resultado);
         }
     }
 
@@ -692,60 +585,87 @@ public class GestaoTonersRepository {
             return Map.of();
         }
 
+        String base = "SELECT COUNT(*) FROM " + TABLE + " WHERE data_instalacao BETWEEN ? AND ?";
         Map<String, Integer> stats = new LinkedHashMap<>();
-        stats.put("total", count("SELECT COUNT(*) FROM " + TABLE + " WHERE data_instalacao BETWEEN ? AND ?", inicio, fim));
-        stats.put("ativos", count("SELECT COUNT(*) FROM " + TABLE + " WHERE data_instalacao BETWEEN ? AND ? AND percentagem_restante > 0", inicio, fim));
-        stats.put("substituidos", count("SELECT COUNT(*) FROM " + TABLE + " WHERE data_instalacao BETWEEN ? AND ? AND percentagem_restante = 0", inicio, fim));
+        stats.put("total", count(base, Date.valueOf(inicio), Date.valueOf(fim)));
+        stats.put("ativos", count(base + " AND percentagem_restante > 0", Date.valueOf(inicio), Date.valueOf(fim)));
+        stats.put("substituidos", count(base + " AND percentagem_restante = 0", Date.valueOf(inicio), Date.valueOf(fim)));
 
-        return Map.copyOf(stats);
+        return stats;   // LinkedHashMap preserva a ordem de inserção (Map.copyOf NÃO preserva!)
     }
 
+    /**
+     * ✅ Era DATE_FORMAT/YEAR() (MySQL — não existem em SQLite).
+     * Agora: busca o período no SQL e agrupa por mês no Java. Portável.
+     */
     public Map<String, Integer> countInstalacoesPorMes(int ano) throws SQLException {
-        String sql = """
-                SELECT DATE_FORMAT(data_instalacao, '%Y-%m') as mes,
-                       COUNT(*) as total
-                FROM %s
-                WHERE YEAR(data_instalacao) = ?
-                GROUP BY DATE_FORMAT(data_instalacao, '%Y-%m')
-                ORDER BY mes
-                """.formatted(TABLE);
+        LocalDate inicio = LocalDate.of(ano, Month.JANUARY, 1);
+        LocalDate fim = LocalDate.of(ano, Month.DECEMBER, 31);
+
+        String sql = "SELECT data_instalacao FROM " + TABLE
+                + " WHERE data_instalacao BETWEEN ? AND ?";
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, ano);
+            stmt.setDate(1, Date.valueOf(inicio));
+            stmt.setDate(2, Date.valueOf(fim));
 
-            Map<String, Integer> resultado = new LinkedHashMap<>();
+            // TreeMap = meses já em ordem; unmodifiableSortedMap preserva a ordem
+            SortedMap<String, Integer> resultado = new TreeMap<>();
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    resultado.put(rs.getString("mes"), rs.getInt("total"));
+                    LocalDate data = getLocalDate(rs, "data_instalacao");
+                    if (data != null) {
+                        String mes = String.format("%04d-%02d", data.getYear(), data.getMonthValue());
+                        resultado.merge(mes, 1, Integer::sum);
+                    }
                 }
             }
-            return Map.copyOf(resultado);
+            return Collections.unmodifiableSortedMap(resultado);
         }
     }
 
-    // ===== MÉTODOS PRIVADOS =====
+    // ============================================================
+    // MÉTODOS PRIVADOS (helpers)
+    // ============================================================
+
+    private List<GestaoToners> executeQuery(String sql, Object... params) throws SQLException {
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            bindParams(stmt, params);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                return mapResultSetList(rs);
+            }
+        }
+    }
+
+    private int executeUpdate(String sql, Object... params) throws SQLException {
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            bindParams(stmt, params);
+            return stmt.executeUpdate();
+        }
+    }
+
+    private void bindParams(PreparedStatement stmt, Object... params) throws SQLException {
+        for (int i = 0; i < params.length; i++) {
+            stmt.setObject(i + 1, params[i]);
+        }
+    }
 
     private int count(String sql, Object... params) throws SQLException {
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            for (int i = 0; i < params.length; i++) {
-                stmt.setObject(i + 1, params[i]);
-            }
+            bindParams(stmt, params);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next() ? rs.getInt(1) : 0;
             }
-        }
-    }
-
-    private List<GestaoToners> executeQuery(String sql) throws SQLException {
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            return mapResultSetList(rs);
         }
     }
 
@@ -757,19 +677,33 @@ public class GestaoTonersRepository {
         return List.copyOf(list);
     }
 
+    // ✅ 12 componentes — alinhado ao GestaoToners v3.0
     private GestaoToners mapResultSet(ResultSet rs) throws SQLException {
         return new GestaoToners(
-                rs.getLong("id"),
-                rs.getLong("inventario_id"),
+                rs.getString("id"),
+                rs.getString("inventario_id"),
                 rs.getString("sku_produto"),
                 getLocalDate(rs, "data_instalacao"),
-                rs.getLong("usuario_responsavel"),
-                rs.getInt("percentagem_restante"),
-                rs.getInt("ciclos_impressao"),
+                rs.getString("usuario_responsavel"),
+                getIntegerNullable(rs, "percentagem_restante"),
+                getIntegerNullable(rs, "ciclos_impressao"),
                 rs.getString("observacoes"),
                 getLocalDateTime(rs, "created_at"),
-                getLocalDateTime(rs, "updated_at")
+                getLocalDateTime(rs, "updated_at"),
+                rs.getString("device_id"),
+                getBooleanNullable(rs, "deleted")
         );
+    }
+
+    /** NULL no banco → null no Java. rs.getInt devolveria 0 (= "esgotado"!) silenciosamente. */
+    private Integer getIntegerNullable(ResultSet rs, String column) throws SQLException {
+        int valor = rs.getInt(column);
+        return rs.wasNull() ? null : valor;
+    }
+
+    private Boolean getBooleanNullable(ResultSet rs, String column) throws SQLException {
+        int valor = rs.getInt(column);
+        return rs.wasNull() ? null : valor != 0;
     }
 
     private LocalDate getLocalDate(ResultSet rs, String column) throws SQLException {
@@ -780,5 +714,13 @@ public class GestaoTonersRepository {
     private LocalDateTime getLocalDateTime(ResultSet rs, String column) throws SQLException {
         Timestamp ts = rs.getTimestamp(column);
         return ts != null ? ts.toLocalDateTime() : null;
+    }
+
+    /**
+     * Identidade do device de origem (sync LWW).
+     * TODO (Degrau 2 do sync): substituir por DeviceIdentityService (@Service).
+     */
+    private String getDeviceId() {
+        return "UNKNOWN-DEVICE";
     }
 }

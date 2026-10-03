@@ -2,22 +2,24 @@ package com.ossobo.gestaoDepIt.db.repositories;
 
 import com.ossobo.gestaoDepIt.db.config.DatabaseConnection;
 import com.ossobo.gestaoDepIt.db.models.ConfigServidorRemoto;
-
-
 import com.ossobo.winterfx.anotations.Inject;
 import com.ossobo.winterfx.anotations.Repository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
 
 /**
- * ConfigServidorRemotoRepository - Acesso a dados com WinterFX
- * v2.0 - Migrado para Java 17+ com Records e Text Blocks
+ * ConfigServidorRemotoRepository — Acesso a dados com WinterFX.
+ *
+ * v2.1 - FIX DO CICLO (interação 21):
+ *    - O @Inject de DatabaseConnection VOLTOU (era o correto desde sempre!).
+ *      O lookup lazy mora na DatabaseConnection, NÃO aqui — esta classe é o
+ *      "lado de baixo" da dependência e não precisa fazer nada especial.
+ *    - Limpeza: instanceof redundante em parâmetros já tipados → null-check direto.
  *
  * Responsabilidades:
  * - CRUD para ConfigServidorRemoto
@@ -27,8 +29,10 @@ import java.util.Optional;
 @Repository
 public class ConfigServidorRemotoRepository {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConfigServidorRemotoRepository.class);
+    private static final System.Logger logger = System.getLogger(ConfigServidorRemotoRepository.class.getName());
 
+    // ✅ RESTAURADO: a injeção do DatabaseConnection é normal e NÃO cria ciclo,
+    //    pois a DatabaseConnection (v3.4) não injeta mais ESTA classe.
     @Inject
     private DatabaseConnection dbConnection;
 
@@ -124,7 +128,9 @@ public class ConfigServidorRemotoRepository {
     }
 
     public Optional<ConfigServidorRemoto> findByNome(String nomeConfig) throws SQLException {
-        if (!(nomeConfig instanceof String n) || n.isBlank()) {
+        // v2.1: instanceof redundante (parâmetro JÁ é String) → null-check direto.
+        // Pattern matching existe para tipos polimórficos, não para checagem de null.
+        if (nomeConfig == null || nomeConfig.isBlank()) {
             return Optional.empty();
         }
 
@@ -156,10 +162,11 @@ public class ConfigServidorRemotoRepository {
     }
 
     public void update(ConfigServidorRemoto config) throws SQLException {
-        if (!(config instanceof ConfigServidorRemoto c)) {
+        // v2.1: null-check direto (mesma justificativa do findByNome)
+        if (config == null) {
             throw new IllegalArgumentException("Configuração inválida");
         }
-        if (c.id() == null) {
+        if (config.id() == null) {
             throw new SQLException("ID não pode ser nulo para atualização");
         }
 
@@ -170,7 +177,7 @@ public class ConfigServidorRemotoRepository {
             int affected = stmt.executeUpdate();
 
             if (affected == 0) {
-                throw new SQLException("Configuração com ID " + c.id() + " não encontrada");
+                throw new SQLException("Configuração com ID " + config.id() + " não encontrada");
             }
         }
     }
@@ -189,9 +196,13 @@ public class ConfigServidorRemotoRepository {
     }
 
     /**
-     * Salva (insert ou update) baseado na existência do ID
+     * Salva (insert ou update) baseado na existência do ID.
      */
     public Long save(ConfigServidorRemoto config) throws SQLException {
+        // v2.1: null-check adicionado — config null estourava NPE seco em config.id()
+        if (config == null) {
+            throw new IllegalArgumentException("Configuração inválida");
+        }
         if (config.id() == null) {
             return insert(config);
         } else {
@@ -201,19 +212,22 @@ public class ConfigServidorRemotoRepository {
     }
 
     /**
-     * Desativa todas as configurações
+     * Desativa todas as configurações ativas em UMA única instrução.
+     *
      * @return número de registros atualizados
      */
     public int desativarTodas() throws SQLException {
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_DESATIVAR_TODAS)) {
 
-            return stmt.executeUpdate();
+            int atualizados = stmt.executeUpdate();
+            logger.log(System.Logger.Level.INFO,"✅ {} configurações desativadas (1 statement)", atualizados);
+            return atualizados;
         }
     }
 
     /**
-     * Atualiza status de conexão
+     * Atualiza status de conexão.
      */
     public void atualizarStatus(Long id, String status, String ultimaConexao) throws SQLException {
         try (Connection conn = dbConnection.getConnection();
@@ -227,7 +241,7 @@ public class ConfigServidorRemotoRepository {
     }
 
     /**
-     * Verifica se existe configuração com determinado nome
+     * Verifica se existe configuração com determinado nome.
      */
     public boolean existsByNome(String nomeConfig) throws SQLException {
         String sql = "SELECT COUNT(*) FROM %s WHERE nome_config = ?".formatted(TABLE);

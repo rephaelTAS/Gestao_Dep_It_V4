@@ -1,18 +1,8 @@
 package com.ossobo.gestaoDepIt.db.services;
 
 import com.ossobo.gestaoDepIt.db.models.ConfigServidorRemoto;
-import com.ossobo.winterfx.anotations.Component;
-import com.ossobo.winterfx.anotations.DeleteMapping;
-import com.ossobo.winterfx.anotations.ExecMapping;
-import com.ossobo.winterfx.anotations.GetMapping;
-import com.ossobo.winterfx.anotations.Inject;
-import com.ossobo.winterfx.anotations.Payload;
-import com.ossobo.winterfx.anotations.PutMapping;
-import com.ossobo.winterfx.anotations.RequestMapping;
-import com.ossobo.winterfx.anotations.RouteVar;
+import com.ossobo.winterfx.anotations.*;
 import com.ossobo.winterfx.router.model.ResponseData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.util.Optional;
@@ -39,7 +29,7 @@ import java.util.Optional;
 @RequestMapping("config-servidor-remoto/service")
 public class ConfigServidorRemotoRoutes {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConfigServidorRemotoRoutes.class);
+    private static final System.Logger logger = System.getLogger(ConfigServidorRemotoRoutes.class.getName());
 
     @Inject
     private ConfigServidorRemotoService service;
@@ -106,8 +96,11 @@ public class ConfigServidorRemotoRoutes {
     // ROTAS — REMOÇÃO (DELETE)
     // ============================================================
 
-    /** Exclui configuração por ID. */
-    @DeleteMapping("por/id")
+    /**
+     * Exclui configuração por ID.
+     * Path renomeado para evitar colisão com GET /por/id
+     */
+    @DeleteMapping("deletar/por/id")
     public ResponseData deletar(@RouteVar("id") Long id) {
         return escrita(() -> { service.deletar(id); return "Configuração " + id + " excluída"; }, "mensagem");
     }
@@ -156,7 +149,7 @@ public class ConfigServidorRemotoRoutes {
         try {
             return ResponseData.success().withData(chave, acao.executar());
         } catch (IllegalArgumentException | IllegalStateException e) {
-            logger.warn("⚠️ Regra de negócio violada: {}", e.getMessage());
+            logger.log(System.Logger.Level.WARNING,"⚠️ Regra de negócio violada: {}", e.getMessage());
             return ResponseData.error(e.getMessage()).withError("negocio", e.getMessage());
         } catch (SQLException e) {
             return erroBanco(e);
@@ -202,7 +195,7 @@ public class ConfigServidorRemotoRoutes {
     }
 
     private ResponseData erroBanco(SQLException e) {
-        logger.error("❌ Erro de banco de dados: {}", e.getMessage(), e);
+        logger.log(System.Logger.Level.ERROR,"❌ Erro de banco de dados: {}", e.getMessage(), e);
         return ResponseData.error("Erro de banco de dados: " + e.getMessage())
                 .withError("banco", e.getMessage());
     }

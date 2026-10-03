@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
  * Responsabilidades:
  * - Armazenar configurações de conexão com BD remoto
  * - Suporte para MySQL, PostgreSQL, Oracle, SQLServer, MariaDB
+ *
+ * NOTA: FORA do sync — infra local por máquina.
  */
 public record ConfigServidorRemoto(
         Long id,
@@ -28,43 +30,32 @@ public record ConfigServidorRemoto(
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
-    // ===== CONSTRUTOR COMPACTO (VALIDAÇÃO) =====
     public ConfigServidorRemoto {
-        if (!(nomeConfig instanceof String n) || n.isBlank()) {
+        if (nomeConfig == null || nomeConfig.isBlank()) {
             throw new IllegalArgumentException("Nome da configuração é obrigatório");
         }
-        if (!(host instanceof String h) || h.isBlank()) {
+        if (host == null || host.isBlank()) {
             throw new IllegalArgumentException("Host é obrigatório");
         }
-        if (!(porta instanceof String p) || p.isBlank()) {
+        if (porta == null || porta.isBlank()) {
             throw new IllegalArgumentException("Porta é obrigatória");
         }
-        if (!(databaseName instanceof String db) || db.isBlank()) {
+        if (databaseName == null || databaseName.isBlank()) {
             throw new IllegalArgumentException("Nome do banco de dados é obrigatório");
         }
-        if (!(usuario instanceof String u) || u.isBlank()) {
+        if (usuario == null || usuario.isBlank()) {
             throw new IllegalArgumentException("Usuário é obrigatório");
         }
-        if (!(senha instanceof String s) || s.isBlank()) {
+        if (senha == null || senha.isBlank()) {
             throw new IllegalArgumentException("Senha é obrigatória");
         }
 
-        // Valores padrão
-        if (tipoBanco == null || tipoBanco.isBlank()) {
-            tipoBanco = "MYSQL";
-        }
-        if (parametrosExtra == null) {
-            parametrosExtra = "";
-        }
-        if (ativo == null) {
-            ativo = 1;
-        }
-        if (statusConexao == null || statusConexao.isBlank()) {
-            statusConexao = "NAO_TESTADO";
-        }
+        if (tipoBanco == null || tipoBanco.isBlank()) tipoBanco = "MYSQL";
+        if (parametrosExtra == null) parametrosExtra = "";
+        if (ativo == null) ativo = 1;
+        if (statusConexao == null || statusConexao.isBlank()) statusConexao = "NAO_TESTADO";
     }
 
-    // ===== CONSTRUTOR DE FÁBRICA =====
     public static ConfigServidorRemoto novo(
             String nomeConfig,
             String tipoBanco,
@@ -82,11 +73,6 @@ public record ConfigServidorRemoto(
         );
     }
 
-    // ===== MÉTODOS DE NEGÓCIO =====
-
-    /**
-     * Gera a URL de conexão baseada no tipo de banco.
-     */
     public String gerarUrlConexao() {
         return switch (tipoBanco) {
             case "MYSQL", "MARIADB" ->
@@ -103,35 +89,21 @@ public record ConfigServidorRemoto(
         };
     }
 
-    /**
-     * Verifica se a configuração está ativa.
-     */
     public boolean isAtivo() {
         return ativo != null && ativo == 1;
     }
 
-    /**
-     * Verifica se a configuração está conectada.
-     */
     public boolean isConectado() {
         return "CONECTADO".equals(statusConexao);
     }
 
-    /**
-     * Verifica se está em teste.
-     */
     public boolean isTestando() {
         return "TESTANDO".equals(statusConexao);
     }
 
-    /**
-     * Verifica se falhou.
-     */
     public boolean isFalha() {
         return "FALHA".equals(statusConexao);
     }
-
-    // ===== MÉTODOS DE TRANSFORMAÇÃO =====
 
     public ConfigServidorRemoto comStatus(String novoStatus) {
         return new ConfigServidorRemoto(
@@ -154,14 +126,6 @@ public record ConfigServidorRemoto(
                 id, nomeConfig, tipoBanco, host, porta, databaseName,
                 usuario, senha, parametrosExtra, novoAtivo,
                 ultimaConexao, statusConexao, createdAt, updatedAt
-        );
-    }
-
-    public ConfigServidorRemoto comAtualizado(LocalDateTime data) {
-        return new ConfigServidorRemoto(
-                id, nomeConfig, tipoBanco, host, porta, databaseName,
-                usuario, senha, parametrosExtra, ativo,
-                ultimaConexao, statusConexao, createdAt, data
         );
     }
 

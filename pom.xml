@@ -5,210 +5,148 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.ossobo</groupId>
-    <artifactId>Gestao_Dep_It_V3</artifactId>
-    <version>1.2.23</version>
-    <name>Gestao_Dep_It_V3</name>
-
-    <url>https://github.com/rephaelTAS/Gestao_Dep_It_V3</url>
-
-    <!-- Licença -->
-    <licenses>
-        <license>
-            <name>MIT License</name>
-            <url>http://www.opensource.org/licenses/mit-license.php</url>
-        </license>
-    </licenses>
-
-    <!-- Informações do desenvolvedor -->
-    <developers>
-        <developer>
-            <name>Rafael Tavares</name>
-            <email>rephaeltavares@gmail.com</email>
-            <organization>Ossobo</organization>
-            <organizationUrl>https://github.com/rephaelTAS/</organizationUrl>
-        </developer>
-    </developers>
+    <artifactId>Gestao_Dep_It_V4</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <name>Gestao_Dep_It_V4</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>25</maven.compiler.source>
-        <maven.compiler.target>25</maven.compiler.target>
-        <maven.compiler.release>25</maven.compiler.release>
-        <java.version>25</java.version>
-        <javafx.version>25.0.2</javafx.version>
-        <slf4j.version>2.0.13</slf4j.version>
-        <logback.version>1.5.6</logback.version>
-        <reflections.version>0.10.2</reflections.version>
-        <guava.version>33.2.1-jre</guava.version>
-        <mysql.connector.version>8.4.0</mysql.connector.version>
-        <jackson.version>2.17.2</jackson.version>
-        <jbcrypt.version>0.4</jbcrypt.version>
-        <poi.version>5.2.5</poi.version>
-        <xmlbeans.version>5.2.1</xmlbeans.version>
-        <gson.version>2.10.1</gson.version>
-        <jakarta.mail.version>2.0.1</jakarta.mail.version>
-        <junit.version>5.10.2</junit.version>
-        <winterfx.version>20.0.1</winterfx.version>
-        <classgraph.version>4.8.168</classgraph.version>
-        <javassist.version>3.28.0-GA</javassist.version>
+        <junit.version>5.12.1</junit.version>
     </properties>
 
     <dependencies>
-        <!-- ===== REPOSITÓRIO GITHUB PACKAGES ===== -->
         <dependency>
             <groupId>com.ossobo</groupId>
             <artifactId>winterfx</artifactId>
-            <version>${winterfx.version}</version>
+            <version>20.0.1</version>
         </dependency>
-
-        <!-- ===== DEPENDÊNCIAS DO WINTERFX ===== -->
-        <dependency>
-            <groupId>org.javassist</groupId>
-            <artifactId>javassist</artifactId>
-            <version>${javassist.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.github.classgraph</groupId>
-            <artifactId>classgraph</artifactId>
-            <version>${classgraph.version}</version>
-        </dependency>
-
-        <!-- ===== GSON ===== -->
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>${gson.version}</version>
-        </dependency>
-
-        <!-- ===== JAVAFX ===== -->
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-controls</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-fxml</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-base</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-web</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-swing</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-media</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
-
-        <!-- ===== LOGGING ===== -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
-        </dependency>
-
-        <!-- ===== REFLECTION & UTILITIES ===== -->
-        <dependency>
-            <groupId>org.reflections</groupId>
-            <artifactId>reflections</artifactId>
-            <version>${reflections.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
-        </dependency>
-
-        <!-- ===== DATABASE ===== -->
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
-            <version>3.47.0.0</version>
+            <version>3.50.3.0</version>
         </dependency>
+        <dependency>
+            <groupId>io.github.classgraph</groupId>
+            <artifactId>classgraph</artifactId>
+            <version>4.8.168</version>
+        </dependency>
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <version>1.14.12</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.librepdf</groupId>
+            <artifactId>openpdf</artifactId>
+            <version>1.3.39</version>
+        </dependency>
+
+
+
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
-            <version>${mysql.connector.version}</version>
+            <version>9.1.0</version>
         </dependency>
-
-        <!-- ===== JACKSON JSON ===== -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-
-        <!-- ===== SECURITY ===== -->
         <dependency>
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
-            <version>${jbcrypt.version}</version>
-        </dependency>
-
-        <!-- ===== APACHE POI ===== -->
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi</artifactId>
-            <version>${poi.version}</version>
+            <version>0.4</version>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>${poi.version}</version>
+            <version>5.3.0</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.xmlbeans</groupId>
-            <artifactId>xmlbeans</artifactId>
-            <version>${xmlbeans.version}</version>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.11.0</version>
         </dependency>
-
-        <!-- ===== JAKARTA MAIL ===== -->
         <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>jakarta.mail</artifactId>
-            <version>${jakarta.mail.version}</version>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>21.0.6</version>
         </dependency>
-
-        <!-- ===== TESTING ===== -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>21.0.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>21.0.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-swing</artifactId>
+            <version>21.0.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-media</artifactId>
+            <version>21.0.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.controlsfx</groupId>
+            <artifactId>controlsfx</artifactId>
+            <version>11.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.dlsc.formsfx</groupId>
+            <artifactId>formsfx-core</artifactId>
+            <version>11.6.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>net.synedra</groupId>
+            <artifactId>validatorfx</artifactId>
+            <version>0.6.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.kordamp.ikonli</groupId>
+            <artifactId>ikonli-javafx</artifactId>
+            <version>12.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kordamp.bootstrapfx</groupId>
+            <artifactId>bootstrapfx-core</artifactId>
+            <version>0.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.hansolo</groupId>
+            <artifactId>tilesfx</artifactId>
+            <version>21.0.9</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.github.almasb</groupId>
+            <artifactId>fxgl</artifactId>
+            <version>11.17</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
@@ -223,123 +161,36 @@
         </dependency>
     </dependencies>
 
-    <repositories>
-        <repository>
-            <id>github</id>
-            <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/rephaelTAS/WinterFx</url>
-        </repository>
-    </repositories>
-
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>**/*</include>
-                </includes>
-                <filtering>false</filtering>
-            </resource>
-        </resources>
-
         <plugins>
-            <!-- Compiler Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
-                    <release>${maven.compiler.release}</release>
-                    <compilerArgs>
-                        <arg>--enable-preview</arg>
-                    </compilerArgs>
+                    <source>25</source>
+                    <target>25</target>
                 </configuration>
             </plugin>
-
-            <!-- Resources Plugin -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.3.1</version>
-            </plugin>
-
-            <!-- JavaFX Plugin -->
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
-                <configuration>
-                    <mainClass>com.ossobo.gestaoDepIt.Launcher</mainClass>
-                    <options>
-                        <option>--add-modules</option>
-                        <option>com.ossobo.winterfx,javafx.controls,javafx.fxml,javafx.graphics,javafx.base,javafx.web,javafx.swing</option>
-                        <option>--enable-native-access=javafx.graphics</option>
-
-                        <!-- ABERTURA DE PACOTES PARA WINTERFX -->
-                        <option>--add-opens</option>
-                        <option>com.ossobo.gestaoDepIt/com.ossobo.gestaoDepIt=com.ossobo.winterfx</option>
-                        <option>--add-opens</option>
-                        <option>com.ossobo.gestaoDepIt/com.ossobo.gestaoDepIt.db.models=com.ossobo.winterfx</option>
-                        <option>--add-opens</option>
-                        <option>com.ossobo.gestaoDepIt/com.ossobo.gestaoDepIt.db.repositories=com.ossobo.winterfx</option>
-                        <option>--add-opens</option>
-                        <option>com.ossobo.gestaoDepIt/com.ossobo.gestaoDepIt.db.services=com.ossobo.winterfx</option>
-                        <option>--add-opens</option>
-                        <option>com.ossobo.gestaoDepIt/com.ossobo.gestaoDepIt.db.config=com.ossobo.winterfx</option>
-                        <option>--add-opens</option>
-                        <option>com.ossobo.gestaoDepIt/com.ossobo.gestaoDepIt.controllers=com.ossobo.winterfx</option>
-                        <option>--add-opens</option>
-                        <option>com.ossobo.gestaoDepIt/com.ossobo.gestaoDepIt.fxmls=com.ossobo.winterfx</option>
-                        <option>--add-opens</option>
-                        <option>com.ossobo.gestaoDepIt/com.ossobo.gestaoDepIt.css=com.ossobo.winterfx</option>
-                        <option>--add-opens</option>
-                        <option>com.ossobo.gestaoDepIt/com.ossobo.gestaoDepIt.images=com.ossobo.winterfx</option>
-
-                        <!-- ABERTURA PARA JAVAFX FXML -->
-                        <option>--add-opens</option>
-                        <option>com.ossobo.gestaoDepIt/com.ossobo.gestaoDepIt.fxmls.login=javafx.fxml</option>
-                        <option>--add-opens</option>
-                        <option>com.ossobo.gestaoDepIt/com.ossobo.gestaoDepIt.controllers.login=javafx.fxml</option>
-                    </options>
-                </configuration>
-            </plugin>
-
-            <!-- Shade Plugin -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.6.0</version>
                 <executions>
                     <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
+                        <!-- Default configuration for running with: mvn clean javafx:run -->
+                        <id>default-cli</id>
                         <configuration>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.ossobo.gestaoDepIt.Launcher</mainClass>
-                                </transformer>
-                            </transformers>
-                            <filters>
-                                <filter>
-                                    <artifact>*:*</artifact>
-                                    <excludes>
-                                        <exclude>META-INF/*.SF</exclude>
-                                        <exclude>META-INF/*.DSA</exclude>
-                                        <exclude>META-INF/*.RSA</exclude>
-                                    </excludes>
-                                </filter>
-                            </filters>
+                            <mainClass>com.ossobo.gestaoDepIt.Launcher</mainClass>
+                            <launcher>app</launcher>
+                            <jlinkZipName>app</jlinkZipName>
+                            <jlinkImageName>app</jlinkImageName>
+                            <noManPages>true</noManPages>
+                            <stripDebug>true</stripDebug>
+                            <noHeaderFiles>true</noHeaderFiles>
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-
-            <!-- Clean Plugin -->
-            <plugin>
-                <artifactId>maven-clean-plugin</artifactId>
-                <version>3.3.2</version>
             </plugin>
         </plugins>
     </build>

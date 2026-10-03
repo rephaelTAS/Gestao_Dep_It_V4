@@ -1,0 +1,105 @@
+/* ============================================================
+   CONFIG_SERVIDOR.CSS - Estilos para Configuração de Servidor
+   v1.0
+   ============================================================ */
+
+.titulo-config {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-fill: #2c3e50;
+}
+
+.form-grid {
+    -fx-padding: 10 0 10 0;
+}
+
+.label-config {
+    -fx-font-size: 14px;
+    -fx-text-fill: #333333;
+    -fx-font-weight: 500;
+}
+
+.input-config {
+    -fx-pref-width: 350px;
+    -fx-padding: 6 10 6 10;
+    -fx-background-radius: 4px;
+    -fx-border-radius: 4px;
+    -fx-border-color: #d0d0d0;
+    -fx-border-width: 1px;
+    -fx-background-color: #ffffff;
+}
+
+.input-config:focused {
+    -fx-border-color: #3498db;
+    -fx-border-width: 2px;
+}
+
+.input-config .text {
+    -fx-font-size: 13px;
+}
+
+/* Status Bar */
+.status-bar {
+    -fx-padding: 10 0 10 0;
+    -fx-background-color: #f8f9fa;
+    -fx-background-radius: 4px;
+    -fx-border-radius: 4px;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1px;
+    -fx-padding: 10 15 10 15;
+}
+
+.status-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #555555;
+}
+
+/* Button Bar */
+.button-bar {
+    -fx-padding: 10 0 0 0;
+    -fx-alignment: center-right;
+}
+
+.button-bar .button {
+    -fx-padding: 8 20 8 20;
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-background-radius: 4px;
+    -fx-cursor: hand;
+}
+
+.btn-testar {
+    -fx-background-color: #FF9800;
+    -fx-text-fill: #ffffff;
+}
+
+.btn-testar:hover {
+    -fx-background-color: #F57C00;
+}
+
+.btn-salvar {
+    -fx-background-color: #2196F3;
+    -fx-text-fill: #ffffff;
+}
+
+.btn-salvar:hover {
+    -fx-background-color: #1976D2;
+}
+
+.btn-ativar {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: #ffffff;
+}
+
+.btn-ativar:hover {
+    -fx-background-color: #388E3C;
+}
+
+.btn-fechar {
+    -fx-background-color: #9E9E9E;
+    -fx-text-fill: #ffffff;
+}
+
+.btn-fechar:hover {
+    -fx-background-color: #757575;
+}

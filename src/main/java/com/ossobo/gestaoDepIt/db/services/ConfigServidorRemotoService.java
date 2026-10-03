@@ -8,8 +8,7 @@ import com.ossobo.winterfx.anotations.Inject;
 import com.ossobo.winterfx.anotations.Service;
 import com.ossobo.winterfx.event.EventBus;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -30,7 +29,7 @@ import java.util.Optional;
 @Service
 public class ConfigServidorRemotoService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConfigServidorRemotoService.class);
+    private static final System.Logger logger = System.getLogger(ConfigServidorRemotoService.class.getName());
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Inject
@@ -77,7 +76,7 @@ public class ConfigServidorRemotoService {
 
         // Publica evento
         eventBus.publish(new ConfigEvent(salvo, "CRIADO"));
-        logger.info("Configuração criada: {}", salvo.nomeConfig());
+        logger.log(System.Logger.Level.INFO,"Configuração criada: {}", salvo.nomeConfig());
 
         return salvo;
     }
@@ -99,7 +98,7 @@ public class ConfigServidorRemotoService {
                 .orElseThrow(() -> new SQLException("Falha ao buscar configuração atualizada"));
 
         eventBus.publish(new ConfigEvent(atualizado, "ATUALIZADO"));
-        logger.info("Configuração atualizada: {}", atualizado.nomeConfig());
+        logger.log(System.Logger.Level.INFO,"Configuração atualizada: {}", atualizado.nomeConfig());
 
         return atualizado;
     }
@@ -112,7 +111,7 @@ public class ConfigServidorRemotoService {
 
         repository.delete(id);
         eventBus.publish(new ConfigEvent(config, "EXCLUIDO"));
-        logger.info("Configuração excluída: {}", config.nomeConfig());
+        logger.log(System.Logger.Level.INFO,"Configuração excluída: {}", config.nomeConfig());
     }
 
     // ===== OPERAÇÕES DE CONEXÃO =====
@@ -138,7 +137,7 @@ public class ConfigServidorRemotoService {
                 .orElseThrow(() -> new SQLException("Falha ao buscar configuração atualizada"));
 
         eventBus.publish(new ConfigEvent(salva, "ATIVADA"));
-        logger.info("Configuração ativada: {}", salva.nomeConfig());
+        logger.log(System.Logger.Level.INFO,"Configuração ativada: {}", salva.nomeConfig());
 
         return salva;
     }
@@ -164,19 +163,19 @@ public class ConfigServidorRemotoService {
                 repository.update(conectada);
 
                 eventBus.publish(new ConfigEvent(conectada, "CONECTADO"));
-                logger.info("✅ Conexão estabelecida: {}", config.nomeConfig());
+                logger.log(System.Logger.Level.INFO,"✅ Conexão estabelecida: {}", config.nomeConfig());
                 return true;
             } else {
                 ConfigServidorRemoto falha = config.comStatus("FALHA");
                 repository.update(falha);
-                logger.warn("❌ Conexão falhou: timeout de 5 segundos - {}", config.nomeConfig());
+                logger.log(System.Logger.Level.WARNING,"❌ Conexão falhou: timeout de 5 segundos - {}", config.nomeConfig());
                 return false;
             }
 
         } catch (SQLException e) {
             ConfigServidorRemoto falha = config.comStatus("FALHA");
             repository.update(falha);
-            logger.error("❌ Erro ao conectar: {} - {}", config.nomeConfig(), e.getMessage());
+            logger.log(System.Logger.Level.ERROR,"❌ Erro ao conectar: {} - {}", config.nomeConfig(), e.getMessage());
             return false;
         }
     }
@@ -221,7 +220,7 @@ public class ConfigServidorRemotoService {
     public boolean testarConexaoAtiva() throws SQLException {
         Optional<ConfigServidorRemoto> opt = repository.findAtivo();
         if (opt.isEmpty()) {
-            logger.warn("Nenhuma configuração ativa encontrada");
+            logger.log(System.Logger.Level.WARNING,"Nenhuma configuração ativa encontrada");
             return false;
         }
         return testarConexao(opt.get());

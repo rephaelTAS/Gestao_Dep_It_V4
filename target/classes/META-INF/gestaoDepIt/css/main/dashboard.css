@@ -1,0 +1,252 @@
+/**
+ * dash.css v1.0
+ * Estilos visuais para Dashboard.fxml — Dashboard principal de Gestão de TI.
+ * Responsabilidades: KPIs, cards de alerta, métricas, gráficos, progress bar.
+ * NÃO contém regras de layout estrutural.
+ * Prefixo "dash-" para diferenciar do "dashboard-" (GIA).
+ */
+
+/* ========== ROOT ========== */
+.dash-scroll {
+    -fx-background-color: #f0f2f5;
+}
+
+.dash-scroll .viewport {
+    -fx-background-color: transparent;
+}
+
+.dash-container {
+    -fx-background-color: transparent;
+}
+
+/* ========== TÍTULO ========== */
+.dash-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1a2332;
+    -fx-padding: 0 0 8 0;
+}
+
+/* ========== SEÇÕES ========== */
+.dash-section-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #374151;
+    -fx-padding: 0 0 4 0;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 0 0 1 0;
+}
+
+/* ========== KPI CARDS ========== */
+.dash-kpi-section {
+    -fx-background-color: transparent;
+}
+
+.dash-kpi-grid {
+    -fx-background-color: transparent;
+}
+
+.dash-kpi-card {
+    -fx-background-color: white;
+    -fx-background-radius: 12px;
+    -fx-padding: 20;
+    -fx-alignment: center;
+    -fx-spacing: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);
+    -fx-border-color: #e8e8e8;
+    -fx-border-radius: 12px;
+    -fx-border-width: 1px;
+}
+
+.dash-kpi-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #6b7280;
+    -fx-text-alignment: center;
+}
+
+.dash-kpi-value {
+    -fx-font-size: 36px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e3a8a;
+    -fx-text-alignment: center;
+}
+
+.dash-kpi-description {
+    -fx-font-size: 11px;
+    -fx-text-fill: #9ca3af;
+    -fx-text-alignment: center;
+}
+
+/* ========== ALERT CARDS ========== */
+.dash-alert-section {
+    -fx-background-color: transparent;
+}
+
+.dash-alert-flow {
+    -fx-background-color: transparent;
+}
+
+.dash-alert-card {
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+    -fx-padding: 16;
+    -fx-alignment: center;
+    -fx-spacing: 6;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 6, 0, 0, 1);
+    -fx-border-color: #e8e8e8;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+}
+
+.dash-alert-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #6b7280;
+}
+
+.dash-alert-value {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #e67e22;
+}
+
+.dash-alert-description {
+    -fx-font-size: 11px;
+    -fx-text-fill: #9ca3af;
+}
+
+/* ========== MÉTRICAS ========== */
+.dash-metric-section {
+    -fx-background-color: transparent;
+}
+
+.dash-metric-row {
+    -fx-background-color: transparent;
+}
+
+.dash-metric-card {
+    -fx-background-color: white;
+    -fx-background-radius: 12px;
+    -fx-padding: 20;
+    -fx-spacing: 10;
+    -fx-alignment: center;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);
+    -fx-border-color: #e8e8e8;
+    -fx-border-radius: 12px;
+    -fx-border-width: 1px;
+}
+
+.dash-metric-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #6b7280;
+}
+
+.dash-metric-value {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e3a8a;
+}
+
+.dash-metric-description {
+    -fx-font-size: 11px;
+    -fx-text-fill: #9ca3af;
+}
+
+/* ========== PROGRESS BAR SEGURANÇA ========== */
+.dash-security-progress {
+    -fx-accent: #22c55e;
+    -fx-pref-width: 200;
+}
+
+.dash-security-progress .track {
+    -fx-background-color: #e5e7eb;
+    -fx-background-radius: 6px;
+}
+
+.dash-security-progress .bar {
+    -fx-background-radius: 6px;
+    -fx-background-color: linear-gradient(to right, #22c55e, #16a34a);
+}
+
+/* ========== GRÁFICOS ========== */
+.dash-chart-section {
+    -fx-background-color: transparent;
+}
+
+.dash-chart-grid {
+    -fx-background-color: transparent;
+}
+
+.dash-chart-container {
+    -fx-background-color: white;
+    -fx-background-radius: 12px;
+    -fx-padding: 16;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);
+    -fx-border-color: #e8e8e8;
+    -fx-border-radius: 12px;
+    -fx-border-width: 1px;
+}
+
+/* Estilos base para gráficos dentro dos containers */
+.dash-chart-container .chart {
+    -fx-padding: 8;
+}
+
+.dash-chart-container .chart-legend {
+    -fx-background-color: transparent;
+}
+
+.dash-chart-container .chart-plot-background {
+    -fx-background-color: #fafafa;
+}
+
+.dash-chart-container .axis {
+    -fx-tick-label-fill: #6b7280;
+    -fx-tick-label-font-size: 11px;
+}
+
+.dash-chart-container .axis-label {
+    -fx-text-fill: #374151;
+    -fx-font-weight: bold;
+}
+
+/* Cores dos gráficos */
+.default-color0.chart-bar {
+    -fx-bar-fill: #3b82f6;
+}
+
+.default-color1.chart-bar {
+    -fx-bar-fill: #22c55e;
+}
+
+.default-color0.chart-series-line {
+    -fx-stroke: #6366f1;
+    -fx-stroke-width: 2px;
+}
+
+.default-color0.chart-line-symbol {
+    -fx-background-color: #6366f1, white;
+}
+
+/* ========== FOOTER ========== */
+.dash-footer {
+    -fx-background-color: white;
+    -fx-background-radius: 8px;
+    -fx-padding: 12 20;
+    -fx-border-color: #e5e7eb;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+}
+
+.dash-footer-text {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6b7280;
+}
+
+.dash-footer-time {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #374151;
+}

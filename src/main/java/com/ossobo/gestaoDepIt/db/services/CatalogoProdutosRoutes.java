@@ -1,85 +1,30 @@
 package com.ossobo.gestaoDepIt.db.services;
 
+import com.ossobo.gestaoDepIt.db.enums.TipoProduto;
 import com.ossobo.gestaoDepIt.db.models.CatalogoProdutos;
-import com.ossobo.winterfx.anotations.Component;
-import com.ossobo.winterfx.anotations.DeleteMapping;
-import com.ossobo.winterfx.anotations.GetMapping;
-import com.ossobo.winterfx.anotations.Inject;
-import com.ossobo.winterfx.anotations.Payload;
-import com.ossobo.winterfx.anotations.PutMapping;
-import com.ossobo.winterfx.anotations.RequestMapping;
-import com.ossobo.winterfx.anotations.RouteVar;
+import com.ossobo.winterfx.anotations.*;
 import com.ossobo.winterfx.router.model.ResponseData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
 /**
- * CatalogoProdutosRoutes v1.1
+ * CatalogoProdutosRoutes v1.5
  *
- * Responsabilidade: Fronteira de Internal Routing do catálogo de produtos.
- *                   Handlers FINOS: delegam ao CatalogoProdutosService e traduzem
- *                   exceção → ResponseData. Único ponto de captura da camada.
+ * v1.5 — Rota nova `atualizar/por/sku`:
+ *        - Resolve SKU → id na fronteira. Cliente envia o record SEM se
+ *          preocupar com o UUID (chave de sync). SKU é imutável em edição.
  *
- * <h2>Contrato de chamada (emissor — view)</h2>
- * Com a API tipada do {@code Params}:
- * <pre>{@code
- * // Mutação com objeto:
- * Rotas.put("catalogo-produtos/service/salvar",
- *           Params.with("produto", novoProduto));
- *
- * // Mutação com params tipados:
- * var resposta = Rotas.put("catalogo-produtos/service/estoque/adicionar",
- *           Params.withString("sku", "SKU-001")
- *                 .withInt("quantidade", 5));
- *
- * // Preço como String (vírgula pt-BR suportada):
- * Rotas.put("catalogo-produtos/service/preco/atualizar",
- *           Params.withString("sku", "SKU-001")
- *                 .withString("preco", "1290,50"));
- *
- * // Leitura tipada do retorno:
- * if (resposta.isSuccess()) {
- *     var produto = resposta.getData("produto", CatalogoProdutos.class);
- * }
- *
- * // Listas:
- * var lista = Rotas.get("catalogo-produtos/service/todos");
- * List<CatalogoProdutos> produtos = lista.getDataList("produtos");
- * var total = lista.getDataInt("total");
- * }</pre>
- *
- * <h2>Chaves de retorno acordadas</h2>
- * <table>
- *   <tr><th>Tipo de rota</th><th>Chave</th><th>Conteúdo</th></tr>
- *   <tr><td>CRUD / estoque / preço</td><td>{@code "produto"}</td><td>{@code CatalogoProdutos}</td></tr>
- *   <tr><td>Listagens</td><td>{@code "produtos"} + {@code "total"}</td><td>{@code List} + Integer</td></tr>
- *   <tr><td>Distinct values (combos)</td><td>{@code "valores"} + {@code "total"}</td><td>{@code List<String>} + Integer</td></tr>
- *   <tr><td>Contagens / estatísticas</td><td>{@code "total"} / {@code "valor"} / {@code "estatisticas"}</td><td>numérico / mapa</td></tr>
- *   <tr><td>Exclusões / ativar / desativar</td><td>— (só {@code getMessage()})</td><td>mensagem global</td></tr>
- * </table>
- *
- * <p>Notas: regras de negócio e eventos residem em CatalogoProdutosService (intacto).
- * Esta classe NÃO conhece repository nem EventBus.</p>
- *
- * <p>v1.0 - Criação; 38 rotas (GET leitura / PUT mutação / DELETE remoção).</p>
- * <p>v1.1 - Mensagens no canal certo ({@code withMessage} — o antigo padrão de
- *          devolver String como dado sob a chave "mensagem" foi eliminado);
- *          helpers {@code acao}/{@code escrita}/{@code lista}/{@code valor} com
- *          captura uniforme de {@code IllegalArgumentException}/{@code IllegalStateException}
- *          (antes vazavam por {@code lista} e {@code valor}); {@code erroNegocio()}
- *          extraído (DRY); mensagem com contagem automática nas listas;
- *          Javadoc com o contrato de chamada usando {@code Params} tipado.</p>
+ * v1.4 — Fatura única passa a ser SÓ o número (fornecedor é informativo).
+ * v1.3 — Rota `existe/por/fatura` (versão anterior com fornecedor).
+ * v1.2 — Alinhado ao Service v2.2 / Repository v2.4 / Model v3.0.
  */
 @Component
 @RequestMapping("catalogo-produtos/service")
 public class CatalogoProdutosRoutes {
 
-    private static final Logger logger = LoggerFactory.getLogger(CatalogoProdutosRoutes.class);
+    private static final System.Logger logger = System.getLogger(CatalogoProdutosRoutes.class.getName());
 
     @Inject
     private CatalogoProdutosService service;
@@ -88,117 +33,131 @@ public class CatalogoProdutosRoutes {
     // ROTAS — CRUD
     // ============================================================
 
-    /** Cria produto. Emissor: {@code Params.with("produto", objeto)}. */
     @PutMapping("salvar")
     public ResponseData salvar(@Payload("produto") CatalogoProdutos produto) {
         return escrita("Produto salvo com sucesso", "produto",
                 () -> service.salvar(produto));
     }
 
-    /** Atualiza produto. Emissor: {@code Params.with("produto", objeto)}. */
+    /**
+     * Atualiza por ID (payload deve trazer o id preenchido).
+     * Mantida para compatibilidade reversa. Prefira `atualizar/por/sku`.
+     */
     @PutMapping("atualizar")
     public ResponseData atualizar(@Payload("produto") CatalogoProdutos produto) {
         return escrita("Produto atualizado com sucesso", "produto",
                 () -> service.atualizar(produto));
     }
 
-    /** Soft delete por SKU. Emissor: {@code Params.withString("sku", "...")}. */
-    @DeleteMapping("por/sku")
-    public ResponseData excluir(@RouteVar("sku") String sku) {
-        return acao("SKU " + sku + " excluído", () -> service.excluir(sku));
+    /**
+     * Atualiza resolvendo SKU → id na fronteira.
+     *
+     * O cliente envia o record SEM se preocupar com o UUID (chave de sync).
+     * O SKU é a chave de negócio estável — nasce uma vez, nunca muda.
+     * O id interno é resolvido aqui e injetado no record antes do service.
+     */
+    @PutMapping("atualizar/por/sku")
+    public ResponseData atualizarPorSku(@Payload("produto") CatalogoProdutos produto) {
+        return escrita("Produto atualizado com sucesso", "produto", () -> {
+            if (produto == null) throw new IllegalArgumentException("Produto inválido");
+            if (produto.sku() == null || produto.sku().isBlank()) {
+                throw new IllegalArgumentException("SKU é obrigatório para atualização");
+            }
+            String idAtual = idDeSku(produto.sku());
+            return service.atualizar(produto.comId(idAtual));
+        });
     }
 
-    /** Exclusão física por SKU (irreversível). */
+    @DeleteMapping("deletar/por/sku")
+    public ResponseData excluir(@RouteVar("sku") String sku) {
+        return acao("SKU " + sku + " excluído", () -> {
+            String id = idDeSku(sku);
+            service.excluir(id);
+        });
+    }
+
     @DeleteMapping("permanente/por/sku")
     public ResponseData excluirPermanentemente(@RouteVar("sku") String sku) {
-        return acao("SKU " + sku + " excluído permanentemente",
-                () -> service.excluirPermanentemente(sku));
+        return acao("SKU " + sku + " excluído permanentemente", () -> {
+            String id = idDeSku(sku);
+            service.excluirPermanentemente(id);
+        });
     }
 
-    /** Ativa produto desativado. */
     @PutMapping("ativar")
     public ResponseData ativar(@RouteVar("sku") String sku) {
-        return acao("Produto ativado", () -> service.ativar(sku));
+        return acao("Produto ativado", () -> service.ativar(idDeSku(sku)));
     }
 
-    /** Desativa produto (soft delete). */
     @PutMapping("desativar")
     public ResponseData desativar(@RouteVar("sku") String sku) {
-        return acao("Produto desativado", () -> service.desativar(sku));
+        return acao("Produto desativado", () -> service.desativar(idDeSku(sku)));
     }
 
     // ============================================================
     // ROTAS — ESTOQUE
     // ============================================================
 
-    /** Emissor: {@code Params.withString("sku", s).withInt("quantidade", n)}. */
     @PutMapping("estoque/adicionar")
     public ResponseData adicionarEstoque(@RouteVar("sku") String sku,
                                          @RouteVar("quantidade") Integer quantidade) {
         return escrita("Estoque adicionado", "produto",
-                () -> service.adicionarEstoque(sku, exigirInt(quantidade, "quantidade")));
+                () -> service.adicionarEstoque(idDeSku(sku), exigirInt(quantidade, "quantidade")));
     }
 
     @PutMapping("estoque/remover")
     public ResponseData removerEstoque(@RouteVar("sku") String sku,
                                        @RouteVar("quantidade") Integer quantidade) {
         return escrita("Estoque removido", "produto",
-                () -> service.removerEstoque(sku, exigirInt(quantidade, "quantidade")));
+                () -> service.removerEstoque(idDeSku(sku), exigirInt(quantidade, "quantidade")));
     }
 
     @PutMapping("estoque/atualizar")
     public ResponseData atualizarEstoque(@RouteVar("sku") String sku,
                                          @RouteVar("quantidade") Integer quantidade) {
         return escrita("Estoque atualizado", "produto",
-                () -> service.atualizarEstoque(sku, exigirInt(quantidade, "quantidade")));
+                () -> service.atualizarEstoque(idDeSku(sku), exigirInt(quantidade, "quantidade")));
     }
 
     // ============================================================
     // ROTAS — PREÇO / FORNECEDOR / FATURA
     // ============================================================
 
-    /**
-     * Preço chega como String (suporta vírgula pt-BR); conversão isolada em
-     * {@link #converterPreco}. Emissor: {@code Params.withString("preco", "1290,50")}.
-     */
     @PutMapping("preco/atualizar")
     public ResponseData atualizarPreco(@RouteVar("sku") String sku,
-                                       @RouteVar("preco") String preco) {
-        return escrita("Preço atualizado", "produto",
-                () -> service.atualizarPreco(sku, converterPreco(preco)));
+                                       @RouteVar("preco") String preco,
+                                       @RouteVar("iva") String iva) {
+        return escrita("Preço atualizado", "produto", () -> {
+            int centavos = converterPrecoCentavos(preco);
+            int bp = converterIvaBp(iva);
+            return service.atualizarPreco(idDeSku(sku), centavos, bp);
+        });
     }
 
     @PutMapping("fornecedor/atualizar")
     public ResponseData atualizarFornecedor(@RouteVar("sku") String sku,
                                             @RouteVar("fornecedor") String fornecedor) {
         return escrita("Fornecedor atualizado", "produto",
-                () -> service.atualizarFornecedor(sku, fornecedor));
+                () -> service.atualizarFornecedor(idDeSku(sku), fornecedor));
     }
 
-    /**
-     * Atualiza fatura do SKU. O emissor DEVE sempre enviar a chave "fatura"
-     * (valor pode ser {@code null} quando não houver arquivo).
-     * Nota: {@code byte[]} não é Collection — passa por referência, sem cópia defensiva.
-     */
     @PutMapping("fatura/atualizar")
     public ResponseData atualizarFatura(@RouteVar("sku") String sku,
                                         @RouteVar("numero") String numero,
                                         @Payload("fatura") byte[] faturaCompra) {
         return escrita("Fatura atualizada", "produto",
-                () -> service.atualizarFatura(sku, numero, faturaCompra));
+                () -> service.atualizarFatura(idDeSku(sku), numero, faturaCompra));
     }
 
     // ============================================================
-    // ROTAS — CONSULTAS (PRODUTOS)
+    // ROTAS — CONSULTAS
     // ============================================================
 
-    /** Emissor lê: {@code resposta.getDataList("produtos")} + {@code getDataInt("total")}. */
     @GetMapping("todos")
     public ResponseData todos() {
         return lista(() -> service.listarTodos(), "produtos");
     }
 
-    /** Lista paginada. Emissor: {@code Params.withInt("pagina", 1).withInt("tamanho", 50)}. */
     @GetMapping("paginados")
     public ResponseData paginados(@RouteVar("pagina") Integer pagina,
                                   @RouteVar("tamanho") Integer tamanho) {
@@ -210,7 +169,6 @@ public class CatalogoProdutosRoutes {
         }, "produtos");
     }
 
-    /** Busca por SKU; erro semântico (com erros por campo) se inexistente. */
     @GetMapping("por/sku")
     public ResponseData buscarPorSku(@RouteVar("sku") String sku) {
         try {
@@ -225,9 +183,23 @@ public class CatalogoProdutosRoutes {
         }
     }
 
+    @GetMapping("por/id")
+    public ResponseData buscarPorId(@RouteVar("id") String id) {
+        try {
+            Optional<CatalogoProdutos> opt = service.buscarPorId(id);
+            return opt.<ResponseData>map(p -> ResponseData.success()
+                            .withMessage("Produto encontrado")
+                            .withData("produto", p))
+                    .orElseGet(() -> ResponseData.error("Produto não encontrado: " + id)
+                            .withError("id", "ID inexistente"));
+        } catch (SQLException e) {
+            return erroBanco(e);
+        }
+    }
+
     @GetMapping("por/tipo")
     public ResponseData porTipo(@RouteVar("tipo") String tipo) {
-        return lista(() -> service.buscarPorTipo(tipo), "produtos");
+        return lista(() -> service.buscarPorTipo(TipoProduto.fromString(tipo)), "produtos");
     }
 
     @GetMapping("por/categoria")
@@ -251,17 +223,15 @@ public class CatalogoProdutosRoutes {
         return lista(() -> service.buscarPorFornecedor(fornecedor), "produtos");
     }
 
-    /** Termo vazio → lista completa (contrato do service). */
     @GetMapping("buscar/por/termo")
     public ResponseData buscarPorTermo(@RouteVar("termo") String termo) {
         return lista(() -> service.buscarPorTermo(termo), "produtos");
     }
 
     // ============================================================
-    // ROTAS — CONSULTAS (ESTOQUE)
+    // ROTAS — ESTOQUE (consultas)
     // ============================================================
 
-    /** Emissor: {@code Params.withInt("limite", 10)}. */
     @GetMapping("estoque/baixo")
     public ResponseData estoqueBaixo(@RouteVar("limite") Integer limite) {
         return lista(() -> {
@@ -273,33 +243,20 @@ public class CatalogoProdutosRoutes {
     }
 
     @GetMapping("estoque/sem")
-    public ResponseData semEstoque() {
-        return lista(service::buscarSemEstoque, "produtos");
-    }
+    public ResponseData semEstoque() { return lista(service::buscarSemEstoque, "produtos"); }
 
     @GetMapping("estoque/com")
-    public ResponseData comEstoque() {
-        return lista(service::buscarComEstoque, "produtos");
-    }
+    public ResponseData comEstoque() { return lista(service::buscarComEstoque, "produtos"); }
 
     // ============================================================
-    // ROTAS — DISTINCT VALUES (COMBOBOXES DA UI)
+    // ROTAS — DISTINCT
     // ============================================================
 
-    @GetMapping("distinct/categorias")
-    public ResponseData categorias()          { return lista(service::listarCategorias, "valores"); }
-
-    @GetMapping("distinct/marcas")
-    public ResponseData marcas()              { return lista(service::listarMarcas, "valores"); }
-
-    @GetMapping("distinct/cores")
-    public ResponseData cores()               { return lista(service::listarCores, "valores"); }
-
-    @GetMapping("distinct/tipos")
-    public ResponseData tipos()               { return lista(service::listarTipos, "valores"); }
-
-    @GetMapping("distinct/fornecedores")
-    public ResponseData fornecedores()        { return lista(service::listarFornecedores, "valores"); }
+    @GetMapping("distinct/categorias")   public ResponseData categorias()    { return lista(service::listarCategorias, "valores"); }
+    @GetMapping("distinct/marcas")       public ResponseData marcas()        { return lista(service::listarMarcas, "valores"); }
+    @GetMapping("distinct/cores")        public ResponseData cores()         { return lista(service::listarCores, "valores"); }
+    @GetMapping("distinct/tipos")        public ResponseData tipos()         { return lista(service::listarTipos, "valores"); }
+    @GetMapping("distinct/fornecedores") public ResponseData fornecedores()  { return lista(service::listarFornecedores, "valores"); }
 
     @GetMapping("distinct/modelos")
     public ResponseData modelosPorMarca(@RouteVar("marca") String marca) {
@@ -307,18 +264,29 @@ public class CatalogoProdutosRoutes {
     }
 
     // ============================================================
+    // ROTAS — VERIFICAÇÃO DE FATURA (só o número)
+    // ============================================================
+
+    /**
+     * Verifica se o número de fatura já está registrado.
+     * Feedback imediato na UI antes de tentar salvar.
+     * Chave: APENAS "numero" — fornecedor é informativo, não entra na regra.
+     */
+    @GetMapping("existe/por/fatura")
+    public ResponseData existePorFatura(@RouteVar("numero") String numero) {
+        return valor(() -> service.existePorFatura(numero), "exists");
+    }
+
+    // ============================================================
     // ROTAS — ESTATÍSTICAS
     // ============================================================
 
-    @GetMapping("contar/total")
-    public ResponseData contarTotal()          { return valor(service::contarTotal, "total"); }
-
-    @GetMapping("contar/ativos")
-    public ResponseData contarAtivos()         { return valor(service::contarAtivos, "total"); }
+    @GetMapping("contar/total")   public ResponseData contarTotal()  { return valor(service::contarTotal, "total"); }
+    @GetMapping("contar/ativos")  public ResponseData contarAtivos() { return valor(service::contarAtivos, "total"); }
 
     @GetMapping("contar/por/tipo")
     public ResponseData contarPorTipo(@RouteVar("tipo") String tipo) {
-        return valor(() -> service.contarPorTipo(tipo), "total");
+        return valor(() -> service.contarPorTipo(TipoProduto.fromString(tipo)), "total");
     }
 
     @GetMapping("contar/por/categoria")
@@ -332,22 +300,19 @@ public class CatalogoProdutosRoutes {
     }
 
     @GetMapping("valor-total-estoque")
-    public ResponseData valorTotalEstoque()    { return valor(service::valorTotalEstoque, "valor"); }
+    public ResponseData valorTotalEstoque() {
+        return valor(service::valorTotalEstoqueCentavos, "valor_centavos");
+    }
 
     @GetMapping("valor-total-estoque-com-iva")
-    public ResponseData valorTotalEstoqueComIva() { return valor(service::valorTotalEstoqueComIva, "valor"); }
+    public ResponseData valorTotalEstoqueComIva() {
+        return valor(service::valorTotalEstoqueComIvaCentavos, "valor_centavos");
+    }
 
-    @GetMapping("stats/por/tipo")
-    public ResponseData statsPorTipo()         { return valor(service::estatisticasPorTipo, "estatisticas"); }
-
-    @GetMapping("stats/por/categoria")
-    public ResponseData statsPorCategoria()    { return valor(service::estatisticasPorCategoria, "estatisticas"); }
-
-    @GetMapping("stats/por/marca")
-    public ResponseData statsPorMarca()        { return valor(service::estatisticasPorMarca, "estatisticas"); }
-
-    @GetMapping("stats/por/fornecedor")
-    public ResponseData statsPorFornecedor()   { return valor(service::estatisticasPorFornecedor, "estatisticas"); }
+    @GetMapping("stats/por/tipo")        public ResponseData statsPorTipo()       { return valor(service::estatisticasPorTipo, "estatisticas"); }
+    @GetMapping("stats/por/categoria")   public ResponseData statsPorCategoria()  { return valor(service::estatisticasPorCategoria, "estatisticas"); }
+    @GetMapping("stats/por/marca")       public ResponseData statsPorMarca()      { return valor(service::estatisticasPorMarca, "estatisticas"); }
+    @GetMapping("stats/por/fornecedor")  public ResponseData statsPorFornecedor() { return valor(service::estatisticasPorFornecedor, "estatisticas"); }
 
     @GetMapping("existe/por/sku")
     public ResponseData existePorSku(@RouteVar("sku") String sku) {
@@ -355,26 +320,15 @@ public class CatalogoProdutosRoutes {
     }
 
     // ============================================================
-    // HELPERS DE FRONTEIRA (ÚNICO PONTO DE CAPTURA)
+    // HELPERS DE FRONTEIRA
     // ============================================================
 
-    /** Ação que devolve um resultado (produto, lista, valor...). */
     @FunctionalInterface
-    private interface Acao<T> {
-        T executar() throws SQLException;
-    }
+    private interface Acao<T> { T executar() throws SQLException; }
 
-    /** Ação de mutação SEM resultado útil — a mensagem é o retorno. */
     @FunctionalInterface
-    private interface VoidAcao {
-        void executar() throws SQLException;
-    }
+    private interface VoidAcao { void executar() throws SQLException; }
 
-    /**
-     * Mutação sem retorno util (excluir, ativar, desativar).
-     * A mensagem vai para o canal CERTO: {@code withMessage} — o emissor lê
-     * com {@code resposta.getMessage()}, nunca via mapa de dados.
-     */
     private ResponseData acao(String mensagem, VoidAcao acao) {
         try {
             acao.executar();
@@ -386,16 +340,10 @@ public class CatalogoProdutosRoutes {
         }
     }
 
-    /**
-     * Mutação com retorno (salvar, atualizar, estoque, preço...).
-     * Entrega mensagem global + resultado sob a chave acordada no contrato.
-     */
     private <T> ResponseData escrita(String mensagem, String chave, Acao<T> acao) {
         try {
             T resultado = acao.executar();
-            return ResponseData.success()
-                    .withMessage(mensagem)
-                    .withData(chave, resultado);
+            return ResponseData.success().withMessage(mensagem).withData(chave, resultado);
         } catch (IllegalArgumentException | IllegalStateException e) {
             return erroNegocio(e);
         } catch (SQLException e) {
@@ -403,10 +351,6 @@ public class CatalogoProdutosRoutes {
         }
     }
 
-    /**
-     * Consulta em lista. Entrega a lista sob a chave + "total" + mensagem
-     * com a contagem — o emissor não precisa recomputar {@code size()}.
-     */
     private ResponseData lista(Acao<List<?>> acao, String chave) {
         try {
             List<?> dados = acao.executar();
@@ -421,7 +365,6 @@ public class CatalogoProdutosRoutes {
         }
     }
 
-    /** Consulta escalar (contagens, valores agregados, estatísticas). */
     private <T> ResponseData valor(Acao<T> acao, String chave) {
         try {
             return ResponseData.success().withData(chave, acao.executar());
@@ -432,55 +375,53 @@ public class CatalogoProdutosRoutes {
         }
     }
 
-    /** Regra de negócio violada — warn no log, erro semântico com campo. */
     private ResponseData erroNegocio(RuntimeException e) {
-        logger.warn("⚠️ Regra de negócio violada: {}", e.getMessage());
-        return ResponseData.error(e.getMessage())
-                .withError("negocio", e.getMessage());
+        // System.Logger usa MessageFormat — {0}, não {} (SLF4J).
+        logger.log(System.Logger.Level.WARNING, "⚠️ Regra de negócio violada: {0}", e.getMessage());
+        String msg = (e.getMessage() == null || e.getMessage().isBlank())
+                ? e.getClass().getSimpleName()
+                : e.getMessage();
+        return ResponseData.error(msg).withError("negocio", msg);
     }
 
-    /** Erro de banco — error no log com stacktrace completo. */
     private ResponseData erroBanco(SQLException e) {
-        logger.error("❌ Erro de banco de dados: {}", e.getMessage(), e);
+        logger.log(System.Logger.Level.ERROR, "❌ Erro de banco de dados: {0}", e.getMessage(), e);
         return ResponseData.error("Erro de banco de dados: " + e.getMessage())
                 .withError("banco", e.getMessage());
     }
 
-    /** Garante unboxing seguro de @RouteVar Integer → int (autoboxing cobre o resto). */
     private int exigirInt(Integer valor, String campo) {
-        if (valor == null) {
-            throw new IllegalArgumentException("Parâmetro obrigatório: " + campo);
-        }
+        if (valor == null) throw new IllegalArgumentException("Parâmetro obrigatório: " + campo);
         return valor;
     }
 
-    /**
-     * Busca combinando múltiplos filtros OPCIONAIS. Parâmetros ausentes ou
-     * null são ignorados pelo service (comportamento delegado).
-     *
-     * <p>Emissor — envie apenas os filtros selecionados:
-     * {@code Params.withString("marca", m).with("ativo", Boolean.TRUE)}</p>
-     */
-    @GetMapping("buscar/com-filtros")
-    public ResponseData buscarComFiltros(@RouteVar("tipo") String tipo,
-                                         @RouteVar("categoria") String categoria,
-                                         @RouteVar("marca") String marca,
-                                         @RouteVar("modelo") String modelo,
-                                         @RouteVar("cor") String cor,
-                                         @RouteVar("ativo") Boolean ativo) {
-        return lista(() -> service.buscarComFiltros(tipo, categoria, marca, modelo, cor, ativo),
-                "produtos");
+    private String idDeSku(String sku) throws SQLException {
+        return service.buscarPorSku(sku)
+                .orElseThrow(() -> new IllegalArgumentException("Produto não encontrado: " + sku))
+                .id();
     }
 
-    /** Aceita vírgula decimal (pt-BR): "1290,50" → BigDecimal. */
-    private BigDecimal converterPreco(String bruto) {
+    private int converterPrecoCentavos(String bruto) {
         if (bruto == null || bruto.isBlank()) {
             throw new IllegalArgumentException("Preço não informado");
         }
         try {
-            return new BigDecimal(bruto.trim().replace(",", "."));
-        } catch (NumberFormatException e) {
+            String limpo = bruto.trim().replace(",", ".");
+            java.math.BigDecimal valor = new java.math.BigDecimal(limpo);
+            return valor.multiply(java.math.BigDecimal.valueOf(100)).intValueExact();
+        } catch (NumberFormatException | ArithmeticException e) {
             throw new IllegalArgumentException("Preço inválido: '" + bruto + "'");
+        }
+    }
+
+    private int converterIvaBp(String bruto) {
+        if (bruto == null || bruto.isBlank()) return 0;
+        try {
+            String limpo = bruto.trim().replace(",", ".");
+            java.math.BigDecimal valor = new java.math.BigDecimal(limpo);
+            return valor.multiply(java.math.BigDecimal.valueOf(100)).intValueExact();
+        } catch (NumberFormatException | ArithmeticException e) {
+            throw new IllegalArgumentException("IVA inválido: '" + bruto + "'");
         }
     }
 }

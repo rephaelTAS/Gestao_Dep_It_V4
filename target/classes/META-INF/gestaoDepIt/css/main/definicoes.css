@@ -1,0 +1,318 @@
+/* ============================================
+   DEFINICOES.CSS - Estilos da Tela Definições
+   ============================================ */
+
+/* =================== */
+/* 1. CONTAINER PRINCIPAL */
+/* =================== */
+
+.root {
+    -fx-background-color: #f5f7fa;
+    -fx-font-family: "Segoe UI", "System", sans-serif;
+}
+
+/* =================== */
+/* 2. TÍTULOS */
+/* =================== */
+
+.titulo-principal {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+    -fx-padding: 0 0 5 0;
+}
+
+.subtitulo-aba {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #34495e;
+    -fx-padding: 5 0 5 0;
+}
+
+/* =================== */
+/* 3. STATUS */
+/* =================== */
+
+.status-online {
+    -fx-text-fill: #27ae60;
+    -fx-font-weight: bold;
+}
+
+.status-offline {
+    -fx-text-fill: #e74c3c;
+    -fx-font-weight: bold;
+}
+
+.status-warning {
+    -fx-text-fill: #f39c12;
+    -fx-font-weight: bold;
+}
+
+/* =================== */
+/* 4. TABPANE */
+/* =================== */
+
+.tab-pane-config {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+}
+
+.tab-pane-config .tab-header-area {
+    -fx-padding: 0 0 10 0;
+}
+
+.tab-pane-config .tab {
+    -fx-background-color: transparent;
+    -fx-padding: 10 20 10 20;
+    -fx-border-color: transparent;
+}
+
+.tab-pane-config .tab:selected {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 8 8 0 0;
+    -fx-border-color: #3498db #3498db transparent #3498db;
+    -fx-border-width: 2;
+}
+
+.tab-pane-config .tab .tab-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-text-fill: #7f8c8d;
+}
+
+.tab-pane-config .tab:selected .tab-label {
+    -fx-text-fill: #2c3e50;
+    -fx-font-weight: bold;
+}
+
+.tab-pane-config .tab-content-area {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 0 8 8 8;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 0 8 8 8;
+    -fx-border-width: 1;
+}
+
+/* =================== */
+/* 5. SCROLLPANE */
+/* =================== */
+
+.scroll-pane {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+/* =================== */
+/* 6. CAMPOS DE FORMULÁRIO */
+/* =================== */
+
+.text-field, .password-field, .combo-box, .spinner {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #dce1e8;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 8 12;
+    -fx-font-size: 13px;
+}
+
+.text-field:focused, .password-field:focused, .combo-box:focused {
+    -fx-border-color: #3498db;
+    -fx-effect: dropshadow(gaussian, rgba(52, 152, 219, 0.3), 8, 0, 0, 0);
+}
+
+.text-field:disabled, .password-field:disabled {
+    -fx-opacity: 0.6;
+    -fx-background-color: #f5f7fa;
+}
+
+.combo-box .arrow-button {
+    -fx-background-color: transparent;
+}
+
+.combo-box .list-cell {
+    -fx-padding: 8 12;
+}
+
+/* =================== */
+/* 7. CHECKBOXES */
+/* =================== */
+
+.check-box {
+    -fx-font-size: 13px;
+    -fx-padding: 5 0;
+}
+
+.check-box .box {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #bdc3c7;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 3;
+}
+
+.check-box:selected .box {
+    -fx-background-color: #3498db;
+    -fx-border-color: #3498db;
+}
+
+.check-box .mark {
+    -fx-background-color: #ffffff;
+    -fx-shape: "M0,5 L3,8 L8,0 L10,2 L3,10 L-2,5 Z";
+    -fx-scale-shape: false;
+}
+
+/* =================== */
+/* 8. BOTÕES */
+/* =================== */
+
+.button {
+    -fx-background-color: #ecf0f1;
+    -fx-background-radius: 6;
+    -fx-border-color: #bdc3c7;
+    -fx-border-radius: 6;
+    -fx-border-width: 1;
+    -fx-padding: 8 18;
+    -fx-font-size: 13px;
+    -fx-font-weight: 500;
+    -fx-cursor: hand;
+    -fx-text-fill: #2c3e50;
+}
+
+.button:hover {
+    -fx-background-color: #d5dbdb;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 6, 0, 0, 1);
+}
+
+.button:pressed {
+    -fx-background-color: #bdc3c7;
+}
+
+/* Botão Primário */
+.btn-primary {
+    -fx-background-color: #3498db;
+    -fx-border-color: #2980b9;
+    -fx-text-fill: #ffffff;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #2980b9;
+}
+
+/* Botão Sucesso */
+.btn-success {
+    -fx-background-color: #27ae60;
+    -fx-border-color: #229954;
+    -fx-text-fill: #ffffff;
+}
+
+.btn-success:hover {
+    -fx-background-color: #229954;
+}
+
+/* Botão Perigo */
+.btn-danger {
+    -fx-background-color: #e74c3c;
+    -fx-border-color: #c0392b;
+    -fx-text-fill: #ffffff;
+}
+
+.btn-danger:hover {
+    -fx-background-color: #c0392b;
+}
+
+/* Botão Secundário */
+.btn-secondary {
+    -fx-background-color: #95a5a6;
+    -fx-border-color: #7f8c8d;
+    -fx-text-fill: #ffffff;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #7f8c8d;
+}
+
+/* =================== */
+/* 9. SEPARADORES */
+/* =================== */
+
+.separator .line {
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1;
+}
+
+/* =================== */
+/* 10. GRID E SPACING */
+/* =================== */
+
+.grid-pane {
+    -fx-hgap: 20;
+    -fx-vgap: 15;
+}
+
+.label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #2c3e50;
+}
+
+/* =================== */
+/* 11. SCROLLBAR PERSONALIZADA */
+/* =================== */
+
+.scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 10;
+}
+
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #d0d3d8;
+    -fx-background-radius: 5;
+    -fx-padding: 0 3;
+}
+
+.scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #b0b3b8;
+}
+
+.scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar:vertical .increment-button,
+.scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+}
+
+/* =================== */
+/* 12. RESPONSIVIDADE */
+/* =================== */
+
+/* Para telas menores */
+@media screen and (max-width: 800px) {
+    .grid-pane {
+        -fx-hgap: 10;
+        -fx-vgap: 10;
+    }
+
+    .text-field, .password-field {
+        -fx-pref-width: 200;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .grid-pane {
+        -fx-vgap: 8;
+    }
+
+    .tab-pane-config .tab {
+        -fx-padding: 5 10;
+    }
+
+    .button {
+        -fx-padding: 6 12;
+        -fx-font-size: 12px;
+    }
+}

@@ -1,23 +1,14 @@
 package com.ossobo.gestaoDepIt.db.services;
 
 import com.ossobo.gestaoDepIt.db.models.GestaoToners;
-import com.ossobo.winterfx.anotations.Component;
-import com.ossobo.winterfx.anotations.DeleteMapping;
-import com.ossobo.winterfx.anotations.GetMapping;
-import com.ossobo.winterfx.anotations.Inject;
-import com.ossobo.winterfx.anotations.Payload;
-import com.ossobo.winterfx.anotations.PutMapping;
-import com.ossobo.winterfx.anotations.RequestMapping;
-import com.ossobo.winterfx.anotations.RouteVar;
+import com.ossobo.winterfx.anotations.*;
 import com.ossobo.winterfx.router.model.ResponseData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -44,7 +35,7 @@ import java.util.Optional;
 @RequestMapping("gestao-toners/service")
 public class GestaoTonersRoutes {
 
-    private static final Logger logger = LoggerFactory.getLogger(GestaoTonersRoutes.class);
+    private static final System.Logger logger = System.getLogger(GestaoTonersRoutes.class.getName());
 
     @Inject
     private GestaoTonersService service;
@@ -71,14 +62,14 @@ public class GestaoTonersRoutes {
 
     /** Busca por ID. Erro semântico se inexistente. */
     @GetMapping("por/id")
-    public ResponseData buscarPorId(@RouteVar("id") Long id) {
+    public ResponseData buscarPorId(@RouteVar("id") String id) {
         return optional(() -> service.buscarPorId(id), "toner",
                 "Toner não encontrado: ID " + id);
     }
 
     /** Histórico de toners de um equipamento. */
     @GetMapping("por/inventario")
-    public ResponseData porInventario(@RouteVar("inventarioid") Long inventarioId) {
+    public ResponseData porInventario(@RouteVar("inventarioid") String inventarioId) {
         return lista(() -> service.buscarPorInventario(inventarioId), "toners");
     }
 
@@ -94,19 +85,19 @@ public class GestaoTonersRoutes {
 
     /** Toner atualmente ativo no equipamento (null se nenhum). */
     @GetMapping("ativo/por/inventario")
-    public ResponseData tonerAtivo(@RouteVar("inventarioid") Long inventarioId) {
+    public ResponseData tonerAtivo(@RouteVar("inventarioid") String inventarioId) {
         return optionalSemErro(() -> service.buscarTonerAtivo(inventarioId), "toner");
     }
 
     /** Último registro de toner do equipamento (qualquer status). */
     @GetMapping("ultimo/por/inventario")
-    public ResponseData ultimoToner(@RouteVar("inventarioid") Long inventarioId) {
+    public ResponseData ultimoToner(@RouteVar("inventarioid") String inventarioId) {
         return optionalSemErro(() -> service.buscarUltimoToner(inventarioId), "toner");
     }
 
     /** true se o equipamento possui toner ativo instalado. */
     @GetMapping("tem-ativo")
-    public ResponseData temAtivo(@RouteVar("inventarioid") Long inventarioId) {
+    public ResponseData temAtivo(@RouteVar("inventarioid") String inventarioId) {
         return valor(() -> service.equipamentoTemTonerAtivo(inventarioId), "temativo");
     }
 
@@ -131,7 +122,7 @@ public class GestaoTonersRoutes {
 
     /** Toners por usuário responsável. */
     @GetMapping("por/usuario")
-    public ResponseData porUsuario(@RouteVar("usuarioid") Long usuarioId) {
+    public ResponseData porUsuario(@RouteVar("usuarioid") String usuarioId) {
         return lista(() -> service.buscarPorUsuario(usuarioId), "toners");
     }
 
@@ -149,9 +140,9 @@ public class GestaoTonersRoutes {
      * inventarioid, sku, usuarioid, inicio/fim (ISO), percmin/percmax (0–100).
      */
     @GetMapping("com-filtros")
-    public ResponseData comFiltros(@RouteVar("inventarioid") Long inventarioId,
+    public ResponseData comFiltros(@RouteVar("inventarioid") String inventarioId,
                                    @RouteVar("sku") String sku,
-                                   @RouteVar("usuarioid") Long usuarioId,
+                                   @RouteVar("usuarioid") String usuarioId,
                                    @RouteVar("inicio") String inicio,
                                    @RouteVar("fim") String fim,
                                    @RouteVar("percmin") Integer percMin,
@@ -216,12 +207,12 @@ public class GestaoTonersRoutes {
     public ResponseData totalEsgotados()        { return valor(service::contarEsgotados, "total"); }
 
     @GetMapping("total/por/inventario")
-    public ResponseData totalPorInventario(@RouteVar("inventarioid") Long inventarioId) {
+    public ResponseData totalPorInventario(@RouteVar("inventarioid") String inventarioId) {
         return valor(() -> service.contarPorInventario(inventarioId), "total");
     }
 
     @GetMapping("exists/id")
-    public ResponseData existePorId(@RouteVar("id") Long id) {
+    public ResponseData existePorId(@RouteVar("id") String id) {
         return valor(() -> service.existePorId(id), "exists");
     }
 
@@ -249,7 +240,7 @@ public class GestaoTonersRoutes {
      * (redução = ciclos/100). Publica USO_REGISTRADO ou ESGOTADO ao zerar.
      */
     @PutMapping("usar")
-    public ResponseData usar(@RouteVar("id") Long id,
+    public ResponseData usar(@RouteVar("id") String id,
                              @RouteVar("ciclos") Integer ciclos) {
         return escrita(() -> {
             service.registrarUso(id, exigirInt(ciclos, "ciclos"));
@@ -259,7 +250,7 @@ public class GestaoTonersRoutes {
 
     /** Define percentagem absoluta (0–100). */
     @PutMapping("percentagem/atualizar")
-    public ResponseData atualizarPercentagem(@RouteVar("id") Long id,
+    public ResponseData atualizarPercentagem(@RouteVar("id") String id,
                                              @RouteVar("valor") Integer valor) {
         return escrita(() -> {
             service.atualizarPercentagem(id, exigirInt(valor, "valor"));
@@ -269,7 +260,7 @@ public class GestaoTonersRoutes {
 
     /** Marca toner como esgotado (percentagem 0). */
     @PutMapping("esgotar")
-    public ResponseData esgotar(@RouteVar("id") Long id) {
+    public ResponseData esgotar(@RouteVar("id") String id) {
         return escrita(() -> {
             service.marcarComoEsgotado(id);
             return "Toner marcado como esgotado";
@@ -280,9 +271,12 @@ public class GestaoTonersRoutes {
     // ROTAS — REMOÇÃO (DELETE)
     // ============================================================
 
-    /** Exclui registro de toner. Publica TonerEvent EXCLUIDO. */
-    @DeleteMapping("por/id")
-    public ResponseData excluir(@RouteVar("id") Long id) {
+    /**
+     * Exclui registro de toner. Publica TonerEvent EXCLUIDO.
+     * Path renomeado para evitar colisão com GET /por/id
+     */
+    @DeleteMapping("deletar/por/id")
+    public ResponseData excluir(@RouteVar("id") String id) {
         return escrita(() -> {
             service.excluir(id);
             return "Toner excluído";
@@ -302,7 +296,7 @@ public class GestaoTonersRoutes {
         try {
             return ResponseData.success().withData(chave, acao.executar());
         } catch (IllegalArgumentException | IllegalStateException e) {
-            logger.warn("⚠️ Regra de negócio violada: {}", e.getMessage());
+            logger.log(System.Logger.Level.WARNING,"⚠️ Regra de negócio violada: {}", e.getMessage());
             return ResponseData.error(e.getMessage()).withError("negocio", e.getMessage());
         } catch (SQLException e) {
             return erroBanco(e);
@@ -346,7 +340,7 @@ public class GestaoTonersRoutes {
     }
 
     private ResponseData erroBanco(SQLException e) {
-        logger.error("❌ Erro de banco de dados: {}", e.getMessage(), e);
+        logger.log(System.Logger.Level.ERROR,"❌ Erro de banco de dados: {}", e.getMessage(), e);
         return ResponseData.error("Erro de banco de dados: " + e.getMessage())
                 .withError("banco", e.getMessage());
     }

@@ -1,0 +1,195 @@
+/* ============================================================
+   HistoricoEventoDetail.css
+   Janela flutuante de detalhes de um evento do histórico.
+   Tema claro, alinhado ao catálogo e inventário.
+   ============================================================ */
+
+.historico-detail-root {
+    -fx-background-color: #ffffff;
+}
+
+/* ===== Header ===== */
+.historico-detail-header-container {
+    -fx-background-color: #ffffff;
+    -fx-border-color: transparent transparent #e5e7eb transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.historico-detail-header-bar {
+    -fx-background-color: transparent;
+}
+
+.historico-detail-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #111827;
+}
+
+.historico-detail-subtitle {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6b7280;
+}
+
+.historico-detail-device {
+    -fx-font-size: 11px;
+    -fx-text-fill: #9ca3af;
+    -fx-font-style: italic;
+}
+
+.historico-detail-status-row {
+    -fx-background-color: #f9fafb;
+}
+
+.historico-detail-status-message {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6b7280;
+}
+
+/* ===== Conteúdo ===== */
+.historico-detail-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.historico-detail-content {
+    -fx-background-color: #f9fafb;
+}
+
+/* ===== Cards ===== */
+.detail-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1;
+    -fx-padding: 15;
+}
+
+.detail-card-header {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #374151;
+    -fx-text-transform: uppercase;
+}
+
+.detail-card-header-antes {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #dc2626;
+}
+
+.detail-card-header-depois {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #059669;
+}
+
+.detail-value {
+    -fx-font-size: 13px;
+    -fx-text-fill: #1f2937;
+}
+
+.detail-value-strong {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #111827;
+}
+
+.detail-value-muted {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6b7280;
+}
+
+/* ===== TextAreas JSON ===== */
+.historico-json-area-antes {
+    -fx-font-family: "Consolas", "Monaco", monospace;
+    -fx-font-size: 12px;
+    -fx-control-inner-background: #fef2f2;
+    -fx-text-fill: #7f1d1d;
+    -fx-border-color: #fecaca;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.historico-json-area-depois {
+    -fx-font-family: "Consolas", "Monaco", monospace;
+    -fx-font-size: 12px;
+    -fx-control-inner-background: #f0fdf4;
+    -fx-text-fill: #14532d;
+    -fx-border-color: #bbf7d0;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+/* ===== Lista de diferenças ===== */
+.historico-diferencas-lista {
+    -fx-background-color: #fffbeb;
+    -fx-border-color: #fde68a;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-font-family: "Consolas", "Monaco", monospace;
+    -fx-font-size: 12px;
+}
+
+.historico-diferencas-lista .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #78350f;
+    -fx-padding: 4 10 4 10;
+}
+
+.historico-diferencas-lista .list-cell:filled:selected {
+    -fx-background-color: #fde68a;
+    -fx-text-fill: #78350f;
+}
+
+/* ===== Bottom ===== */
+.historico-detail-bottom-bar {
+    -fx-background-color: #f9fafb;
+    -fx-border-color: #e5e7eb transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+/* ===== Botões (reaproveitamento) ===== */
+.btn-primary {
+    -fx-background-color: #3b82f6;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-padding: 6 14 6 14;
+    -fx-cursor: hand;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #2563eb;
+}
+
+.btn-secondary {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #374151;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 6 14 6 14;
+    -fx-cursor: hand;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #f3f4f6;
+}
+
+.btn-danger {
+    -fx-background-color: #ef4444;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-padding: 6 14 6 14;
+    -fx-cursor: hand;
+}
+
+.btn-danger:hover {
+    -fx-background-color: #dc2626;
+}

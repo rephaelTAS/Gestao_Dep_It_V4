@@ -1,25 +1,15 @@
 package com.ossobo.gestaoDepIt.db.services;
 
 import com.ossobo.gestaoDepIt.db.models.Funcionarios;
-import com.ossobo.winterfx.anotations.Component;
-import com.ossobo.winterfx.anotations.DeleteMapping;
-import com.ossobo.winterfx.anotations.GetMapping;
-import com.ossobo.winterfx.anotations.Inject;
-import com.ossobo.winterfx.anotations.Payload;
-import com.ossobo.winterfx.anotations.PutMapping;
-import com.ossobo.winterfx.anotations.RequestMapping;
-import com.ossobo.winterfx.anotations.RouteVar;
+import com.ossobo.winterfx.anotations.*;
 import com.ossobo.winterfx.router.model.ResponseData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
- * FuncionariosRoutes v1.0
+ * FuncionariosRoutes v1.1
  *
  * Responsabilidade: Fronteira de Internal Routing dos funcionários.
  *                   Handlers FINOS: delegam ao FuncionariosService e traduzem
@@ -30,18 +20,19 @@ import java.util.Optional;
  *   CRUD        : "funcionario" (payload Funcionarios).
  *   Imagem      : PUT exige "imagem" (byte[]) + "tipo"; GET devolve "imagem"
  *                 (byte[] ou null); DELETE remove. Chave "temimagem" (boolean).
- *   Composição  : "departamento", "funcao" — operações parciais.
- *   Filtros     : com-filtros aceita 5 chaves OPCIONAIS — omitir = sem filtro:
- *                 departamento, funcao, local, nome, ativo (true/false).
  *
  * v1.0 - Criação; 37 rotas (GET 28 / PUT 7 / DELETE 2); status dividido em
  *        rotas explícitas; imagem exposta nos três canais aplicáveis.
+ * v1.1 - Alinhado ao FuncionariosService v2.2 (fonte da verdade = Repository
+ *        v2.2). Removidas 18 rotas cujos métodos do Service foram suprimidos
+ *        por dependerem de consultas/agregações não oferecidas pelo repositório.
+ *        Total atual: 19 rotas.
  */
 @Component
 @RequestMapping("funcionarios/service")
 public class FuncionariosRoutes {
 
-    private static final Logger logger = LoggerFactory.getLogger(FuncionariosRoutes.class);
+    private static final System.Logger logger = System.getLogger(FuncionariosRoutes.class.getName());
 
     @Inject
     private FuncionariosService service;
@@ -91,7 +82,7 @@ public class FuncionariosRoutes {
     }
 
     // ============================================================
-    // ROTAS — IMAGEM DE PERFIL
+    // ROTAS — IMAGEM DE PERFIL (GET / PUT / DELETE com paths distintos)
     // ============================================================
 
     /** Devolve os bytes da imagem (null se não houver). */
@@ -113,16 +104,26 @@ public class FuncionariosRoutes {
         return valor(() -> service.temImagemPerfil(codDep), "temimagem");
     }
 
-    /** Funcionários COM imagem. */
-    @GetMapping("imagem/com")
-    public ResponseData comImagem() {
-        return lista(service::listarComImagem, "funcionarios");
-    }
-
-    /** Funcionários SEM imagem. */
-    @GetMapping("imagem/sem")
-    public ResponseData semImagem() {
-        return lista(service::listarSemImagem, "funcionarios");
+    /**
+     * Transfere o funcionário para outro departamento.
+     * Operação composta (funcionário + inventário + histórico) atômica.
+     *
+     * Chaves:
+     *   "coddep"        — cod_dep atual do funcionário
+     *   "departamento"  — novo departamento
+     *   "funcionarioid" — cod_dep do executor (auditoria)
+     *   "descricao"     — JSON opcional
+     */
+    @PutMapping("transferir-departamento")
+    public ResponseData transferirDepartamento(@RouteVar("coddep") String codDep,
+                                               @RouteVar("departamento") String novoDepartamento,
+                                               @RouteVar("funcionarioid") String codDepExecutor,
+                                               @RouteVar("descricao") String descricao) {
+        return escrita(() -> {
+            String novoCod = service.transferirDepartamento(
+                    codDep, novoDepartamento, codDepExecutor, descricao);
+            return novoCod;
+        }, "novoCodDep");
     }
 
     /**
@@ -139,8 +140,11 @@ public class FuncionariosRoutes {
         }, "mensagem");
     }
 
-    /** Remove a imagem de perfil. */
-    @DeleteMapping("imagem/por/coddep")
+    /**
+     * Remove a imagem de perfil.
+     * Path renomeado para evitar colisão com GET /imagem/por/coddep
+     */
+    @DeleteMapping("imagem/remover/por/coddep")
     public ResponseData removerImagem(@RouteVar("coddep") String codDep) {
         return escrita(() -> {
             service.removerImagemPerfil(codDep);
@@ -149,87 +153,14 @@ public class FuncionariosRoutes {
     }
 
     // ============================================================
-    // ROTAS — FILTROS SIMPLES (GET)
+    // ROTAS — ESTATÍSTICAS (GET)
     // ============================================================
-
-    @GetMapping("por/departamento")
-    public ResponseData porDepartamento(@RouteVar("departamento") String departamento) {
-        return lista(() -> service.buscarPorDepartamento(departamento), "funcionarios");
-    }
-
-    @GetMapping("por/funcao")
-    public ResponseData porFuncao(@RouteVar("funcao") String funcao) {
-        return lista(() -> service.buscarPorFuncao(funcao), "funcionarios");
-    }
-
-    @GetMapping("por/local")
-    public ResponseData porLocal(@RouteVar("local") String local) {
-        return lista(() -> service.buscarPorLocalTrabalho(local), "funcionarios");
-    }
-
-    /** Busca textual por nome. */
-    @GetMapping("buscar/por/nome")
-    public ResponseData porNome(@RouteVar("nome") String nome) {
-        return lista(() -> service.buscarPorNome(nome), "funcionarios");
-    }
-
-    /** Ativos. */
-    @GetMapping("status/ativos")
-    public ResponseData ativos() {
-        return lista(() -> service.buscarPorStatus(true), "funcionarios");
-    }
-
-    /** Inativos. */
-    @GetMapping("status/inativos")
-    public ResponseData inativos() {
-        return lista(() -> service.buscarPorStatus(false), "funcionarios");
-    }
-
-    /**
-     * Filtro combinado — TODAS as chaves OPCIONAIS:
-     * departamento, funcao, local, nome, ativo ("true"/"false").
-     * Chave omitida no Params = critério ignorado.
-     */
-    @GetMapping("com-filtros")
-    public ResponseData comFiltros(@RouteVar("departamento") String departamento,
-                                   @RouteVar("funcao") String funcao,
-                                   @RouteVar("local") String local,
-                                   @RouteVar("nome") String nome,
-                                   @RouteVar("ativo") Boolean ativo) {
-        return lista(() -> service.buscarComFiltros(
-                departamento, funcao, local, ativo, nome), "funcionarios");
-    }
-
-    // ============================================================
-    // ROTAS — ESTATÍSTICAS E DISTINCT (GET)
-    // ============================================================
-
-    @GetMapping("estatisticas")
-    public ResponseData estatisticas()          { return valor(service::obterEstatisticas, "estatisticas"); }
-
-    @GetMapping("stats/departamento")
-    public ResponseData statsDepartamento()     { return valor(service::obterContagemPorDepartamento, "estatisticas"); }
-
-    @GetMapping("stats/funcao")
-    public ResponseData statsFuncao()           { return valor(service::obterContagemPorFuncao, "estatisticas"); }
-
-    @GetMapping("stats/imagem")
-    public ResponseData statsImagem()           { return valor(service::obterEstatisticasImagem, "estatisticas"); }
 
     @GetMapping("total")
     public ResponseData total()                 { return valor(service::contarTotal, "total"); }
 
     @GetMapping("total/ativos")
     public ResponseData totalAtivos()           { return valor(service::contarAtivos, "total"); }
-
-    @GetMapping("distinct/departamentos")
-    public ResponseData departamentos()         { return lista(service::listarDepartamentos, "valores"); }
-
-    @GetMapping("distinct/funcoes")
-    public ResponseData funcoes()               { return lista(service::listarFuncoes, "valores"); }
-
-    @GetMapping("distinct/locais-trabalho")
-    public ResponseData locaisTrabalho()        { return lista(service::listarLocaisTrabalho, "valores"); }
 
     // ============================================================
     // ROTAS — VERIFICAÇÕES (GET)
@@ -279,26 +210,6 @@ public class FuncionariosRoutes {
         return escrita(() -> { service.desativar(codDep); return "Funcionário desativado"; }, "mensagem");
     }
 
-    /** Transfere de departamento. */
-    @PutMapping("transferir-departamento")
-    public ResponseData transferir(@RouteVar("coddep") String codDep,
-                                   @RouteVar("departamento") String departamento) {
-        return escrita(() -> {
-            service.transferirDepartamento(codDep, departamento);
-            return "Transferido para: " + departamento;
-        }, "mensagem");
-    }
-
-    /** Promove/muda função. */
-    @PutMapping("promover")
-    public ResponseData promover(@RouteVar("coddep") String codDep,
-                                 @RouteVar("funcao") String funcao) {
-        return escrita(() -> {
-            service.promover(codDep, funcao);
-            return "Nova função: " + funcao;
-        }, "mensagem");
-    }
-
     // ============================================================
     // ROTAS — REMOÇÃO (DELETE)
     // ============================================================
@@ -307,7 +218,7 @@ public class FuncionariosRoutes {
      * ⚠️ EXCLUSÃO FÍSICA. Política em análise (backlog OBS-F1):
      * histórico de estoque referencia este codDep. Prefira "desativar".
      */
-    @DeleteMapping("por/coddep")
+    @DeleteMapping("deletar/por/coddep")
     public ResponseData excluir(@RouteVar("coddep") String codDep) {
         return escrita(() -> {
             service.excluir(codDep);
@@ -328,7 +239,7 @@ public class FuncionariosRoutes {
         try {
             return ResponseData.success().withData(chave, acao.executar());
         } catch (IllegalArgumentException | IllegalStateException e) {
-            logger.warn("⚠️ Regra de negócio violada: {}", e.getMessage());
+            logger.log(System.Logger.Level.WARNING,"⚠️ Regra de negócio violada: {}", e.getMessage());
             return ResponseData.error(e.getMessage()).withError("negocio", e.getMessage());
         } catch (SQLException e) {
             return erroBanco(e);
@@ -363,7 +274,7 @@ public class FuncionariosRoutes {
     }
 
     private ResponseData erroBanco(SQLException e) {
-        logger.error("❌ Erro de banco de dados: {}", e.getMessage(), e);
+        logger.log(System.Logger.Level.ERROR,"❌ Erro de banco de dados: {}", e.getMessage(), e);
         return ResponseData.error("Erro de banco de dados: " + e.getMessage())
                 .withError("banco", e.getMessage());
     }

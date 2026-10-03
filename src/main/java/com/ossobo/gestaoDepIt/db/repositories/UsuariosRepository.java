@@ -1,39 +1,52 @@
 package com.ossobo.gestaoDepIt.db.repositories;
 
 import com.ossobo.gestaoDepIt.db.config.DatabaseConnection;
+import com.ossobo.gestaoDepIt.db.enums.Hierarquia;
 import com.ossobo.gestaoDepIt.db.models.Usuario;
-
 
 import com.ossobo.winterfx.anotations.Inject;
 import com.ossobo.winterfx.anotations.Repository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
 /**
  * UsuariosRepository - Acesso a dados com WinterFX
- * v2.0 - Migrado para Java 17+ com Records e Text Blocks
+ * v2.1 - Alinhado ao Usuario v3.1 (PK String/UUID + colunas de sync)
  *
- * Responsabilidades:
- * - CRUD para Usuario
- * - Autenticação e gestão de sessão
- * - Filtros por nível, status, atividade
- * - Estatísticas
+ * Mudanças v2.0 → v2.1:
+ * - PK Long → String (UUID v4) em TODAS as assinaturas e setters
+ * - INSERT inclui id (gerado pela fábrica), device_id, deleted e os
+ *   timestamps da fábrica (created_at/updated_at) — essenciais para o LWW
+ * - UPDATE grava device_id (origem da última mutação — sync)
+ * - Funções de data do MySQL (NOW(), DATE_SUB, DATE_ADD, CURDATE)
+ *   substituídas por timestamps calculados no Java → SQL portável SQLite
+ * - getBooleanNullable: NULL no banco chega como null (não false!)
+ * - getLoginsPorPeriodo retorna record LoginPorDia (antes: Object[])
+ * - Helpers executeQuery/executeUpdate com varargs eliminam duplicação
  */
 @Repository
 public class UsuariosRepository {
 
-    private static final Logger logger = LoggerFactory.getLogger(UsuariosRepository.class);
+    private static final System.Logger logger = System.getLogger(UsuariosRepository.class.getName());
 
     @Inject
     private DatabaseConnection dbConnection;
 
     private static final String TABLE = "usuarios";
 
-    // ===== SQL COM TEXT BLOCKS =====
+    // ============================================================
+    // TIPOS AUXILIARES
+    // ============================================================
+
+    /** Resultado agregado de logins por dia (substitui o antigo Object[]). */
+    public record LoginPorDia(LocalDate data, int total) {}
+
+    // ============================================================
+    // SQL COM TEXT BLOCKS
+    // ============================================================
 
     private static final String SQL_FIND_ALL = """
             SELECT * FROM %s
@@ -74,9 +87,10 @@ public class UsuariosRepository {
             WHERE funcionario_id = ?
             """.formatted(TABLE);
 
+    // ✅ "expiracao_sessao > ?" — o "agora" vem do Java como parâmetro
     private static final String SQL_FIND_BY_SESSAO = """
             SELECT * FROM %s
-            WHERE sessao_atual = ? AND expiracao_sessao > NOW()
+            WHERE sessao_atual = ? AND expiracao_sessao > ?
             """.formatted(TABLE);
 
     private static final String SQL_FIND_BY_NIVEL = """
@@ -105,101 +119,106 @@ public class UsuariosRepository {
 
     private static final String SQL_FIND_COM_SESSAO_ATIVA = """
             SELECT * FROM %s
-            WHERE sessao_atual IS NOT NULL AND expiracao_sessao > NOW()
+            WHERE sessao_atual IS NOT NULL AND expiracao_sessao > ?
             ORDER BY nome
             """.formatted(TABLE);
 
     private static final String SQL_FIND_COM_SESSAO_EXPIRADA = """
             SELECT * FROM %s
-            WHERE sessao_atual IS NOT NULL AND expiracao_sessao <= NOW()
+            WHERE sessao_atual IS NOT NULL AND expiracao_sessao <= ?
             ORDER BY nome
             """.formatted(TABLE);
 
+    // ✅ era DATE_SUB(NOW(), INTERVAL ? DAY) — não existe em SQLite
     private static final String SQL_FIND_RECENTES_LOGIN = """
             SELECT * FROM %s
-            WHERE ultimo_login >= DATE_SUB(NOW(), INTERVAL ? DAY)
+            WHERE ultimo_login >= ?
             ORDER BY ultimo_login DESC
             """.formatted(TABLE);
 
     private static final String SQL_FIND_INATIVOS = """
             SELECT * FROM %s
-            WHERE (ultimo_login IS NULL OR ultimo_login < DATE_SUB(NOW(), INTERVAL ? DAY))
+            WHERE (ultimo_login IS NULL OR ultimo_login < ?)
             AND ativo = 1
             ORDER BY ultimo_login
             """.formatted(TABLE);
 
+    // ✅ era BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL ? MINUTE)
     private static final String SQL_FIND_SESSOES_PRESTES_EXPIRAR = """
             SELECT * FROM %s
             WHERE sessao_atual IS NOT NULL
-            AND expiracao_sessao BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL ? MINUTE)
+            AND expiracao_sessao BETWEEN ? AND ?
             ORDER BY expiracao_sessao
             """.formatted(TABLE);
 
+    // ✅ id/device_id/deleted/timestamps incluídos — a fábrica já os gerou
     private static final String SQL_INSERT = """
             INSERT INTO %s (
-                funcionario_id, nome, email, senha_hash,
-                nivel_acesso, ativo
-            ) VALUES (?, ?, ?, ?, ?, ?)
+                id, funcionario_id, nome, email, senha_hash,
+                nivel_acesso, ativo, device_id, deleted,
+                created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """.formatted(TABLE);
 
     private static final String SQL_UPDATE = """
             UPDATE %s
             SET funcionario_id = ?, nome = ?, email = ?, senha_hash = ?,
-                nivel_acesso = ?, ativo = ?, updated_at = CURRENT_TIMESTAMP
+                nivel_acesso = ?, ativo = ?, device_id = ?, updated_at = ?
             WHERE id = ?
             """.formatted(TABLE);
 
     private static final String SQL_UPDATE_SENHA = """
             UPDATE %s
-            SET senha_hash = ?, updated_at = CURRENT_TIMESTAMP
+            SET senha_hash = ?, device_id = ?, updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
             """.formatted(TABLE);
 
     private static final String SQL_UPDATE_LOGIN = """
             UPDATE %s
-            SET ultimo_login = NOW(), ip_ultimo_login = ?, updated_at = CURRENT_TIMESTAMP
+            SET ultimo_login = ?, ip_ultimo_login = ?, device_id = ?, updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
             """.formatted(TABLE);
 
     private static final String SQL_UPDATE_SESSAO = """
             UPDATE %s
-            SET sessao_atual = ?, expiracao_sessao = ?, updated_at = CURRENT_TIMESTAMP
+            SET sessao_atual = ?, expiracao_sessao = ?, device_id = ?, updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
             """.formatted(TABLE);
 
     private static final String SQL_INVALIDAR_SESSAO = """
             UPDATE %s
-            SET sessao_atual = NULL, expiracao_sessao = NULL, updated_at = CURRENT_TIMESTAMP
+            SET sessao_atual = NULL, expiracao_sessao = NULL, device_id = ?, updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
             """.formatted(TABLE);
 
+    // ⚠️ Sem WHERE — derruba a sessão de TODOS os usuários. Intencional?
     private static final String SQL_INVALIDAR_TODAS_SESSOES = """
             UPDATE %s
-            SET sessao_atual = NULL, expiracao_sessao = NULL, updated_at = CURRENT_TIMESTAMP
+            SET sessao_atual = NULL, expiracao_sessao = NULL, device_id = ?, updated_at = CURRENT_TIMESTAMP
             """.formatted(TABLE);
 
     private static final String SQL_INVALIDAR_SESSOES_EXPIRADAS = """
             UPDATE %s
-            SET sessao_atual = NULL, expiracao_sessao = NULL
-            WHERE expiracao_sessao <= NOW()
+            SET sessao_atual = NULL, expiracao_sessao = NULL, device_id = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE expiracao_sessao <= ?
             """.formatted(TABLE);
 
     private static final String SQL_DESATIVAR = """
             UPDATE %s
             SET ativo = 0, sessao_atual = NULL, expiracao_sessao = NULL,
-                updated_at = CURRENT_TIMESTAMP
+                device_id = ?, updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
             """.formatted(TABLE);
 
     private static final String SQL_ATIVAR = """
             UPDATE %s
-            SET ativo = 1, updated_at = CURRENT_TIMESTAMP
+            SET ativo = 1, device_id = ?, updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
             """.formatted(TABLE);
 
     private static final String SQL_UPDATE_NIVEL = """
             UPDATE %s
-            SET nivel_acesso = ?, updated_at = CURRENT_TIMESTAMP
+            SET nivel_acesso = ?, device_id = ?, updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
             """.formatted(TABLE);
 
@@ -208,372 +227,249 @@ public class UsuariosRepository {
             WHERE id = ?
             """.formatted(TABLE);
 
-    // ===== CRUD =====
+    // ============================================================
+    // CRUD — LEITURAS
+    // ============================================================
 
     public List<Usuario> findAll() throws SQLException {
         return executeQuery(SQL_FIND_ALL);
     }
 
     public List<Usuario> findAll(int limit, int offset) throws SQLException {
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_FIND_ALL_PAGINATED)) {
+        return executeQuery(SQL_FIND_ALL_PAGINATED, limit, offset);
+    }
 
-            stmt.setInt(1, limit);
-            stmt.setInt(2, offset);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return mapResultSetList(rs);
-            }
-        }
+    public List<Usuario> findAllAtivos() throws SQLException {
+        return executeQuery(SQL_FIND_ALL_ATIVOS);
     }
 
     public List<Usuario> findAllAtivos(int limit, int offset) throws SQLException {
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_FIND_ALL_ATIVOS_PAGINATED)) {
-
-            stmt.setInt(1, limit);
-            stmt.setInt(2, offset);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return mapResultSetList(rs);
-            }
-        }
+        return executeQuery(SQL_FIND_ALL_ATIVOS_PAGINATED, limit, offset);
     }
 
-    public Optional<Usuario> findById(Long id) throws SQLException {
-        if (id == null || id <= 0) {
+    public Optional<Usuario> findById(String id) throws SQLException {
+        if (id == null || id.isBlank()) {
             return Optional.empty();
         }
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_FIND_BY_ID)) {
-
-            stmt.setLong(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next() ? Optional.of(mapResultSet(rs)) : Optional.empty();
-            }
-        }
+        List<Usuario> resultado = executeQuery(SQL_FIND_BY_ID, id);
+        return resultado.isEmpty() ? Optional.empty() : Optional.of(resultado.get(0));
     }
 
     public Optional<Usuario> findByEmail(String email) throws SQLException {
-        if (!(email instanceof String e) || e.isBlank()) {
+        if (email == null || email.isBlank()) {
             return Optional.empty();
         }
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_FIND_BY_EMAIL)) {
-
-            stmt.setString(1, email);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next() ? Optional.of(mapResultSet(rs)) : Optional.empty();
-            }
-        }
+        List<Usuario> resultado = executeQuery(SQL_FIND_BY_EMAIL, email);
+        return resultado.isEmpty() ? Optional.empty() : Optional.of(resultado.get(0));
     }
 
     public Optional<Usuario> findByFuncionarioId(String funcionarioId) throws SQLException {
-        if (!(funcionarioId instanceof String f) || f.isBlank()) {
+        if (funcionarioId == null || funcionarioId.isBlank()) {
             return Optional.empty();
         }
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_FIND_BY_FUNCIONARIO)) {
-
-            stmt.setString(1, funcionarioId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next() ? Optional.of(mapResultSet(rs)) : Optional.empty();
-            }
-        }
+        List<Usuario> resultado = executeQuery(SQL_FIND_BY_FUNCIONARIO, funcionarioId);
+        return resultado.isEmpty() ? Optional.empty() : Optional.of(resultado.get(0));
     }
 
     public Optional<Usuario> findBySessao(String token) throws SQLException {
-        if (!(token instanceof String t) || t.isBlank()) {
+        if (token == null || token.isBlank()) {
             return Optional.empty();
         }
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_FIND_BY_SESSAO)) {
-
-            stmt.setString(1, token);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next() ? Optional.of(mapResultSet(rs)) : Optional.empty();
-            }
-        }
+        List<Usuario> resultado = executeQuery(SQL_FIND_BY_SESSAO,
+                token, Timestamp.valueOf(LocalDateTime.now()));
+        return resultado.isEmpty() ? Optional.empty() : Optional.of(resultado.get(0));
     }
 
     public List<Usuario> findByNivelAcesso(String nivel) throws SQLException {
-        if (!(nivel instanceof String n) || n.isBlank()) {
+        if (nivel == null || nivel.isBlank()) {
             return List.of();
         }
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_FIND_BY_NIVEL)) {
-
-            stmt.setString(1, nivel);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return mapResultSetList(rs);
-            }
-        }
+        return executeQuery(SQL_FIND_BY_NIVEL, nivel);
     }
 
     public List<Usuario> findByStatus(boolean ativo) throws SQLException {
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_FIND_BY_STATUS)) {
-
-            stmt.setBoolean(1, ativo);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return mapResultSetList(rs);
-            }
-        }
+        return executeQuery(SQL_FIND_BY_STATUS, ativo);
     }
 
     public List<Usuario> findByNomeContaining(String nome) throws SQLException {
-        if (!(nome instanceof String n) || n.isBlank()) {
+        if (nome == null || nome.isBlank()) {
             return List.of();
         }
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_FIND_BY_NOME_LIKE)) {
-
-            stmt.setString(1, "%" + nome + "%");
-            try (ResultSet rs = stmt.executeQuery()) {
-                return mapResultSetList(rs);
-            }
-        }
+        return executeQuery(SQL_FIND_BY_NOME_LIKE, "%" + nome + "%");
     }
 
     public List<Usuario> findByEmailContaining(String email) throws SQLException {
-        if (!(email instanceof String e) || e.isBlank()) {
+        if (email == null || email.isBlank()) {
             return List.of();
         }
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_FIND_BY_EMAIL_LIKE)) {
-
-            stmt.setString(1, "%" + email + "%");
-            try (ResultSet rs = stmt.executeQuery()) {
-                return mapResultSetList(rs);
-            }
-        }
+        return executeQuery(SQL_FIND_BY_EMAIL_LIKE, "%" + email + "%");
     }
 
     public List<Usuario> findComSessaoAtiva() throws SQLException {
-        return executeQuery(SQL_FIND_COM_SESSAO_ATIVA);
+        return executeQuery(SQL_FIND_COM_SESSAO_ATIVA,
+                Timestamp.valueOf(LocalDateTime.now()));
     }
 
     public List<Usuario> findComSessaoExpirada() throws SQLException {
-        return executeQuery(SQL_FIND_COM_SESSAO_EXPIRADA);
+        return executeQuery(SQL_FIND_COM_SESSAO_EXPIRADA,
+                Timestamp.valueOf(LocalDateTime.now()));
     }
 
     public List<Usuario> findRecentesLogin(int dias) throws SQLException {
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_FIND_RECENTES_LOGIN)) {
-
-            stmt.setInt(1, dias);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return mapResultSetList(rs);
-            }
-        }
+        return executeQuery(SQL_FIND_RECENTES_LOGIN,
+                Timestamp.valueOf(LocalDateTime.now().minusDays(dias)));
     }
 
     public List<Usuario> findInativos(int dias) throws SQLException {
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_FIND_INATIVOS)) {
-
-            stmt.setInt(1, dias);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return mapResultSetList(rs);
-            }
-        }
+        return executeQuery(SQL_FIND_INATIVOS,
+                Timestamp.valueOf(LocalDateTime.now().minusDays(dias)));
     }
 
     public List<Usuario> findSessoesPrestesExpirar(int minutos) throws SQLException {
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_FIND_SESSOES_PRESTES_EXPIRAR)) {
-
-            stmt.setInt(1, minutos);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return mapResultSetList(rs);
-            }
-        }
+        LocalDateTime agora = LocalDateTime.now();
+        return executeQuery(SQL_FIND_SESSOES_PRESTES_EXPIRAR,
+                Timestamp.valueOf(agora),
+                Timestamp.valueOf(agora.plusMinutes(minutos)));
     }
 
-    public Long insert(Usuario usuario) throws SQLException {
-        if (!(usuario instanceof Usuario u)) {
+    // ============================================================
+    // CRUD — ESCRITAS
+    // ============================================================
+
+    /**
+     * Insere o usuário. O id (UUID v4) JÁ veio da fábrica do record —
+     * aqui só persistimos; não há "generated keys" a recuperar.
+     *
+     * @return o id do usuário inserido (o mesmo que veio no objeto)
+     */
+    public String insert(Usuario usuario) throws SQLException {
+        if (usuario == null) {
             throw new IllegalArgumentException("Usuário inválido");
         }
 
         try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_INSERT,
-                     PreparedStatement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement stmt = conn.prepareStatement(SQL_INSERT)) {
 
-            stmt.setString(1, u.funcionarioId());
-            stmt.setString(2, u.nome());
-            stmt.setString(3, u.email());
-            stmt.setString(4, u.senhaHash());
-            stmt.setString(5, u.nivelAcesso());
-            stmt.setBoolean(6, u.isAtivo());
+            LocalDateTime agora = LocalDateTime.now();
+            stmt.setString(1, usuario.id());
+            stmt.setString(2, usuario.funcionarioId());
+            stmt.setString(3, usuario.nome());
+            stmt.setString(4, usuario.email());
+            stmt.setString(5, usuario.senhaHash());
+            stmt.setString(6, usuario.nivelAcesso().name());
+            stmt.setBoolean(7, usuario.isAtivo());
+            stmt.setString(8, getDeviceId());
+            stmt.setBoolean(9, usuario.isDeletado());
+            stmt.setTimestamp(10, Timestamp.valueOf(
+                    usuario.createdAt() != null ? usuario.createdAt() : agora));
+            stmt.setTimestamp(11, Timestamp.valueOf(
+                    usuario.updatedAt() != null ? usuario.updatedAt() : agora));
 
             stmt.executeUpdate();
-
-            try (ResultSet rs = stmt.getGeneratedKeys()) {
-                if (rs.next()) {
-                    return rs.getLong(1);
-                }
-                throw new SQLException("Falha ao obter ID gerado");
-            }
+            return usuario.id();
         }
     }
 
     public void update(Usuario usuario) throws SQLException {
-        if (!(usuario instanceof Usuario u)) {
+        if (usuario == null) {
             throw new IllegalArgumentException("Usuário inválido");
         }
-        if (u.id() == null) {
-            throw new SQLException("ID não pode ser nulo para atualização");
+        if (usuario.id() == null || usuario.id().isBlank()) {
+            throw new SQLException("ID não pode ser vazio para atualização");
         }
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE)) {
 
-            stmt.setString(1, u.funcionarioId());
-            stmt.setString(2, u.nome());
-            stmt.setString(3, u.email());
-            stmt.setString(4, u.senhaHash());
-            stmt.setString(5, u.nivelAcesso());
-            stmt.setBoolean(6, u.isAtivo());
-            stmt.setLong(7, u.id());
+            stmt.setString(1, usuario.funcionarioId());
+            stmt.setString(2, usuario.nome());
+            stmt.setString(3, usuario.email());
+            stmt.setString(4, usuario.senhaHash());
+            stmt.setString(5, usuario.nivelAcesso().name());
+            stmt.setBoolean(6, usuario.isAtivo());
+            stmt.setString(7, getDeviceId());
+            stmt.setTimestamp(8, Timestamp.valueOf(
+                    usuario.updatedAt() != null ? usuario.updatedAt() : LocalDateTime.now()));
+            stmt.setString(9, usuario.id());
 
             int affected = stmt.executeUpdate();
             if (affected == 0) {
-                throw new SQLException("Usuário com ID " + u.id() + " não encontrado");
+                throw new SQLException("Usuário com ID " + usuario.id() + " não encontrado");
             }
         }
     }
 
-    public void updateSenha(Long id, String novaSenhaHash) throws SQLException {
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE_SENHA)) {
-
-            stmt.setString(1, novaSenhaHash);
-            stmt.setLong(2, id);
-            int affected = stmt.executeUpdate();
-
-            if (affected == 0) {
-                throw new SQLException("Usuário com ID " + id + " não encontrado");
-            }
+    public void updateSenha(String id, String novaSenhaHash) throws SQLException {
+        int affected = executeUpdate(SQL_UPDATE_SENHA, novaSenhaHash, getDeviceId(), id);
+        if (affected == 0) {
+            throw new SQLException("Usuário com ID " + id + " não encontrado");
         }
     }
 
-    public void updateLogin(Long id, String ip) throws SQLException {
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE_LOGIN)) {
-
-            stmt.setString(1, ip);
-            stmt.setLong(2, id);
-            int affected = stmt.executeUpdate();
-
-            if (affected == 0) {
-                throw new SQLException("Usuário com ID " + id + " não encontrado");
-            }
+    public void updateLogin(String id, String ip) throws SQLException {
+        int affected = executeUpdate(SQL_UPDATE_LOGIN,
+                Timestamp.valueOf(LocalDateTime.now()), ip, getDeviceId(), id);
+        if (affected == 0) {
+            throw new SQLException("Usuário com ID " + id + " não encontrado");
         }
     }
 
-    public void updateSessao(Long id, String token, LocalDateTime expiracao) throws SQLException {
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE_SESSAO)) {
-
-            stmt.setString(1, token);
-            stmt.setTimestamp(2, Timestamp.valueOf(expiracao));
-            stmt.setLong(3, id);
-            int affected = stmt.executeUpdate();
-
-            if (affected == 0) {
-                throw new SQLException("Usuário com ID " + id + " não encontrado");
-            }
+    public void updateSessao(String id, String token, LocalDateTime expiracao) throws SQLException {
+        int affected = executeUpdate(SQL_UPDATE_SESSAO,
+                token, Timestamp.valueOf(expiracao), getDeviceId(), id);
+        if (affected == 0) {
+            throw new SQLException("Usuário com ID " + id + " não encontrado");
         }
     }
 
-    public void invalidarSessao(Long id) throws SQLException {
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_INVALIDAR_SESSAO)) {
-
-            stmt.setLong(1, id);
-            int affected = stmt.executeUpdate();
-
-            if (affected == 0) {
-                throw new SQLException("Usuário com ID " + id + " não encontrado");
-            }
+    public void invalidarSessao(String id) throws SQLException {
+        int affected = executeUpdate(SQL_INVALIDAR_SESSAO, getDeviceId(), id);
+        if (affected == 0) {
+            throw new SQLException("Usuário com ID " + id + " não encontrado");
         }
     }
 
+    /** ⚠️ Derruba a sessão de TODOS os usuários. */
     public void invalidarTodasSessoes() throws SQLException {
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_INVALIDAR_TODAS_SESSOES)) {
-
-            stmt.executeUpdate();
-        }
+        executeUpdate(SQL_INVALIDAR_TODAS_SESSOES, getDeviceId());
     }
 
     public void invalidarSessoesExpiradas() throws SQLException {
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_INVALIDAR_SESSOES_EXPIRADAS)) {
+        executeUpdate(SQL_INVALIDAR_SESSOES_EXPIRADAS,
+                getDeviceId(), Timestamp.valueOf(LocalDateTime.now()));
+    }
 
-            stmt.executeUpdate();
+    public void desativar(String id) throws SQLException {
+        int affected = executeUpdate(SQL_DESATIVAR, getDeviceId(), id);
+        if (affected == 0) {
+            throw new SQLException("Usuário com ID " + id + " não encontrado");
         }
     }
 
-    public void desativar(Long id) throws SQLException {
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_DESATIVAR)) {
-
-            stmt.setLong(1, id);
-            int affected = stmt.executeUpdate();
-
-            if (affected == 0) {
-                throw new SQLException("Usuário com ID " + id + " não encontrado");
-            }
+    public void ativar(String id) throws SQLException {
+        int affected = executeUpdate(SQL_ATIVAR, getDeviceId(), id);
+        if (affected == 0) {
+            throw new SQLException("Usuário com ID " + id + " não encontrado");
         }
     }
 
-    public void ativar(Long id) throws SQLException {
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_ATIVAR)) {
-
-            stmt.setLong(1, id);
-            int affected = stmt.executeUpdate();
-
-            if (affected == 0) {
-                throw new SQLException("Usuário com ID " + id + " não encontrado");
-            }
+    public void updateNivelAcesso(String id, String nivel) throws SQLException {
+        int affected = executeUpdate(SQL_UPDATE_NIVEL, nivel, getDeviceId(), id);
+        if (affected == 0) {
+            throw new SQLException("Usuário com ID " + id + " não encontrado");
         }
     }
 
-    public void updateNivelAcesso(Long id, String nivel) throws SQLException {
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE_NIVEL)) {
-
-            stmt.setString(1, nivel);
-            stmt.setLong(2, id);
-            int affected = stmt.executeUpdate();
-
-            if (affected == 0) {
-                throw new SQLException("Usuário com ID " + id + " não encontrado");
-            }
+    public void delete(String id) throws SQLException {
+        int affected = executeUpdate(SQL_DELETE, id);
+        if (affected == 0) {
+            throw new SQLException("Usuário com ID " + id + " não encontrado");
         }
     }
 
-    public void delete(Long id) throws SQLException {
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_DELETE)) {
-
-            stmt.setLong(1, id);
-            int affected = stmt.executeUpdate();
-
-            if (affected == 0) {
-                throw new SQLException("Usuário com ID " + id + " não encontrado");
-            }
-        }
-    }
-
-    // ===== FILTROS COMBINADOS =====
+    // ============================================================
+    // FILTROS COMBINADOS
+    // ============================================================
 
     public List<Usuario> findWithFilters(
             String nome,
@@ -605,77 +501,48 @@ public class UsuariosRepository {
         }
         if (comSessaoAtiva != null) {
             if (comSessaoAtiva) {
-                sql.append(" AND sessao_atual IS NOT NULL AND expiracao_sessao > NOW()");
+                sql.append(" AND sessao_atual IS NOT NULL AND expiracao_sessao > ?");
+                params.add(Timestamp.valueOf(LocalDateTime.now()));
             } else {
-                sql.append(" AND (sessao_atual IS NULL OR expiracao_sessao <= NOW())");
+                sql.append(" AND (sessao_atual IS NULL OR expiracao_sessao <= ?)");
+                params.add(Timestamp.valueOf(LocalDateTime.now()));
             }
         }
         if (dataLoginInicio != null && dataLoginFim != null) {
             sql.append(" AND ultimo_login BETWEEN ? AND ?");
-            params.add(dataLoginInicio);
-            params.add(dataLoginFim);
+            // ✅ Timestamp.valueOf explícito — setObject com LocalDateTime
+            //    nem sempre é aceito pelo driver
+            params.add(Timestamp.valueOf(dataLoginInicio));
+            params.add(Timestamp.valueOf(dataLoginFim));
         }
 
         sql.append(" ORDER BY nome, email");
 
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
-
-            for (int i = 0; i < params.size(); i++) {
-                stmt.setObject(i + 1, params.get(i));
-            }
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                return mapResultSetList(rs);
-            }
-        }
+        return executeQuery(sql.toString(), params.toArray());
     }
 
-    // ===== VERIFICAÇÕES =====
+    // ============================================================
+    // VERIFICAÇÕES
+    // ============================================================
 
-    public boolean existsById(Long id) throws SQLException {
-        if (id == null) return false;
-        String sql = "SELECT COUNT(*) FROM %s WHERE id = ?".formatted(TABLE);
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setLong(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next() && rs.getInt(1) > 0;
-            }
-        }
+    public boolean existsById(String id) throws SQLException {
+        if (id == null || id.isBlank()) return false;
+        return count("SELECT COUNT(*) FROM " + TABLE + " WHERE id = ?", id) > 0;
     }
 
     public boolean existsByEmail(String email) throws SQLException {
         if (email == null || email.isBlank()) return false;
-        String sql = "SELECT COUNT(*) FROM %s WHERE email = ?".formatted(TABLE);
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, email);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next() && rs.getInt(1) > 0;
-            }
-        }
+        return count("SELECT COUNT(*) FROM " + TABLE + " WHERE email = ?", email) > 0;
     }
 
     public boolean existsByFuncionarioId(String funcionarioId) throws SQLException {
         if (funcionarioId == null || funcionarioId.isBlank()) return false;
-        String sql = "SELECT COUNT(*) FROM %s WHERE funcionario_id = ?".formatted(TABLE);
-
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, funcionarioId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next() && rs.getInt(1) > 0;
-            }
-        }
+        return count("SELECT COUNT(*) FROM " + TABLE + " WHERE funcionario_id = ?", funcionarioId) > 0;
     }
 
-    // ===== ESTATÍSTICAS =====
+    // ============================================================
+    // ESTATÍSTICAS
+    // ============================================================
 
     public int countAll() throws SQLException {
         return count("SELECT COUNT(*) FROM " + TABLE);
@@ -693,22 +560,29 @@ public class UsuariosRepository {
                 GROUP BY nivel_acesso
                 ORDER BY total DESC
                 """.formatted(TABLE);
-
         return countGroupBy(sql);
     }
 
+    // ✅ CURDATE()/NOW() → limites calculados no Java
     public Map<String, Integer> getEstatisticasAtividade() throws SQLException {
-        Map<String, Integer> stats = new LinkedHashMap<>();
+        LocalDateTime agora = LocalDateTime.now();
+        LocalDateTime inicioDoDia = agora.toLocalDate().atStartOfDay();
 
+        Map<String, Integer> stats = new LinkedHashMap<>();
         stats.put("total", countAll());
         stats.put("ativos", countAtivos());
-        stats.put("com_sessao", count("SELECT COUNT(*) FROM " + TABLE + " WHERE sessao_atual IS NOT NULL AND expiracao_sessao > NOW()"));
-        stats.put("login_hoje", count("SELECT COUNT(*) FROM " + TABLE + " WHERE DATE(ultimo_login) = CURDATE()"));
+        stats.put("com_sessao", count(
+                "SELECT COUNT(*) FROM " + TABLE
+                        + " WHERE sessao_atual IS NOT NULL AND expiracao_sessao > ?",
+                Timestamp.valueOf(agora)));
+        stats.put("login_hoje", count(
+                "SELECT COUNT(*) FROM " + TABLE + " WHERE ultimo_login >= ?",
+                Timestamp.valueOf(inicioDoDia)));
 
         return Map.copyOf(stats);
     }
 
-    public List<Object[]> getLoginsPorPeriodo(LocalDateTime inicio, LocalDateTime fim) throws SQLException {
+    public List<LoginPorDia> getLoginsPorPeriodo(LocalDateTime inicio, LocalDateTime fim) throws SQLException {
         if (inicio == null || fim == null) {
             return List.of();
         }
@@ -727,28 +601,59 @@ public class UsuariosRepository {
             stmt.setTimestamp(1, Timestamp.valueOf(inicio));
             stmt.setTimestamp(2, Timestamp.valueOf(fim));
 
-            List<Object[]> resultados = new ArrayList<>();
+            List<LoginPorDia> resultados = new ArrayList<>();
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    resultados.add(new Object[]{
+                    resultados.add(new LoginPorDia(
                             rs.getDate("data").toLocalDate(),
-                            rs.getInt("total")
-                    });
+                            rs.getInt("total")));
                 }
             }
             return List.copyOf(resultados);
         }
     }
 
-    // ===== MÉTODOS PRIVADOS =====
+    // ============================================================
+    // MÉTODOS PRIVADOS (helpers)
+    // ============================================================
+
+    /**
+     * Executa um SELECT com parâmetros variádicos e mapeia o resultado.
+     * Centraliza o try-with-resources que antes se repetia em cada método.
+     */
+    private List<Usuario> executeQuery(String sql, Object... params) throws SQLException {
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            bindParams(stmt, params);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                return mapResultSetList(rs);
+            }
+        }
+    }
+
+    /** Executa um UPDATE/INSERT/DELETE com parâmetros variádicos. */
+    private int executeUpdate(String sql, Object... params) throws SQLException {
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            bindParams(stmt, params);
+            return stmt.executeUpdate();
+        }
+    }
+
+    private void bindParams(PreparedStatement stmt, Object... params) throws SQLException {
+        for (int i = 0; i < params.length; i++) {
+            stmt.setObject(i + 1, params[i]);
+        }
+    }
 
     private int count(String sql, Object... params) throws SQLException {
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            for (int i = 0; i < params.length; i++) {
-                stmt.setObject(i + 1, params[i]);
-            }
+            bindParams(stmt, params);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next() ? rs.getInt(1) : 0;
@@ -769,14 +674,6 @@ public class UsuariosRepository {
         }
     }
 
-    private List<Usuario> executeQuery(String sql) throws SQLException {
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            return mapResultSetList(rs);
-        }
-    }
-
     private List<Usuario> mapResultSetList(ResultSet rs) throws SQLException {
         List<Usuario> list = new ArrayList<>();
         while (rs.next()) {
@@ -785,26 +682,44 @@ public class UsuariosRepository {
         return List.copyOf(list);
     }
 
+    // ✅ 15 componentes — alinhado ao Usuario v3.1
     private Usuario mapResultSet(ResultSet rs) throws SQLException {
         return new Usuario(
-                rs.getLong("id"),
+                rs.getString("id"),
                 rs.getString("funcionario_id"),
                 rs.getString("nome"),
                 rs.getString("email"),
                 rs.getString("senha_hash"),
-                rs.getString("nivel_acesso"),
-                rs.getBoolean("ativo"),
+                Hierarquia.de(rs.getString("nivel_acesso")),
+                getBooleanNullable(rs, "ativo"),
                 getLocalDateTime(rs, "ultimo_login"),
                 rs.getString("ip_ultimo_login"),
                 rs.getString("sessao_atual"),
                 getLocalDateTime(rs, "expiracao_sessao"),
                 getLocalDateTime(rs, "created_at"),
-                getLocalDateTime(rs, "updated_at")
+                getLocalDateTime(rs, "updated_at"),
+                rs.getString("device_id"),
+                getBooleanNullable(rs, "deleted")
         );
+    }
+
+    /** NULL no banco → null no Java (rs.getBoolean devolveria false!). */
+    private Boolean getBooleanNullable(ResultSet rs, String column) throws SQLException {
+        int valor = rs.getInt(column);
+        return rs.wasNull() ? null : valor != 0;
     }
 
     private LocalDateTime getLocalDateTime(ResultSet rs, String column) throws SQLException {
         Timestamp ts = rs.getTimestamp(column);
         return ts != null ? ts.toLocalDateTime() : null;
+    }
+
+    /**
+     * Identidade do device de origem (sync LWW — "repository preenche na escrita").
+     * TODO (Degrau 2 do sync): substituir por DeviceIdentityService (@Service)
+     * que persista o UUID do device em arquivo/config.
+     */
+    private String getDeviceId() {
+        return "UNKNOWN-DEVICE";
     }
 }

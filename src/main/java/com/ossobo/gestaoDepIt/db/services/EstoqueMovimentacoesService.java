@@ -10,8 +10,6 @@ import com.ossobo.winterfx.anotations.Inject;
 import com.ossobo.winterfx.anotations.Service;
 import com.ossobo.winterfx.event.EventBus;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -30,7 +28,7 @@ import java.util.*;
 @Service
 public class EstoqueMovimentacoesService {
 
-    private static final Logger logger = LoggerFactory.getLogger(EstoqueMovimentacoesService.class);
+    private static final System.Logger logger = System.getLogger(EstoqueMovimentacoesService.class.getName());
 
     @Inject
     private EstoqueMovimentacoesRepository repository;
@@ -106,7 +104,7 @@ public class EstoqueMovimentacoesService {
                 .orElseThrow(() -> new SQLException("Falha ao buscar movimentação"));
 
         eventBus.publish(new EstoqueEvent<>(salva, "ENTRADA"));
-        logger.info("✅ Entrada registrada: SKU={}, Qtd={}, Func={}", sku, quantidade, codDepFuncionario);
+        logger.log(System.Logger.Level.INFO,"✅ Entrada registrada: SKU={}, Qtd={}, Func={}", sku, quantidade, codDepFuncionario);
 
         return salva;
     }
@@ -141,7 +139,7 @@ public class EstoqueMovimentacoesService {
                 .orElseThrow(() -> new SQLException("Falha ao buscar movimentação"));
 
         eventBus.publish(new EstoqueEvent<>(salva, "SAIDA"));
-        logger.info("✅ Saída registrada: SKU={}, Qtd={}, Func={}", sku, quantidade, codDepFuncionario);
+        logger.log(System.Logger.Level.INFO,"✅ Saída registrada: SKU={}, Qtd={}, Func={}", sku, quantidade, codDepFuncionario);
 
         return salva;
     }
@@ -169,7 +167,7 @@ public class EstoqueMovimentacoesService {
                 .orElseThrow(() -> new SQLException("Falha ao buscar movimentação"));
 
         eventBus.publish(new EstoqueEvent<>(salva, "AJUSTE"));
-        logger.info("✅ Ajuste registrado: SKU={}, Qtd={}, Func={}", sku, quantidade, codDepFuncionario);
+        logger.log(System.Logger.Level.INFO,"✅ Ajuste registrado: SKU={}, Qtd={}, Func={}", sku, quantidade, codDepFuncionario);
 
         return salva;
     }
@@ -204,7 +202,7 @@ public class EstoqueMovimentacoesService {
                 .orElseThrow(() -> new SQLException("Falha ao buscar movimentação"));
 
         eventBus.publish(new EstoqueEvent<>(salva, "RESERVA"));
-        logger.info("✅ Reserva registrada: SKU={}, Qtd={}, Func={}", sku, quantidade, codDepFuncionario);
+        logger.log(System.Logger.Level.INFO,"✅ Reserva registrada: SKU={}, Qtd={}, Func={}", sku, quantidade, codDepFuncionario);
 
         return salva;
     }
@@ -228,7 +226,7 @@ public class EstoqueMovimentacoesService {
                 localizacaoDestino, codDepFuncionario,
                 "Transferência de " + localizacaoOrigem, observacoes);
 
-        logger.info("✅ Transferência realizada: SKU={}, Qtd={}, {} → {}",
+        logger.log(System.Logger.Level.INFO,"✅ Transferência realizada: SKU={}, Qtd={}, {} → {}",
                 sku, quantidade, localizacaoOrigem, localizacaoDestino);
     }
 
@@ -243,7 +241,7 @@ public class EstoqueMovimentacoesService {
         registrarEntrada(sku, quantidade, lote, null, null,
                 codDepFuncionario, motivo != null ? motivo : "Devolução", observacoes);
 
-        logger.info("✅ Devolução registrada: SKU={}, Qtd={}, Func={}", sku, quantidade, codDepFuncionario);
+        logger.log(System.Logger.Level.INFO,"✅ Devolução registrada: SKU={}, Qtd={}, Func={}", sku, quantidade, codDepFuncionario);
     }
 
     public void registrarPerda(
@@ -256,7 +254,7 @@ public class EstoqueMovimentacoesService {
         registrarSaida(sku, quantidade, codDepFuncionario,
                 motivo != null ? motivo : "Perda/avaria", observacoes);
 
-        logger.info("✅ Perda registrada: SKU={}, Qtd={}, Func={}", sku, quantidade, codDepFuncionario);
+        logger.log(System.Logger.Level.INFO,"✅ Perda registrada: SKU={}, Qtd={}, Func={}", sku, quantidade, codDepFuncionario);
     }
 
     // ===== CONSULTAS ANALÍTICAS =====
@@ -275,7 +273,7 @@ public class EstoqueMovimentacoesService {
     }
 
     public Map<String, Object> obterRelatorioDiario(LocalDate data) throws SQLException {
-        logger.debug("Gerando relatório diário para: {}", data);
+        logger.log(System.Logger.Level.DEBUG,"Gerando relatório diário para: {}", data);
 
         List<EstoqueMovimentacoes> movs = repository.findByPeriodo(data, data);
 
@@ -289,7 +287,7 @@ public class EstoqueMovimentacoesService {
 
         for (EstoqueMovimentacoes m : movs) {
             skus.add(m.skuProduto());
-            funcionarios.add(m.codDepFuncionario());
+            funcionarios.add(m.funcionarioId());
 
             switch (m.tipoMovimentacao()) {
                 case ENTRADA -> {

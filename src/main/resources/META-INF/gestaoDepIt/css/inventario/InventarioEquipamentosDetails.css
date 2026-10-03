@@ -1,0 +1,291 @@
+/* ============================================================
+   InventarioEquipamentosDetails.css
+   Janela de detalhes de um equipamento.
+   Tema claro, cards com cabeçalho colorido.
+   ============================================================ */
+
+.detail-root {
+    -fx-background-color: #f9fafb;
+    -fx-font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+    -fx-font-size: 13px;
+}
+
+/* ===== Header ===== */
+.detail-header-bar {
+    -fx-background-color: #ffffff;
+    -fx-border-color: transparent transparent #e5e7eb transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 15 20 15 20;
+}
+
+.detail-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #111827;
+}
+
+.detail-subtitle {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6b7280;
+}
+
+/* ===== Badges de status ===== */
+.badge-status,
+.badge-condicao {
+    -fx-padding: 4 12 4 12;
+    -fx-background-radius: 12;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 11px;
+    -fx-background-color: #6b7280;
+}
+
+/* ===== Barra de info rápida ===== */
+.detail-info-bar {
+    -fx-background-color: #f9fafb;
+    -fx-border-color: transparent transparent #e5e7eb transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 10 20 10 20;
+}
+
+.info-label {
+    -fx-text-fill: #6b7280;
+    -fx-font-size: 12px;
+}
+
+.info-value {
+    -fx-text-fill: #1f2937;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+/* ===== Conteúdo ===== */
+.detail-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.detail-content {
+    -fx-padding: 20;
+}
+
+/* ===== Cards ===== */
+.detail-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1;
+    -fx-padding: 15;
+}
+
+.detail-card-header-primary   { -fx-background-color: #dbeafe; -fx-padding: 8 12 8 12; -fx-background-radius: 6; }
+.detail-card-header-secondary { -fx-background-color: #e0e7ff; -fx-padding: 8 12 8 12; -fx-background-radius: 6; }
+.detail-card-header-success   { -fx-background-color: #d1fae5; -fx-padding: 8 12 8 12; -fx-background-radius: 6; }
+.detail-card-header-warning   { -fx-background-color: #fef3c7; -fx-padding: 8 12 8 12; -fx-background-radius: 6; }
+.detail-card-header-purple    { -fx-background-color: #ede9fe; -fx-padding: 8 12 8 12; -fx-background-radius: 6; }
+.detail-card-header-pink      { -fx-background-color: #fce7f3; -fx-padding: 8 12 8 12; -fx-background-radius: 6; }
+
+.card-icon {
+    -fx-font-size: 16px;
+}
+
+.card-header-title {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #374151;
+}
+
+.card-content {
+    -fx-padding: 5 0 0 0;
+}
+
+/* ===== Labels e valores ===== */
+.label-bold {
+    -fx-text-fill: #6b7280;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.value-highlight {
+    -fx-text-fill: #111827;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+/* ===== Score de saúde ===== */
+.score-label {
+    -fx-text-fill: #111827;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
+
+.score-subtitle {
+    -fx-text-fill: #9ca3af;
+    -fx-font-size: 11px;
+}
+
+/* ===== Ações rápidas (botões) ===== */
+.btn-action-info,
+.btn-action-danger,
+.btn-action-success,
+.btn-action-purple,
+.btn-action-gray {
+    -fx-padding: 8 12 8 12;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-cursor: hand;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.btn-action-info    { -fx-background-color: #3b82f6; }
+.btn-action-info:hover { -fx-background-color: #2563eb; }
+
+.btn-action-danger  { -fx-background-color: #ef4444; }
+.btn-action-danger:hover { -fx-background-color: #dc2626; }
+
+.btn-action-success { -fx-background-color: #10b981; }
+.btn-action-success:hover { -fx-background-color: #059669; }
+
+.btn-action-purple  { -fx-background-color: #8b5cf6; }
+.btn-action-purple:hover { -fx-background-color: #7c3aed; }
+
+.btn-action-gray    { -fx-background-color: #6b7280; }
+.btn-action-gray:hover { -fx-background-color: #4b5563; }
+
+/* ===== Caixa técnica ===== */
+.detail-tech-box {
+    -fx-background-color: #f9fafb;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1;
+    -fx-padding: 10;
+}
+
+.detail-textarea {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-font-size: 12px;
+    -fx-text-fill: #1f2937;
+}
+
+/* ===== Abas ===== */
+.detail-tab-pane {
+    -fx-background-color: transparent;
+    -fx-tab-min-width: 100px;
+}
+
+.detail-tab-pane .tab-header-background {
+    -fx-background-color: #f3f4f6;
+    -fx-background-radius: 6 6 0 0;
+}
+
+.detail-tab-pane .tab {
+    -fx-background-color: transparent;
+    -fx-padding: 6 12 6 12;
+}
+
+.detail-tab-pane .tab:selected {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #3b82f6 transparent transparent transparent;
+    -fx-border-width: 2 0 0 0;
+}
+
+.detail-tab-pane .tab-label {
+    -fx-text-fill: #374151;
+    -fx-font-size: 12px;
+}
+
+.detail-tab-pane .tab:selected .tab-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #1f2937;
+}
+
+.tab-content {
+    -fx-padding: 10;
+}
+
+/* ===== ListView ===== */
+.list-view {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+
+.list-view .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #1f2937;
+    -fx-padding: 6 10 6 10;
+    -fx-font-size: 12px;
+}
+
+.list-view .list-cell:filled:selected {
+    -fx-background-color: #dbeafe;
+    -fx-text-fill: #1e40af;
+}
+
+/* ===== Bottom ===== */
+.detail-bottom-bar {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e5e7eb transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 10 20 10 20;
+}
+
+.bottom-label {
+    -fx-text-fill: #9ca3af;
+    -fx-font-size: 11px;
+}
+
+.bottom-value {
+    -fx-text-fill: #374151;
+    -fx-font-size: 12px;
+}
+
+.bottom-value-highlight {
+    -fx-text-fill: #111827;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+/* ===== Botões (reaproveitamento) ===== */
+.btn-primary {
+    -fx-background-color: #3b82f6;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-padding: 6 14 6 14;
+    -fx-cursor: hand;
+}
+.btn-primary:hover { -fx-background-color: #2563eb; }
+
+.btn-secondary {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #374151;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 6 14 6 14;
+    -fx-cursor: hand;
+}
+.btn-secondary:hover { -fx-background-color: #f3f4f6; }
+
+.btn-danger {
+    -fx-background-color: #ef4444;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-padding: 6 14 6 14;
+    -fx-cursor: hand;
+}
+.btn-danger:hover { -fx-background-color: #dc2626; }

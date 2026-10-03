@@ -131,4 +131,60 @@ public final class DateUtils {
             return String.format("%d:%02d", minutes, secs);
         }
     }
+
+    // ===== PARSE TOLERANTE (persistência) =====
+
+    /** Aceita "yyyy-MM-dd" (ISO) e timestamp Unix em ms. */
+    public static LocalDate parseDateTolerante(String raw) {
+        if (raw == null || raw.isBlank()) return null;
+
+        // ISO: yyyy-MM-dd
+        if (raw.contains("-")) {
+            try {
+                return LocalDate.parse(raw);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
+        // Legado: timestamp Unix em ms
+        try {
+            long ms = Long.parseLong(raw);
+            return java.time.Instant.ofEpochMilli(ms)
+                    .atZone(java.time.ZoneId.systemDefault())
+                    .toLocalDate();
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    /** Aceita ISO com T, SQLite default (yyyy-MM-dd HH:mm:ss) e ms. */
+    public static LocalDateTime parseDateTimeTolerante(String raw) {
+        if (raw == null || raw.isBlank()) return null;
+
+        // ISO: yyyy-MM-ddTHH:mm:ss[.SSS]
+        if (raw.contains("T")) {
+            try {
+                return LocalDateTime.parse(raw);
+            } catch (Exception e) { /* tenta próximo */ }
+        }
+
+        // SQLite default: yyyy-MM-dd HH:mm:ss[.SSS]
+        if (raw.contains("-") && raw.contains(" ")) {
+            try {
+                return LocalDateTime.parse(raw,
+                        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss[.SSS]"));
+            } catch (Exception e) { /* tenta próximo */ }
+        }
+
+        // Legado: ms
+        try {
+            long ms = Long.parseLong(raw);
+            return java.time.Instant.ofEpochMilli(ms)
+                    .atZone(java.time.ZoneId.systemDefault())
+                    .toLocalDateTime();
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
 }

@@ -1,22 +1,14 @@
 package com.ossobo.gestaoDepIt.db.services;
 
 import com.ossobo.gestaoDepIt.db.enums.TipoMovimentacao;
-import com.ossobo.gestaoDepIt.db.models.EstoqueMovimentacoes;
-import com.ossobo.winterfx.anotations.Component;
-import com.ossobo.winterfx.anotations.GetMapping;
-import com.ossobo.winterfx.anotations.Inject;
-import com.ossobo.winterfx.anotations.PutMapping;
-import com.ossobo.winterfx.anotations.RequestMapping;
-import com.ossobo.winterfx.anotations.RouteVar;
+import com.ossobo.winterfx.anotations.*;
 import com.ossobo.winterfx.router.model.ResponseData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -42,7 +34,7 @@ import java.util.Optional;
 @RequestMapping("estoque-movimentacoes/service")
 public class EstoqueMovimentacoesRoutes {
 
-    private static final Logger logger = LoggerFactory.getLogger(EstoqueMovimentacoesRoutes.class);
+    private static final System.Logger logger = System.getLogger(EstoqueMovimentacoesRoutes.class.getName());
 
     @Inject
     private EstoqueMovimentacoesService service;
@@ -303,7 +295,7 @@ public class EstoqueMovimentacoesRoutes {
         try {
             return ResponseData.success().withData(chave, acao.executar());
         } catch (IllegalArgumentException | IllegalStateException e) {
-            logger.warn("⚠️ Regra de negócio violada: {}", e.getMessage());
+            logger.log(System.Logger.Level.WARNING,"⚠️ Regra de negócio violada: {}", e.getMessage());
             return ResponseData.error(e.getMessage()).withError("negocio", e.getMessage());
         } catch (SQLException e) {
             return erroBanco(e);
@@ -338,7 +330,7 @@ public class EstoqueMovimentacoesRoutes {
     }
 
     private ResponseData erroBanco(SQLException e) {
-        logger.error("❌ Erro de banco de dados: {}", e.getMessage(), e);
+        logger.log(System.Logger.Level.ERROR,"❌ Erro de banco de dados: {}", e.getMessage(), e);
         return ResponseData.error("Erro de banco de dados: " + e.getMessage())
                 .withError("banco", e.getMessage());
     }

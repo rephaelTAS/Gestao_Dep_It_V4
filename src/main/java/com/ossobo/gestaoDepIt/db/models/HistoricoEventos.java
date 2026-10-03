@@ -1,416 +1,190 @@
 package com.ossobo.gestaoDepIt.db.models;
 
+import com.ossobo.gestaoDepIt.db.enums.TipoEvento;
+
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 /**
- * HistoricoEventos - Modelo imutável com Record (Java 17+)
- * v3.1 - Degrau 1: UUID universal + deviceId (ledger append-only) + fábrica genérica porTipo
+ * HistoricoEventos v3.3 - Modelo imutável com Record (Java 17+)
  *
  * Schema: historico_eventos (id TEXT PRIMARY KEY — UUID v4)
  *
- * Responsabilidades:
- * - Representação imutável de evento histórico
- * - Validação de negócio no construtor
- * - Métodos auxiliares para tipo de evento
- * - Transporte de metadados de sync (deviceId — origem do evento)
+ * LEDGER append-only: não edita, não deleta, sem tombstone.
+ * DECISÃO RATIFICADA (Letra I): SEM FOREIGN KEY.
  *
- * Natureza: LEDGER append-only
- * - Nunca edita, nunca deleta → sem tombstone, sem updated_at
- * - Convergência por união de UUIDs disjuntos (conflito impossível entre devices)
+ * v3.3 — numSerie passa a ser campo próprio do evento (chave do equipamento).
+ *        Regra do ledger: a chave é (skuProduto, funcionarioId, numSerie) —
+ *        identificar o equipamento físico sem misturar históricos.
+ *        Todos os eventos têm num_serie ('' para auth/produto).
+ *        Fábricas atualizadas para aceitar numSerie explicitamente.
  *
- * Mudanças v3.0 → v3.1:
- * - +porTipo(...): fábrica genérica para despachos dinâmicos onde o tipo só é
- *   conhecido em runtime (ex.: InventarioHistoricoRegistrar.registrarAcao).
- *   Preserva dadosAnteriores para QUALQUER tipo (comportamento do utilitário legado).
- *
- * Mudanças v2.0 → v3.0 (histórico):
- * - id: Long → String (UUID v4, gerado pelas fábricas)
- * - +deviceId: device de origem do evento (rastreio de sync; repository preenche)
- * - SEM deleted: append-only não deleta (tombstone desnecessário)
- * - OBS-H3: TIPOS_VALIDOS alinhados ao ENUM MySQL real — 12 tipos
- *   (adicionados DEVOLUCAO, LOCALIZACAO, TRANSFERENCIA)
- * - toString(): %d → %s (id agora é String)
+ * v3.2 — Tipos válidos migram para enum TipoEvento (fonte única).
  */
 public record HistoricoEventos(
-        String id,                   // UUID v4 — gerado na fábrica, nunca pelo construtor
-        String tipoEvento,           // ENUM MySQL real: 12 tipos válidos
+        String id,                   // UUID v4 — gerado no gargalo
+        String tipoEvento,
         String skuProduto,
-        String funcionarioId,
-        String descricaoFuncionario, // JSON
-        String dadosAnteriores,      // JSON
-        String dadosNovos,           // JSON (NOT NULL)
+        String numSerie,             // chave do equipamento físico — '' quando N/A
+        String funcionarioId,        // referência funcional — SEM FK (Letra I)
+        String descricaoFuncionario,
+        String dadosAnteriores,      // JSON do estado anterior (regra do ledger)
+        String dadosNovos,           // JSON do estado atual
         LocalDateTime createdAt,
-        String deviceId              // sync: origem do evento (rastreio)
+        String deviceId
 ) {
-    // ===== CONSTANTES =====
-    // Alinhado ao ENUM do MySQL real (fonte da verdade) — 12 tipos.
-    // OBS-H3: registros legados com DEVOLUCAO/LOCALIZACAO/TRANSFERENCIA
-    // não podem quebrar o bootstrap.
-    public static final List<String> TIPOS_VALIDOS = List.of(
-            "CRIACAO", "ATUALIZACAO", "DEVOLUCAO", "BAIXA", "EXCLUSAO",
-            "MANUTENCAO", "MOVIMENTACAO", "LOCALIZACAO", "INSTALACAO",
-            "LOGIN", "LOGOUT", "TRANSFERENCIA"
-    );
-
-    // ===== CONSTRUTOR COMPACTO (VALIDAÇÃO) =====
     public HistoricoEventos {
-        // Validação com Pattern Matching (Java 16+)
-        if (!(tipoEvento instanceof String t) || t.isBlank()) {
+        if (id == null || id.isBlank()) {
+            id = UUID.randomUUID().toString();
+        }
+        if (tipoEvento == null || tipoEvento.isBlank()) {
             throw new IllegalArgumentException("Tipo de evento é obrigatório");
         }
-        if (!TIPOS_VALIDOS.contains(t)) {
-            throw new IllegalArgumentException("Tipo de evento inválido: " + t +
-                    ". Tipos permitidos: " + String.join(", ", TIPOS_VALIDOS));
+        if (!TipoEvento.isValido(tipoEvento)) {
+            throw new IllegalArgumentException("Tipo de evento inválido: " + tipoEvento);
         }
-
-        if (!(skuProduto instanceof String sku) || sku.isBlank()) {
+        if (skuProduto == null || skuProduto.isBlank()) {
             throw new IllegalArgumentException("SKU do produto é obrigatório");
         }
-
-        if (!(funcionarioId instanceof String func) || func.isBlank()) {
+        if (funcionarioId == null || funcionarioId.isBlank()) {
             throw new IllegalArgumentException("ID do funcionário é obrigatório");
         }
-
-        if (!(dadosNovos instanceof String dados) || dados.isBlank()) {
+        if (dadosNovos == null || dadosNovos.isBlank()) {
             throw new IllegalArgumentException("Dados novos são obrigatórios");
         }
 
-        // Valores padrão
+        tipoEvento = tipoEvento.trim().toUpperCase();
+        if (numSerie == null) numSerie = "";              // obrigatório na coluna, '' quando N/A
         if (descricaoFuncionario == null) descricaoFuncionario = "{}";
         if (dadosAnteriores == null) dadosAnteriores = "{}";
         if (createdAt == null) createdAt = LocalDateTime.now();
+        if (deviceId == null) deviceId = "";
     }
 
-    // ===== CONSTRUTORES DE FÁBRICA (geram UUID + timestamps) =====
+    // ===== FÁBRICAS POR TIPO =====
 
-    public static HistoricoEventos criacao(
-            String skuProduto,
-            String funcionarioId,
-            String dadosNovos,
-            String descricaoFuncionario
-    ) {
+    public static HistoricoEventos criacao(String sku, String numSerie, String func,
+                                           String dadosNovos, String descricao) {
+        return fabricar(TipoEvento.CRIACAO, sku, numSerie, func, null, dadosNovos, descricao);
+    }
+
+    public static HistoricoEventos atualizacao(String sku, String numSerie, String func,
+                                               String anteriores, String novos, String descricao) {
+        return fabricar(TipoEvento.ATUALIZACAO, sku, numSerie, func, anteriores, novos, descricao);
+    }
+
+    public static HistoricoEventos baixa(String sku, String numSerie, String func,
+                                         String anteriores, String descricao) {
+        return fabricar(TipoEvento.BAIXA, sku, numSerie, func, anteriores, "{}", descricao);
+    }
+
+    public static HistoricoEventos exclusao(String sku, String numSerie, String func,
+                                            String anteriores, String descricao) {
+        return fabricar(TipoEvento.EXCLUSAO, sku, numSerie, func, anteriores, "{}", descricao);
+    }
+
+    public static HistoricoEventos manutencao(String sku, String numSerie, String func,
+                                              String dados, String descricao) {
+        return fabricar(TipoEvento.MANUTENCAO, sku, numSerie, func, null, dados, descricao);
+    }
+
+    public static HistoricoEventos movimentacao(String sku, String func,
+                                                String dados, String descricao) {
+        // Movimentação é de PRODUTO (estoque), não de equipamento físico — sem série.
+        return fabricar(TipoEvento.MOVIMENTACAO, sku, "", func, null, dados, descricao);
+    }
+
+    public static HistoricoEventos instalacao(String sku, String numSerie, String func,
+                                              String dados, String descricao) {
+        return fabricar(TipoEvento.INSTALACAO, sku, numSerie, func, null, dados, descricao);
+    }
+
+    public static HistoricoEventos devolucao(String sku, String numSerie, String func,
+                                             String anteriores, String descricao) {
+        return fabricar(TipoEvento.DEVOLUCAO, sku, numSerie, func, anteriores, "{}", descricao);
+    }
+
+    public static HistoricoEventos transferencia(String sku, String numSerie, String func,
+                                                 String anteriores, String novos,
+                                                 String descricao) {
+        return fabricar(TipoEvento.TRANSFERENCIA, sku, numSerie, func, anteriores, novos, descricao);
+    }
+
+    public static HistoricoEventos localizacao(String sku, String numSerie, String func,
+                                               String dados, String descricao) {
+        return fabricar(TipoEvento.LOCALIZACAO, sku, numSerie, func, null, dados, descricao);
+    }
+
+    public static HistoricoEventos login(String func, String dadosLogin, String descricao) {
+        return fabricar(TipoEvento.LOGIN, "AUTH", "", func, null, dadosLogin, descricao);
+    }
+
+    public static HistoricoEventos logout(String func, String dadosLogout, String descricao) {
+        return fabricar(TipoEvento.LOGOUT, "AUTH", "", func, null, dadosLogout, descricao);
+    }
+
+    /** Fábrica genérica — preserva compatibilidade com porTipo(tipo, ...). */
+    public static HistoricoEventos porTipo(String tipo, String sku, String numSerie, String func,
+                                           String anteriores, String novos) {
+        return fabricar(TipoEvento.de(tipo), sku, numSerie, func, anteriores,
+                (novos == null || novos.isBlank()) ? "{}" : novos, null);
+    }
+
+    private static HistoricoEventos fabricar(TipoEvento tipo, String sku, String numSerie,
+                                             String func, String anteriores,
+                                             String novos, String descricao) {
         return new HistoricoEventos(
-                UUID.randomUUID().toString(), "CRIACAO", skuProduto, funcionarioId,
-                descricaoFuncionario, null, dadosNovos, LocalDateTime.now(), null
+                UUID.randomUUID().toString(),
+                tipo.name(),
+                sku,
+                numSerie != null ? numSerie : "",
+                func,
+                descricao,
+                anteriores != null ? anteriores : "{}",
+                novos != null ? novos : "{}",
+                LocalDateTime.now(),
+                null
         );
     }
 
-    public static HistoricoEventos atualizacao(
-            String skuProduto,
-            String funcionarioId,
-            String dadosAnteriores,
-            String dadosNovos,
-            String descricaoFuncionario
-    ) {
-        return new HistoricoEventos(
-                UUID.randomUUID().toString(), "ATUALIZACAO", skuProduto, funcionarioId,
-                descricaoFuncionario, dadosAnteriores, dadosNovos, LocalDateTime.now(), null
-        );
-    }
-
-    public static HistoricoEventos baixa(
-            String skuProduto,
-            String funcionarioId,
-            String dadosAnteriores,
-            String descricaoFuncionario
-    ) {
-        return new HistoricoEventos(
-                UUID.randomUUID().toString(), "BAIXA", skuProduto, funcionarioId,
-                descricaoFuncionario, dadosAnteriores,
-                "{\"status\": \"BAIXADO\"}", LocalDateTime.now(), null
-        );
-    }
-
-    public static HistoricoEventos exclusao(
-            String skuProduto,
-            String funcionarioId,
-            String dadosAnteriores,
-            String descricaoFuncionario
-    ) {
-        return new HistoricoEventos(
-                UUID.randomUUID().toString(), "EXCLUSAO", skuProduto, funcionarioId,
-                descricaoFuncionario, dadosAnteriores,
-                "{\"status\": \"EXCLUIDO\"}", LocalDateTime.now(), null
-        );
-    }
-
-    public static HistoricoEventos manutencao(
-            String skuProduto,
-            String funcionarioId,
-            String dadosManutencao,
-            String descricaoFuncionario
-    ) {
-        return new HistoricoEventos(
-                UUID.randomUUID().toString(), "MANUTENCAO", skuProduto, funcionarioId,
-                descricaoFuncionario, null, dadosManutencao, LocalDateTime.now(), null
-        );
-    }
-
-    public static HistoricoEventos movimentacao(
-            String skuProduto,
-            String funcionarioId,
-            String dadosMovimentacao,
-            String descricaoFuncionario
-    ) {
-        return new HistoricoEventos(
-                UUID.randomUUID().toString(), "MOVIMENTACAO", skuProduto, funcionarioId,
-                descricaoFuncionario, null, dadosMovimentacao, LocalDateTime.now(), null
-        );
-    }
-
-    public static HistoricoEventos instalacao(
-            String skuProduto,
-            String funcionarioId,
-            String dadosInstalacao,
-            String descricaoFuncionario
-    ) {
-        return new HistoricoEventos(
-                UUID.randomUUID().toString(), "INSTALACAO", skuProduto, funcionarioId,
-                descricaoFuncionario, null, dadosInstalacao, LocalDateTime.now(), null
-        );
-    }
-
-    /** Fábrica do tipo DEVOLUCAO (presente no ENUM MySQL real — antes não gerável). */
-    public static HistoricoEventos devolucao(
-            String skuProduto,
-            String funcionarioId,
-            String dadosDevolucao,
-            String descricaoFuncionario
-    ) {
-        return new HistoricoEventos(
-                UUID.randomUUID().toString(), "DEVOLUCAO", skuProduto, funcionarioId,
-                descricaoFuncionario, null, dadosDevolucao, LocalDateTime.now(), null
-        );
-    }
-
-    /** Fábrica do tipo LOCALIZACAO (presente no ENUM MySQL real — antes não gerável). */
-    public static HistoricoEventos localizacao(
-            String skuProduto,
-            String funcionarioId,
-            String dadosLocalizacao,
-            String descricaoFuncionario
-    ) {
-        return new HistoricoEventos(
-                UUID.randomUUID().toString(), "LOCALIZACAO", skuProduto, funcionarioId,
-                descricaoFuncionario, null, dadosLocalizacao, LocalDateTime.now(), null
-        );
-    }
-
-    /** Fábrica do tipo TRANSFERENCIA (presente no ENUM MySQL real — antes não gerável). */
-    public static HistoricoEventos transferencia(
-            String skuProduto,
-            String funcionarioId,
-            String dadosTransferencia,
-            String descricaoFuncionario
-    ) {
-        return new HistoricoEventos(
-                UUID.randomUUID().toString(), "TRANSFERENCIA", skuProduto, funcionarioId,
-                descricaoFuncionario, null, dadosTransferencia, LocalDateTime.now(), null
-        );
-    }
-
-    public static HistoricoEventos login(
-            String funcionarioId,
-            String dadosLogin,
-            String descricaoFuncionario
-    ) {
-        return new HistoricoEventos(
-                UUID.randomUUID().toString(), "LOGIN", "SISTEMA", funcionarioId,
-                descricaoFuncionario, null, dadosLogin, LocalDateTime.now(), null
-        );
-    }
-
-    public static HistoricoEventos logout(
-            String funcionarioId,
-            String dadosLogout,
-            String descricaoFuncionario
-    ) {
-        return new HistoricoEventos(
-                UUID.randomUUID().toString(), "LOGOUT", "SISTEMA", funcionarioId,
-                descricaoFuncionario, null, dadosLogout, LocalDateTime.now(), null
-        );
-    }
-
-    /**
-     * Fábrica genérica por tipo — para despachos dinâmicos onde o tipo só é
-     * conhecido em runtime (ex.: InventarioHistoricoRegistrar.registrarAcao).
-     * Preserva dadosAnteriores para QUALQUER tipo (comportamento do utilitário legado).
-     * Mantém a regra: UUID + timestamps gerados AQUI, nunca pelo chamador.
-     *
-     * @param tipo um dos 12 valores de TIPOS_VALIDOS (validado no construtor)
-     */
-    public static HistoricoEventos porTipo(String tipo, String skuProduto, String funcionarioId,
-                                           String dadosAnteriores, String dadosNovos) {
-        return new HistoricoEventos(
-                UUID.randomUUID().toString(), tipo, skuProduto, funcionarioId,
-                null, dadosAnteriores, dadosNovos, LocalDateTime.now(), null
-        );
-    }
-
-    // ===== MÉTODOS DE NEGÓCIO =====
+    // ===== HELPERS =====
 
     public boolean isCriacao() {
-        return "CRIACAO".equals(tipoEvento);
+        return TipoEvento.CRIACAO.name().equals(tipoEvento);
     }
 
     public boolean isAtualizacao() {
-        return "ATUALIZACAO".equals(tipoEvento);
-    }
-
-    public boolean isDevolucao() {
-        return "DEVOLUCAO".equals(tipoEvento);
-    }
-
-    public boolean isBaixa() {
-        return "BAIXA".equals(tipoEvento);
-    }
-
-    public boolean isExclusao() {
-        return "EXCLUSAO".equals(tipoEvento);
-    }
-
-    public boolean isManutencao() {
-        return "MANUTENCAO".equals(tipoEvento);
-    }
-
-    public boolean isMovimentacao() {
-        return "MOVIMENTACAO".equals(tipoEvento);
-    }
-
-    public boolean isLocalizacao() {
-        return "LOCALIZACAO".equals(tipoEvento);
-    }
-
-    public boolean isInstalacao() {
-        return "INSTALACAO".equals(tipoEvento);
-    }
-
-    public boolean isLogin() {
-        return "LOGIN".equals(tipoEvento);
-    }
-
-    public boolean isLogout() {
-        return "LOGOUT".equals(tipoEvento);
-    }
-
-    public boolean isTransferencia() {
-        return "TRANSFERENCIA".equals(tipoEvento);
-    }
-
-    public boolean isEventoAutenticacao() {
-        return isLogin() || isLogout();
-    }
-
-    /**
-     * ⚠️ OBS-H3b: lista de "alteração" NÃO foi estendida para os novos tipos
-     * (DEVOLUCAO/LOCALIZACAO/TRANSFERENCIA) — chamadores podem usá-la como gatilho
-     * de lógica. Revisar semântica no Degrau 2 com os services reais em mãos.
-     */
-    public boolean isEventoAlteracao() {
-        return isCriacao() || isAtualizacao() || isBaixa() || isExclusao();
-    }
-
-    /**
-     * Extrai o nome do funcionário do JSON de descrição
-     */
-    public String getFuncionarioNome() {
-        if (descricaoFuncionario == null || descricaoFuncionario.isBlank()) {
-            return null;
-        }
-        try {
-            // Busca "nome" no JSON
-            int idx = descricaoFuncionario.indexOf("\"nome\"");
-            if (idx >= 0) {
-                int start = descricaoFuncionario.indexOf("\"", idx + 7) + 1;
-                int end = descricaoFuncionario.indexOf("\"", start);
-                if (start > 0 && end > start) {
-                    return descricaoFuncionario.substring(start, end);
-                }
-            }
-        } catch (Exception e) {
-            // Fallback silencioso
-        }
-        return null;
-    }
-
-    /**
-     * Retorna informação do funcionário (ID + Nome)
-     */
-    public String getUsuarioInfo() {
-        String nome = getFuncionarioNome();
-        if (nome != null && !nome.isBlank()) {
-            return String.format("ID: %s | Nome: %s", funcionarioId, nome);
-        }
-        return String.format("ID: %s", funcionarioId);
-    }
-
-    /**
-     * Retorna descrição legível do evento
-     */
-    public String getDescricaoEvento() {
-        String tipo = switch (tipoEvento) {
-            case "CRIACAO" -> "Criação";
-            case "ATUALIZACAO" -> "Atualização";
-            case "DEVOLUCAO" -> "Devolução";
-            case "BAIXA" -> "Baixa";
-            case "EXCLUSAO" -> "Exclusão";
-            case "MANUTENCAO" -> "Manutenção";
-            case "MOVIMENTACAO" -> "Movimentação";
-            case "LOCALIZACAO" -> "Localização";
-            case "INSTALACAO" -> "Instalação";
-            case "LOGIN" -> "Login";
-            case "LOGOUT" -> "Logout";
-            case "TRANSFERENCIA" -> "Transferência";
-            default -> tipoEvento;
-        };
-        return String.format("%s do produto %s pelo funcionário %s",
-                tipo, skuProduto, funcionarioId);
+        return TipoEvento.ATUALIZACAO.name().equals(tipoEvento);
     }
 
     public String getTipoDescricao() {
         return switch (tipoEvento) {
-            case "CRIACAO" -> "Criação";
-            case "ATUALIZACAO" -> "Atualização";
-            case "DEVOLUCAO" -> "Devolução";
-            case "BAIXA" -> "Baixa";
-            case "EXCLUSAO" -> "Exclusão";
-            case "MANUTENCAO" -> "Manutenção";
-            case "MOVIMENTACAO" -> "Movimentação";
-            case "LOCALIZACAO" -> "Localização";
-            case "INSTALACAO" -> "Instalação";
-            case "LOGIN" -> "Login";
-            case "LOGOUT" -> "Logout";
+            case "CRIACAO"       -> "Criação";
+            case "ATUALIZACAO"   -> "Atualização";
+            case "DEVOLUCAO"     -> "Devolução";
+            case "BAIXA"         -> "Baixa";
+            case "EXCLUSAO"      -> "Exclusão";
+            case "MANUTENCAO"    -> "Manutenção";
+            case "MOVIMENTACAO"  -> "Movimentação";
+            case "LOCALIZACAO"   -> "Localização";
+            case "INSTALACAO"    -> "Instalação";
+            case "LOGIN"         -> "Login";
+            case "LOGOUT"        -> "Logout";
             case "TRANSFERENCIA" -> "Transferência";
-            default -> tipoEvento;
+            default              -> tipoEvento;
         };
     }
 
-    // ===== MÉTODOS DE TRANSFORMAÇÃO =====
-    // Ledger: transformação pós-criação local, antes do primeiro persist.
-    // deviceId nunca é alterado aqui.
-
-    public HistoricoEventos comId(String novoId) {
-        return new HistoricoEventos(
-                novoId, tipoEvento, skuProduto, funcionarioId,
-                descricaoFuncionario, dadosAnteriores, dadosNovos, createdAt, deviceId
-        );
-    }
-
-    // ===== MÉTODOS ESTÁTICOS =====
-
-    public static List<String> getTiposValidos() {
-        return TIPOS_VALIDOS;
-    }
-
-    public static boolean isTipoValido(String tipo) {
-        return TIPOS_VALIDOS.contains(tipo);
+    public String getDescricaoEvento() {
+        return String.format("%s do produto %s (série %s) pelo funcionário %s",
+                getTipoDescricao(), skuProduto,
+                numSerie != null && !numSerie.isBlank() ? numSerie : "N/A",
+                funcionarioId);
     }
 
     @Override
     public String toString() {
-        return String.format("HistoricoEventos[ID=%s, %s SKU:%s, Func:%s, Data:%s]",
-                id, tipoEvento, skuProduto, funcionarioId, createdAt);
+        return String.format("HistoricoEventos[ID=%s, %s SKU:%s, Série:%s, Func:%s, Data:%s]",
+                id, tipoEvento, skuProduto, numSerie, funcionarioId, createdAt);
     }
 }

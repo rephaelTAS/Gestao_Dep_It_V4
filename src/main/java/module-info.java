@@ -1,170 +1,117 @@
-module com.ossobo.gestaoDepIt {
+module com.ossobo.Gestao_Dep_It_V4 {
 
-    // ==========================================
-    // DEPENDENCIAS EXTERNAS (REQUIRES)
-    // ==========================================
+    // ============================================================
+    // REQUIRES
+    // ============================================================
 
-    // === MODULOS JAVAFX ===
-    requires transitive javafx.controls;
-    requires transitive javafx.fxml;
-    requires transitive javafx.graphics;
-    requires transitive javafx.base;
-    requires javafx.media;
-    requires javafx.swing;
+    // JavaFX
+    requires javafx.controls;
+    requires javafx.fxml;
     requires javafx.web;
 
-    // === MODULOS JAVA STANDARD ===
-    requires java.prefs;
+    // Scanner e proxy
+    requires io.github.classgraph;
+    requires net.bytebuddy;
+
+    // UI Extras
+    requires org.controlsfx.controls;
+    requires com.dlsc.formsfx;
+    requires net.synedra.validatorfx;
+    requires org.kordamp.ikonli.javafx;
+    requires org.kordamp.bootstrapfx.core;
+    requires eu.hansolo.tilesfx;
+    requires com.almasb.fxgl.all;
+
+    // Banco
     requires java.sql;
-    requires java.desktop;
-    requires java.net.http;
-    requires java.management;
-    requires jdk.httpserver;
-    requires jdk.xml.dom;
 
-    // === MODULOS DE LOGGING ===
-    requires org.slf4j;
-    requires ch.qos.logback.classic;
-    requires ch.qos.logback.core;
-
-    // === MODULOS DE JSON E SERIALIZACAO ===
-    requires com.fasterxml.jackson.databind;
-    requires com.fasterxml.jackson.core;
-    requires com.fasterxml.jackson.annotation;
-    requires com.google.gson;
-
-    // === MODULOS DE CRIPTOGRAFIA ===
+    // Framework
+    requires com.ossobo.winterfx;
     requires jbcrypt;
-
-    // === MODULOS DE E-MAIL ===
-    requires jakarta.mail;
-
-    // === MODULOS APACHE POI (EXCEL) ===
+    requires com.github.librepdf.openpdf;
+    requires com.google.gson;
     requires org.apache.poi.poi;
     requires org.apache.poi.ooxml;
-    requires com.google.common;
-    requires java.naming;
-    requires org.checkerframework.checker.qual;
-    requires java.logging;
+    requires java.desktop;
 
-    // === NEXUSFX FRAMEWORK ===
-    requires org.reflections;
-    requires javassist;
-    requires org.apache.commons.collections4;
-    requires io.github.classgraph;
-    requires com.ossobo.winterfx;
+    // ============================================================
+    // OPENS — reflexão do WinterFX (instanciação) + FXMLLoader (@FXML)
+    // ============================================================
+    //
+    // Regra: um pacote com classe @Controller/@RegisterView precisa abrir
+    // para AMBOS os atores:
+    //   - com.ossobo.winterfx → instancia o controller por reflexão
+    //   - javafx.fxml         → injeta os campos @FXML
+    //
+    // Pacotes sem @FXML (Component/Service/Repository) abrem só para winterfx.
+    //
+    // ATENÇÃO JPMS: opens X to A e opens X to B são declarações DIFERENTES
+    // e o compilador RECUSA duplicata com destinos distintos. Sempre unifique
+    // numa linha: opens X to A, B;
 
+    // Raiz / shell
+    opens com.ossobo.gestaoDepIt       to javafx.fxml, com.ossobo.winterfx;
+    opens com.ossobo.gestaoDepIt.login to javafx.fxml, com.ossobo.winterfx;
+    opens com.ossobo.gestaoDepIt.main  to javafx.fxml, com.ossobo.winterfx;
 
-    // ==========================================
-    // ABERTURAS PARA REFLEXAO (OPENS)
-    // ==========================================
+    // Camadas de dados (DI — sem @FXML)
+    opens com.ossobo.gestaoDepIt.db.config                  to com.ossobo.winterfx;
+    opens com.ossobo.gestaoDepIt.db.config.event            to com.ossobo.winterfx;
+    opens com.ossobo.gestaoDepIt.db.enums                   to com.ossobo.winterfx;
+    opens com.ossobo.gestaoDepIt.db.models                  to com.ossobo.winterfx;
+    opens com.ossobo.gestaoDepIt.db.repositories            to com.ossobo.winterfx;
+    opens com.ossobo.gestaoDepIt.db.repositories.exceptions to com.ossobo.winterfx;
+    opens com.ossobo.gestaoDepIt.db.services                to com.ossobo.winterfx;
+    opens com.ossobo.gestaoDepIt.db.sync                    to com.ossobo.winterfx;
+    opens com.ossobo.gestaoDepIt.db.documentos              to com.ossobo.winterfx;
+    opens com.ossobo.gestaoDepIt.db.relatorios              to com.ossobo.winterfx;
 
-    // === PACOTE RAIZ ===
-    opens com.ossobo.gestaoDepIt to com.ossobo.nexusfx, javafx.fxml, javafx.graphics;
+    // Controllers — Inventário
+    opens com.ossobo.gestaoDepIt.controlls.inventario                to javafx.fxml, com.ossobo.winterfx;
+    opens com.ossobo.gestaoDepIt.controlls.inventario.inventarioList to javafx.fxml, com.ossobo.winterfx;
+    opens com.ossobo.gestaoDepIt.controlls.inventario.cellfactories  to com.ossobo.winterfx;
 
-    // === CONFIG ===
-    opens com.ossobo.gestaoDepIt.config to com.ossobo.nexusfx, javafx.fxml;
-    opens com.ossobo.gestaoDepIt.config.view to com.ossobo.nexusfx, javafx.fxml;
+    // Controllers — Histórico
+    opens com.ossobo.gestaoDepIt.controlls.historico                              to javafx.fxml, com.ossobo.winterfx;
+    opens com.ossobo.gestaoDepIt.controlls.historico.historicoList                to javafx.fxml, com.ossobo.winterfx;
+    opens com.ossobo.gestaoDepIt.controlls.historico.historicoDetail              to javafx.fxml, com.ossobo.winterfx;
+    opens com.ossobo.gestaoDepIt.controlls.historico.historicoList.cellfactories  to com.ossobo.winterfx;
 
-    // === UTILS ===
-    opens com.ossobo.gestaoDepIt.utils to com.ossobo.nexusfx;
+    // Controllers — Catálogo
+    opens com.ossobo.gestaoDepIt.controlls.product                             to javafx.fxml, com.ossobo.winterfx;
+    opens com.ossobo.gestaoDepIt.controlls.product.catalogoList                to javafx.fxml, com.ossobo.winterfx;
+    opens com.ossobo.gestaoDepIt.controlls.product.catalogoList.cellfactories  to com.ossobo.winterfx;
 
+    // Controllers — Funcionários
+    opens com.ossobo.gestaoDepIt.controlls.funcionario                                to javafx.fxml, com.ossobo.winterfx;
+    opens com.ossobo.gestaoDepIt.controlls.funcionario.funcionarioList                to com.ossobo.winterfx;
+    opens com.ossobo.gestaoDepIt.controlls.funcionario.funcionarioList.cellfactories  to com.ossobo.winterfx;
 
+    // Controllers — Relatórios (FXML + WinterFX na MESMA linha)
+    opens com.ossobo.gestaoDepIt.controlls.relatorio           to javafx.fxml, com.ossobo.winterfx;
+    opens com.ossobo.gestaoDepIt.controlls.relatorio.dashboard to javafx.fxml, com.ossobo.winterfx;
+    opens com.ossobo.gestaoDepIt.controlls.relatorio.simples   to javafx.fxml, com.ossobo.winterfx;
+    opens com.ossobo.gestaoDepIt.controlls.relatorio.avancado  to javafx.fxml, com.ossobo.winterfx;
 
-    // === DATABASE ===
-    opens com.ossobo.gestaoDepIt.db.config to com.ossobo.nexusfx;
-    opens com.ossobo.gestaoDepIt.db.models to com.ossobo.nexusfx, com.fasterxml.jackson.databind;
-    opens com.ossobo.gestaoDepIt.db.enums to com.ossobo.nexusfx, com.fasterxml.jackson.databind;
-    opens com.ossobo.gestaoDepIt.db.repositories to com.ossobo.nexusfx;
-    opens com.ossobo.gestaoDepIt.db.repositories.exceptions to com.ossobo.nexusfx;
-    opens com.ossobo.gestaoDepIt.db.services to com.ossobo.nexusfx;
-
-    // === CONTROLLERS - LOGIN ===
-    opens com.ossobo.gestaoDepIt.controllers.login to com.ossobo.nexusfx, javafx.fxml;
-
-    // === CONTROLLERS - MAIN ===
-    opens com.ossobo.gestaoDepIt.controllers.main to com.ossobo.nexusfx, javafx.fxml;
-    opens com.ossobo.gestaoDepIt.controllers.main.sidebar to com.ossobo.nexusfx, javafx.fxml;
-
-    // === CONTROLLERS - PROGRESS BAR ===
-    opens com.ossobo.gestaoDepIt.controllers.progresBar to com.ossobo.nexusfx, javafx.fxml;
-
-    // === CONTROLLERS - REPORTS ===
-    opens com.ossobo.gestaoDepIt.controllers.reports to com.ossobo.nexusfx, javafx.fxml;
-
-    // === CONTROLLERS - FUNCIONARIO ===
-    opens com.ossobo.gestaoDepIt.controllers.gestao.funcionario to com.ossobo.nexusfx, javafx.fxml;
-
-    // === CONTROLLERS - PESSOAL ===
-    opens com.ossobo.gestaoDepIt.controllers.gestao.pessoal to com.ossobo.nexusfx, javafx.fxml;
-
-    // === CONTROLLERS - RELATORIOS ===
-    opens com.ossobo.gestaoDepIt.controllers.gestao.relatorios to com.ossobo.nexusfx, javafx.fxml;
-    opens com.ossobo.gestaoDepIt.controllers.gestao.relatorios.model to javafx.base;
-
-    // === CONTROLLERS - TONERS ===
-    opens com.ossobo.gestaoDepIt.controllers.gestao.toners to com.ossobo.nexusfx, javafx.fxml;
-
-    // === CONTROLLERS - VISUALIZAR ===
-    opens com.ossobo.gestaoDepIt.controllers.gestao.visualizar to com.ossobo.nexusfx, javafx.fxml;
-
-    opens com.ossobo.gestaoDepIt.controllers.gestao.gia to com.ossobo.nexusfx, javafx.fxml;
-
-    // === CONTROLLERS - INVENTARIO ===
-    opens com.ossobo.gestaoDepIt.controllers.gestao.equipamentos.inventario to com.ossobo.nexusfx, javafx.fxml;
-    opens com.ossobo.gestaoDepIt.controllers.gestao.equipamentos.inventario.audit to com.ossobo.nexusfx;
-    opens com.ossobo.gestaoDepIt.controllers.gestao.equipamentos.inventario.builders to javafx.base;
-    opens com.ossobo.gestaoDepIt.controllers.gestao.equipamentos.inventario.dto to com.ossobo.nexusfx, javafx.base;
-    opens com.ossobo.gestaoDepIt.controllers.gestao.equipamentos.inventario.historico to com.ossobo.nexusfx, javafx.fxml;
-    opens com.ossobo.gestaoDepIt.controllers.gestao.equipamentos.inventario.service to com.ossobo.nexusfx;
-    opens com.ossobo.gestaoDepIt.controllers.gestao.equipamentos.inventario.validators to com.ossobo.nexusfx;
-
-    // === CONTROLLERS - ESTOQUE - CATALOGO PRODUTO ===
-    opens com.ossobo.gestaoDepIt.controllers.gestao.estoque.catalugoproduto to com.ossobo.nexusfx, javafx.fxml;
-    opens com.ossobo.gestaoDepIt.controllers.gestao.estoque.catalugoproduto.catalogoList to com.ossobo.nexusfx, javafx.fxml;
-    opens com.ossobo.gestaoDepIt.controllers.gestao.estoque.catalugoproduto.strategies to com.ossobo.nexusfx, javafx.fxml;
-    opens com.ossobo.gestaoDepIt.controllers.gestao.estoque.catalugoproduto.validators to javafx.fxml;
+    // Utils
+    opens com.ossobo.gestaoDepIt.utils            to com.ossobo.winterfx;
+    opens com.ossobo.gestaoDepIt.utils.crypthash  to com.ossobo.winterfx;
 
 
-    // === CONTROLLERS - ESTOQUE - MOVIMENTACOES ===
-    opens com.ossobo.gestaoDepIt.controllers.gestao.estoque.movimentacoes to com.ossobo.nexusfx, javafx.fxml;
-    opens com.ossobo.gestaoDepIt.controllers.gestao.estoque.movimentacoes.detalhes to com.ossobo.nexusfx, javafx.fxml;
-    opens com.ossobo.gestaoDepIt.controllers.gestao.estoque.movimentacoes.dialogs to com.ossobo.nexusfx, javafx.fxml;
-    opens com.ossobo.gestaoDepIt.controllers.gestao.estoque.movimentacoes.dto to com.ossobo.nexusfx, javafx.base;
-    opens com.ossobo.gestaoDepIt.controllers.gestao.estoque.movimentacoes.estoque to com.ossobo.nexusfx;
-    opens com.ossobo.gestaoDepIt.controllers.gestao.estoque.movimentacoes.formview to com.ossobo.nexusfx;
-    opens com.ossobo.gestaoDepIt.controllers.gestao.estoque.movimentacoes.service to com.ossobo.nexusfx;
-    opens com.ossobo.gestaoDepIt.controllers.gestao.estoque.movimentacoes.util to javafx.fxml;
-    opens com.ossobo.gestaoDepIt.controllers.gestao.equipamentos.inventario.mappers to com.ossobo.nexusfx, javafx.base;
-
-
-    // ==========================================
-    // EXPORTACOES PUBLICAS (EXPORTS)
-    // ==========================================
+    opens com.ossobo.gestaoDepIt.utils.gerarCodDep to com.ossobo.winterfx;
+    // ============================================================
+    // EXPORTS
+    // ============================================================
 
     exports com.ossobo.gestaoDepIt;
-    exports com.ossobo.gestaoDepIt.config;
-    exports com.ossobo.gestaoDepIt.config.view;
-    exports com.ossobo.gestaoDepIt.controllers.login;
-    exports com.ossobo.gestaoDepIt.controllers.main;
-    exports com.ossobo.gestaoDepIt.controllers.main.sidebar;
-    exports com.ossobo.gestaoDepIt.controllers.progresBar;
-    exports com.ossobo.gestaoDepIt.controllers.gestao.estoque.movimentacoes;
-    exports com.ossobo.gestaoDepIt.controllers.gestao.estoque.movimentacoes.service;
-    exports com.ossobo.gestaoDepIt.controllers.gestao.estoque.catalugoproduto;
-    exports com.ossobo.gestaoDepIt.controllers.gestao.pessoal;
-    exports com.ossobo.gestaoDepIt.controllers.gestao.visualizar;
-
-    // Exports qualificados para NexusFX (DiContainer)
-    exports com.ossobo.gestaoDepIt.db.config to com.ossobo.nexusfx;
-    exports com.ossobo.gestaoDepIt.db.repositories to com.ossobo.nexusfx;
-    exports com.ossobo.gestaoDepIt.db.repositories.exceptions to com.ossobo.nexusfx;
-    exports com.ossobo.gestaoDepIt.db.services to com.ossobo.nexusfx;
-    opens com.ossobo.gestaoDepIt.controllers.gestao.estoque.catalugoproduto.catalogoList.cellfactories to com.ossobo.nexusfx, javafx.fxml;
-    exports com.ossobo.gestaoDepIt.db.config.event to com.ossobo.nexusfx;
-    opens com.ossobo.gestaoDepIt.db.config.event to com.ossobo.nexusfx;
-    exports com.ossobo.gestaoDepIt.ui.splash;
-    opens com.ossobo.gestaoDepIt.ui.splash to com.ossobo.nexusfx, javafx.fxml;
-    exports com.ossobo.gestaoDepIt.events;
-    opens com.ossobo.gestaoDepIt.events to com.ossobo.nexusfx, javafx.fxml, javafx.graphics;
+    exports com.ossobo.gestaoDepIt.login;
+    exports com.ossobo.gestaoDepIt.main;
+    exports com.ossobo.gestaoDepIt.db.models;
+    exports com.ossobo.gestaoDepIt.db.enums;
+    exports com.ossobo.gestaoDepIt.db.sync;
+    exports com.ossobo.gestaoDepIt.controlls.historico;
+    exports com.ossobo.gestaoDepIt.controlls.product;
+    exports com.ossobo.gestaoDepIt.db.documentos to com.ossobo.winterfx;
+    opens com.ossobo.gestaoDepIt.utils.gerarSKU to com.ossobo.winterfx;
+    opens com.ossobo.gestaoDepIt.controlls.relatorio.dados to com.ossobo.winterfx, javafx.fxml;
 }

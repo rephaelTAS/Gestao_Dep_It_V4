@@ -3,15 +3,11 @@ package com.ossobo.gestaoDepIt.db.repositories;
 import com.ossobo.gestaoDepIt.db.config.DatabaseConnection;
 import com.ossobo.gestaoDepIt.db.enums.TipoMovimentacao;
 import com.ossobo.gestaoDepIt.db.models.EstoqueMovimentacoes;
-
-import java.sql.Date;
-
 import com.ossobo.winterfx.anotations.Inject;
 import com.ossobo.winterfx.anotations.Repository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.*;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -28,7 +24,7 @@ import java.util.*;
 @Repository
 public class EstoqueMovimentacoesRepository {
 
-    private static final Logger logger = LoggerFactory.getLogger(EstoqueMovimentacoesRepository.class);
+    private static final System.Logger logger = System.getLogger(EstoqueMovimentacoesRepository.class.getName());
 
     @Inject
     private DatabaseConnection dbConnection;
@@ -307,7 +303,7 @@ public class EstoqueMovimentacoesRepository {
              PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE)) {
 
             setParameters(stmt, m);
-            stmt.setLong(12, m.id());
+            stmt.setLong(12, Long.parseLong(m.id()));
 
             int affected = stmt.executeUpdate();
             if (affected == 0) {
@@ -337,7 +333,7 @@ public class EstoqueMovimentacoesRepository {
             return insert(mov);
         } else {
             update(mov);
-            return mov.id();
+            return Long.valueOf(mov.id());
         }
     }
 
@@ -473,7 +469,7 @@ public class EstoqueMovimentacoesRepository {
         stmt.setDate(6, m.dataValidade() != null ? Date.valueOf(m.dataValidade()) : null);
         stmt.setDate(7, m.dataFimLicenca() != null ? Date.valueOf(m.dataFimLicenca()) : null);
         stmt.setString(8, m.localizacao());
-        stmt.setString(9, m.codDepFuncionario());
+        stmt.setString(9, m.funcionarioId());
         stmt.setString(10, m.motivo());
         stmt.setString(11, m.observacoes());
     }
@@ -499,24 +495,25 @@ public class EstoqueMovimentacoesRepository {
         try {
             tipo = TipoMovimentacao.valueOf(rs.getString("tipo_movimentacao"));
         } catch (IllegalArgumentException e) {
-            logger.warn("Valor inválido de tipo_movimentacao: {}", rs.getString("tipo_movimentacao"));
+            logger.log(System.Logger.Level.WARNING,"Valor inválido de tipo_movimentacao: {}", rs.getString("tipo_movimentacao"));
             tipo = TipoMovimentacao.ENTRADA;
         }
 
         return new EstoqueMovimentacoes(
-                rs.getLong("id"),
+                rs.getString("id"),
                 rs.getString("sku_produto"),
                 tipo,
                 rs.getInt("quantidade"),
                 rs.getString("lote"),
-                rs.getDate("data_movimentacao").toLocalDate(),
+                getLocalDate(rs, "data_movimentacao"),   // ⚠️ trocado — veja abaixo
                 getLocalDate(rs, "data_validade"),
                 getLocalDate(rs, "data_fim_licenca"),
                 rs.getString("localizacao"),
                 rs.getString("cod_dep_funcionario"),
                 rs.getString("motivo"),
                 rs.getString("observacoes"),
-                getLocalDateTime(rs, "created_at")
+                getLocalDateTime(rs, "created_at"),
+                rs.getString("device_id")                // ← o 14º
         );
     }
 
