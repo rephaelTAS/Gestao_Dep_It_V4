@@ -7,13 +7,18 @@ import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 /**
- * Usuario v3.2 - Modelo imutável com Record (Java 17+)
+ * Usuario v3.3 - Modelo imutável com Record (Java 17+)
  *
  * Schema: usuarios (id TEXT PRIMARY KEY — UUID v4)
  *
  * CONSTANTES DO GUEST:
  * - GUEST_ID: UUID fixo universal (mesma entidade em todos os devices)
  * - GUEST_FUNC_ID: codDep fixo do funcionário-parceiro
+ *
+ * v3.3 — senhaHash opcional no record: normaliza null/branco para "".
+ *        O record serve leitura (mascaramento SEC-1) E escrita. Exigir hash
+ *        aqui bloqueava comSenhaHash(null) e semSenha(). A obrigatoriedade
+ *        do hash na CRIAÇÃO é regra de serviço (UsuariosService.criar).
  *
  * v3.2 — nivelAcesso passa de String para Hierarquia (enum fonte única).
  *        Removidas as listas NIVEIS_VALIDOS e HIERARQUIA — vivem no enum.
@@ -42,7 +47,6 @@ public record Usuario(
 
     public Usuario {
         // id nasce no GARGALO se ausente (identidade de sync).
-        // Exceção: Usuario.guestPadrao passa GUEST_ID fixo — nunca null.
         if (id == null || id.isBlank()) {
             id = java.util.UUID.randomUUID().toString();
         }
@@ -58,11 +62,11 @@ public record Usuario(
         if (!isValidEmail(email)) {
             throw new IllegalArgumentException("Email inválido: " + email);
         }
-        if (senhaHash == null || senhaHash.isBlank()) {
-            throw new IllegalArgumentException("Hash da senha é obrigatório");
-        }
+        // senhaHash vazio = objeto mascarado (SEC-1) ou pré-criação.
+        // A obrigatoriedade é validada no UsuariosService.criar.
+        if (senhaHash == null) senhaHash = "";
 
-        if (nivelAcesso == null) nivelAcesso = Hierarquia.NIVEL_OPERADOR;
+        if (nivelAcesso == null) nivelAcesso = Hierarquia.OPERADOR;
         if (ativo == null) ativo = true;
         if (ipUltimoLogin == null) ipUltimoLogin = "";
         if (sessaoAtual == null) sessaoAtual = "";
@@ -79,8 +83,21 @@ public record Usuario(
         return new Usuario(
                 UUID.randomUUID().toString(),
                 funcionarioId, nome, email, senhaHash,
-                Hierarquia.NIVEL_OPERADOR, true, null, null, null, null,
+                Hierarquia.OPERADOR, true, null, null, null, null,
                 agora, agora, null, false
+        );
+    }
+
+    /**
+     * Cópia para transporte (hash removido).
+     * O construtor compacto aceita senhaHash vazio desde a v3.3.
+     */
+    public Usuario semSenha() {
+        return new Usuario(
+                id, funcionarioId, nome, email, "",
+                nivelAcesso, ativo, ultimoLogin, ipUltimoLogin,
+                sessaoAtual, expiracaoSessao, createdAt, updatedAt,
+                deviceId, deletado
         );
     }
 
@@ -104,7 +121,7 @@ public record Usuario(
         LocalDateTime agora = LocalDateTime.now();
         return new Usuario(
                 GUEST_ID, GUEST_FUNC_ID, "Guest", "guest@local", senhaHash,
-                Hierarquia.NIVEL_ADMIN, true, null, null, null, null,
+                Hierarquia.ADMIN, true, null, null, null, null,
                 agora, agora, null, false
         );
     }
@@ -114,7 +131,7 @@ public record Usuario(
     }
 
     public boolean isAdmin() {
-        return nivelAcesso == Hierarquia.NIVEL_ADMIN;
+        return nivelAcesso == Hierarquia.ADMIN;
     }
 
     public boolean isDeletado() {
@@ -133,11 +150,11 @@ public record Usuario(
 
     public String getNivelDescricao() {
         return switch (nivelAcesso) {
-            case NIVEL_ADMIN -> "Administrador";
-            case NIVEL_GESTOR -> "Gestor";
-            case NIVEL_SUPERVISOR -> "Supervisor";
-            case NIVEL_OPERADOR -> "Operador";
-            case NIVEL_READONLY -> "Leitura Apenas";
+            case ADMIN -> "Administrador";
+            case GESTOR -> "Gestor";
+            case SUPERVISOR -> "Supervisor";
+            case OPERADOR -> "Operador";
+            case READONLY -> "Leitura Apenas";
         };
     }
 

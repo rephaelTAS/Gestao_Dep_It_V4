@@ -66,7 +66,7 @@ import java.util.ResourceBundle;
         width = 1200,
         height = 800,
         centered = true,
-        primaryCss = "/META-INF/gestaoDepIt/ss/main/main.css"
+        primaryCss = "/META-INF/gestaoDepIt/css/main/main.css"
 )
 public class MainController implements Initializable, WinterFXController {
     private static final Logger LOGGER = System.getLogger(MainController.class.getName());

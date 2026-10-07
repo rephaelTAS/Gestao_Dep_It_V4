@@ -60,7 +60,7 @@ import java.util.concurrent.CompletableFuture;
 @RegisterView(
         id = ViewConstant.Funcionario.DETAIL,
         fxml = "/META-INF/gestaoDepIt/fxmls/funcionario/FuncionarioDetail.fxml",
-        primaryCss = "/META-INF/gestaoDepIt/css/funcionario/FuncionarioDetail.css"
+        primaryCss = "/META-INF/gestaoDepIt/css/funcionario/funcionario-detail.css"
 )
 public class FuncionarioDetailController implements Initializable, WinterFXController {
 

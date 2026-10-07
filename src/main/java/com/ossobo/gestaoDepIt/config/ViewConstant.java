@@ -100,8 +100,7 @@ public final class ViewConstant {
     public static final class Usuario {
         public static final String LIST   = "usuario";
         public static final String DETAIL = "detalheusuario";
-        // FORM: ainda não definido — usar quando existir
-        // public static final String FORM = "adicionar_editar_usuario";
+        public static final String FORM = "adicionar_editar_usuario";
 
         private Usuario() { }
     }

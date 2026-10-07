@@ -86,6 +86,8 @@ module com.ossobo.Gestao_Dep_It_V4 {
     opens com.ossobo.gestaoDepIt.controlls.funcionario                                to javafx.fxml, com.ossobo.winterfx;
     opens com.ossobo.gestaoDepIt.controlls.funcionario.funcionarioList                to com.ossobo.winterfx;
     opens com.ossobo.gestaoDepIt.controlls.funcionario.funcionarioList.cellfactories  to com.ossobo.winterfx;
+    opens com.ossobo.gestaoDepIt.controlls.usuarios to com.ossobo.winterfx, javafx.fxml;
+
 
     // Controllers — Relatórios (FXML + WinterFX na MESMA linha)
     opens com.ossobo.gestaoDepIt.controlls.relatorio           to javafx.fxml, com.ossobo.winterfx;

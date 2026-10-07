@@ -1,266 +1,225 @@
-/**
- * main.css v1.0
- * Estilos visuais para Main.fxml — Layout principal da aplicação.
- * Responsabilidades: Header glass, sidebar, menu items, user card, footer.
- * NÃO contém regras de layout estrutural.
- * Prefixo "main-" para isolamento de namespaces.
- */
+/* Main.css v2.0
+   Objetivo: shell principal (header, sidebar, content, footer, painel direito).
+   Regras:
+     - Superfícies = #FEFEFE; fundo de trabalho = #E8E5DE.
+     - Hierarquia por elevação (.elevation-1..4). Sem blocos coloridos.
+     - Primary #9EBCEE só em item de menu ativo, avatar e estados.
+     - Focus #00CFCC só em foco.
+   Tokens: ver Login.css (mesma paleta).
+   Elevação: L1 blur4/y1 | L2 blur8/y3 | L3 blur16/y6 | L4 blur24/y10 (rgba(175,170,164,0.55)).
+*/
 
-/* ========== ROOT ========== */
-.main-root {
-    -fx-background-color: #0f1923;
+/* ---------- Elevação (reutilizável) ---------- */
+.elevation-1 { -fx-effect: dropshadow(gaussian, rgba(175,170,164,0.55), 4,  0, 0, 1); }
+.elevation-2 { -fx-effect: dropshadow(gaussian, rgba(175,170,164,0.55), 8,  0, 2, 3); }
+.elevation-3 { -fx-effect: dropshadow(gaussian, rgba(175,170,164,0.55), 16, 0, 4, 6); }
+.elevation-4 { -fx-effect: dropshadow(gaussian, rgba(175,170,164,0.55), 24, 0, 6, 10); }
+
+/* ---------- Root ---------- */
+.app-root {
+    -fx-background-color: #E8E5DE;
+    -fx-font-family: "Segoe UI", "Roboto", "Helvetica Neue", sans-serif;
 }
 
-/* ========== HEADER ========== */
-.main-header {
-    -fx-background-color: rgba(15, 25, 35, 0.85);
-    -fx-background-radius: 0 0 16 16;
-    -fx-border-color: rgba(255,255,255,0.06);
+/* ---------- Header ---------- */
+.app-header {
+    -fx-background-color: #FEFEFE;
+    -fx-border-color: transparent transparent #AFAAA4 transparent;
     -fx-border-width: 0 0 1 0;
-    -fx-border-radius: 0 0 16 16;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 12, 0, 0, 4);
-    -fx-padding: 8 0 8 0;
 }
 
-.main-header-title {
-    -fx-font-size: 18px;
+.app-header-title {
+    -fx-text-fill: #222222;
+    -fx-font-size: 15px;
     -fx-font-weight: bold;
-    -fx-text-fill: linear-gradient(to right, #60a5fa, #a78bfa);
 }
 
-.main-header-icon-btn {
-    -fx-background-color: rgba(255,255,255,0.06);
-    -fx-background-radius: 10px;
-    -fx-padding: 6;
+.app-header-icon-btn {
+    -fx-background-color: transparent;
+    -fx-background-radius: 999;
+    -fx-padding: 6 10 6 10;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-border-radius: 999;
+    -fx-border-width: 1.5;
+}
+.app-header-icon-btn:hover   { -fx-background-color: #E8E5DE; }
+.app-header-icon-btn:pressed { -fx-background-color: #C2DFCD; }
+.app-header-icon-btn:focused { -fx-border-color: #00CFCC; }
+
+.app-header-text-btn {
+    -fx-background-color: #FEFEFE;
+    -fx-text-fill: #222222;
+    -fx-font-size: 13px;
+    -fx-background-radius: 999;
+    -fx-border-color: #AFAAA4;
+    -fx-border-radius: 999;
+    -fx-border-width: 1;
+    -fx-padding: 6 16 6 16;
     -fx-cursor: hand;
 }
+.app-header-text-btn:hover   { -fx-background-color: #E8E5DE; -fx-border-color: #00CFCC; }
+.app-header-text-btn:pressed { -fx-background-color: #C2DFCD; }
+.app-header-text-btn:focused { -fx-border-color: #00CFCC; -fx-border-width: 1.5; }
 
-.main-header-icon-btn:hover {
-    -fx-background-color: rgba(255,255,255,0.12);
-}
+.app-header-icon { -fx-opacity: 0.9; }
+.app-page-icon   { -fx-opacity: 0.9; }
 
-.main-header-icon {
-    -fx-opacity: 0.85;
-}
-
-.main-notification-btn {
-    -fx-background-radius: 50%;
-}
-
-/* ========== PAGE INFO ========== */
-.main-page-icon {
-    -fx-opacity: 0.8;
-    -fx-effect: dropshadow(gaussian, rgba(96,165,250,0.3), 6, 0, 0, 0);
-}
-
-.main-page-name {
-    -fx-font-size: 16px;
+.app-page-name {
+    -fx-text-fill: #222222;
+    -fx-font-size: 14px;
     -fx-font-weight: bold;
-    -fx-text-fill: #e2e8f0;
 }
 
-/* ========== USER CARD ========== */
-.main-user-card {
-    -fx-background-color: rgba(255,255,255,0.05);
-    -fx-background-radius: 12px;
-    -fx-padding: 6 12 6 8;
-    -fx-border-color: rgba(255,255,255,0.08);
-    -fx-border-radius: 12px;
+/* ---------- Cartão de usuário ---------- */
+.app-user-card {
+    -fx-background-color: #E8E5DE;
+    -fx-background-radius: 999;
+    -fx-padding: 4 12 4 8;
+}
+.app-user-info { -fx-padding: 0 4 0 4; }
+
+.app-time-display { -fx-text-fill: #222222; -fx-font-size: 12px; -fx-font-weight: bold; }
+.app-date-display { -fx-text-fill: #AFAAA4; -fx-font-size: 11px; }
+.app-user-name    { -fx-text-fill: #222222; -fx-font-size: 12px; }
+.app-user-status-dot { -fx-text-fill: #AFD9C3; -fx-font-size: 10px; }
+
+.app-avatar-container {
+    -fx-background-color: #9EBCEE;
+    -fx-background-radius: 999;
+    -fx-min-width: 36; -fx-min-height: 36;
+}
+.app-avatar-image { -fx-opacity: 0.95; }
+.app-avatar-border {
+    -fx-fill: transparent;
+    -fx-stroke: #00CFCC;
+    -fx-stroke-width: 1.5;
 }
 
-.main-user-info {
+/* ---------- Sidebar ---------- */
+.app-sidebar {
+    -fx-background-color: #FEFEFE;
+    -fx-border-color: transparent #AFAAA4 transparent transparent;
+    -fx-border-width: 0 1 0 0;
+}
+
+.app-sidebar-header {
+    -fx-background-color: #FEFEFE;
+    -fx-padding: 0 16 0 16;
+    -fx-border-color: transparent transparent #AFAAA4 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+.app-sidebar-logo { -fx-opacity: 0.95; }
+.app-sidebar-title {
+    -fx-text-fill: #222222;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.app-sidebar-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+}
+.app-sidebar-scroll > .viewport { -fx-background-color: transparent; }
+.app-sidebar-scroll .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 6;
+}
+.app-sidebar-scroll .scroll-bar:vertical .thumb {
+    -fx-background-color: #AFAAA4;
+    -fx-background-radius: 3;
+}
+.app-sidebar-scroll .scroll-bar:vertical .thumb:hover { -fx-background-color: #9EBCEE; }
+.app-sidebar-scroll .scroll-bar:vertical .track,
+.app-sidebar-scroll .scroll-bar:vertical .increment-button,
+.app-sidebar-scroll .scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
     -fx-padding: 0;
 }
 
-.main-time-display {
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #93c5fd;
-    -fx-font-family: "Monospaced", "Consolas";
-}
-
-.main-date-display {
-    -fx-font-size: 11px;
-    -fx-text-fill: #64748b;
-}
-
-.main-user-name {
-    -fx-font-size: 13px;
-    -fx-font-weight: bold;
-    -fx-text-fill: linear-gradient(to right, #e2e8f0, #cbd5e1);
-}
-
-.main-user-status-dot {
-    -fx-font-size: 10px;
-    -fx-text-fill: #22c55e;
-}
-
-/* ========== AVATAR ========== */
-.main-avatar-container {
-    -fx-padding: 2;
-}
-
-.main-avatar-image {
-    -fx-opacity: 0.9;
-}
-
-.main-avatar-border {
-    -fx-fill: transparent;
-    -fx-stroke: linear-gradient(to bottom right, #60a5fa, #a78bfa);
-    -fx-stroke-width: 2;
-    -fx-arc-height: 20;
-    -fx-arc-width: 20;
-}
-
-/* ========== SIDEBAR ========== */
-.main-sidebar {
-    -fx-background-color: rgba(10, 18, 28, 0.95);
-    -fx-border-color: rgba(255,255,255,0.05);
-    -fx-border-width: 0 1 0 0;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 2, 0);
-}
-
-.main-sidebar-header {
-    -fx-padding: 16 16 12 16;
-    -fx-border-color: rgba(255,255,255,0.06);
-    -fx-border-width: 0 0 1 0;
-}
-
-.main-sidebar-logo {
-    -fx-effect: dropshadow(gaussian, rgba(96,165,250,0.4), 8, 0, 0, 0);
-}
-
-.main-sidebar-title {
-    -fx-font-size: 18px;
-    -fx-font-weight: bold;
-    -fx-text-fill: linear-gradient(to right, #60a5fa, #a78bfa);
-}
-
-.main-sidebar-scroll {
-    -fx-background: transparent;
-    -fx-background-color: transparent;
-}
-
-.main-sidebar-scroll .viewport {
-    -fx-background-color: transparent;
-}
-
-/* ========== MENU ========== */
-.main-menu-container {
+/* ---------- Menu ---------- */
+.app-menu-container {
     -fx-padding: 12 10 12 10;
     -fx-background-color: transparent;
 }
 
-.main-menu-section {
+.app-menu-section {
+    -fx-text-fill: #AFAAA4;
     -fx-font-size: 10px;
     -fx-font-weight: bold;
-    -fx-text-fill: #475569;
-    -fx-padding: 16 12 6 12;
-    -fx-letter-spacing: 1.5;
+    -fx-padding: 12 8 4 8;
 }
 
-.main-menu-item {
+.app-menu-separator {
     -fx-background-color: transparent;
-    -fx-text-fill: #94a3b8;
+    -fx-border-color: transparent transparent #E8E5DE transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 4 0 4 0;
+}
+
+.app-menu-item {
+    -fx-background-color: transparent;
+    -fx-text-fill: #222222;
     -fx-font-size: 13px;
-    -fx-font-weight: normal;
-    -fx-background-radius: 8px;
-    -fx-alignment: center-left;
+    -fx-alignment: CENTER_LEFT;
+    -fx-background-radius: 12;
+    -fx-graphic-text-gap: 12;
     -fx-cursor: hand;
+    -fx-padding: 8 12 8 12;
+    -fx-border-color: transparent transparent transparent transparent;
+    -fx-border-width: 0 0 0 3;
+    -fx-border-radius: 12;
 }
-
-.main-menu-item:hover {
-    -fx-background-color: rgba(255,255,255,0.06);
-    -fx-text-fill: #e2e8f0;
+.app-menu-item:hover   { -fx-background-color: #E8E5DE; }
+.app-menu-item:pressed { -fx-background-color: #C2DFCD; }
+.app-menu-item:focused {
+    -fx-background-color: #E8E5DE;
+    -fx-border-color: transparent transparent transparent #00CFCC;
 }
-
-.main-menu-item:selected,
-.main-menu-item:focused {
-    -fx-background-color: rgba(96,165,250,0.15);
-    -fx-text-fill: #60a5fa;
+.app-menu-item.active,
+.app-menu-item:selected {
+    -fx-background-color: #B6D7C4;
+    -fx-text-fill: #222222;
+    -fx-font-weight: bold;
+    -fx-border-color: transparent transparent transparent #9EBCEE;
 }
+.app-menu-icon { -fx-opacity: 0.85; }
 
-.main-menu-icon {
-    -fx-opacity: 0.6;
+/* ---------- Status do sistema ---------- */
+.app-sidebar-status {
+    -fx-background-color: #FEFEFE;
+    -fx-border-color: #AFAAA4 transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 14 16 14 16;
+    -fx-spacing: 6;
 }
+.app-status-title { -fx-text-fill: #AFAAA4; -fx-font-size: 10px; -fx-font-weight: bold; }
+.app-status-indicator { -fx-min-width: 8; -fx-min-height: 8; }
+.app-status-dot { -fx-fill: #AFD9C3; }
+.app-status-value { -fx-text-fill: #222222; -fx-font-size: 12px; -fx-font-weight: bold; }
+.app-version-text { -fx-text-fill: #AFAAA4; -fx-font-size: 10px; }
 
-.main-menu-item:hover .main-menu-icon {
-    -fx-opacity: 0.9;
+/* ---------- Content / Footer / Right ---------- */
+.app-content-area { -fx-background-color: #E8E5DE; }
+
+.app-footer {
+    -fx-background-color: #FEFEFE;
+    -fx-border-color: #AFAAA4 transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
 }
+.app-footer-text { -fx-text-fill: #AFAAA4; -fx-font-size: 11px; }
 
-.main-menu-item:selected .main-menu-icon {
-    -fx-opacity: 1;
-    -fx-effect: dropshadow(gaussian, rgba(96,165,250,0.5), 6, 0, 0, 0);
-}
-
-.main-menu-separator {
-    -fx-padding: 4 12 4 12;
-    -fx-opacity: 0.15;
-}
-
-.main-menu-separator .line {
-    -fx-border-color: rgba(255,255,255,0.1);
+.app-right-panel {
+    -fx-background-color: #FEFEFE;
+    -fx-background-radius: 16;
+    -fx-border-color: #AFAAA4;
+    -fx-border-radius: 16;
     -fx-border-width: 1;
 }
 
-/* ========== SIDEBAR STATUS ========== */
-.main-sidebar-status {
-    -fx-background-color: rgba(255,255,255,0.03);
-    -fx-padding: 12 16;
-    -fx-border-color: rgba(255,255,255,0.06);
-    -fx-border-width: 1 0 0 0;
-}
-
-.main-status-title {
-    -fx-font-size: 9px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #475569;
-    -fx-letter-spacing: 1.2;
-}
-
-.main-status-indicator {
-    -fx-padding: 2;
-}
-
-.main-status-dot {
-    -fx-fill: #22c55e;
-    -fx-effect: dropshadow(gaussian, rgba(34,197,94,0.6), 6, 0, 0, 0);
-}
-
-.main-status-value {
-    -fx-font-size: 12px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #22c55e;
-}
-
-.main-version-text {
-    -fx-font-size: 10px;
-    -fx-text-fill: #475569;
-    -fx-padding: 4 0 0 0;
-}
-
-/* ========== ÁREA DE CONTEÚDO ========== */
-.main-content-area {
-    -fx-background-color: transparent;
-    -fx-background-radius: 12px;
-}
-
-/* ========== PAINEL DIREITO ========== */
-.main-right-panel {
-    -fx-background-color: rgba(10, 18, 28, 0.8);
-    -fx-background-radius: 12px;
-    -fx-border-color: rgba(255,255,255,0.05);
-    -fx-border-radius: 12px;
-}
-
-/* ========== FOOTER ========== */
-.main-footer {
-    -fx-background-color: rgba(15, 25, 35, 0.9);
-    -fx-border-color: rgba(255,255,255,0.05);
-    -fx-border-width: 1 0 0 0;
-}
-
-.main-footer-text {
-    -fx-font-size: 11px;
-    -fx-text-fill: #475569;
+/* ---------- Separator genérico ---------- */
+.separator *.line {
+    -fx-border-color: #AFAAA4;
+    -fx-border-width: 0 1 0 0;
 }

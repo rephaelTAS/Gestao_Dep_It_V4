@@ -3,6 +3,7 @@ package com.ossobo.gestaoDepIt.db.repositories;
 import com.ossobo.gestaoDepIt.db.config.DatabaseConnection;
 import com.ossobo.gestaoDepIt.db.enums.Hierarquia;
 import com.ossobo.gestaoDepIt.db.models.Usuario;
+import com.ossobo.gestaoDepIt.utils.DateUtils;
 
 import com.ossobo.winterfx.anotations.Inject;
 import com.ossobo.winterfx.anotations.Repository;
@@ -14,18 +15,20 @@ import java.util.*;
 
 /**
  * UsuariosRepository - Acesso a dados com WinterFX
- * v2.1 - Alinhado ao Usuario v3.1 (PK String/UUID + colunas de sync)
+ * v2.2 - Alinhado ao Usuario v3.3
  *
- * Mudanças v2.0 → v2.1:
- * - PK Long → String (UUID v4) em TODAS as assinaturas e setters
- * - INSERT inclui id (gerado pela fábrica), device_id, deleted e os
- *   timestamps da fábrica (created_at/updated_at) — essenciais para o LWW
- * - UPDATE grava device_id (origem da última mutação — sync)
- * - Funções de data do MySQL (NOW(), DATE_SUB, DATE_ADD, CURDATE)
- *   substituídas por timestamps calculados no Java → SQL portável SQLite
- * - getBooleanNullable: NULL no banco chega como null (não false!)
- * - getLoginsPorPeriodo retorna record LoginPorDia (antes: Object[])
- * - Helpers executeQuery/executeUpdate com varargs eliminam duplicação
+ * Mudanças v2.1 → v2.2:
+ * - getLocalDateTime usa DateUtils.parseDateTimeTolerante (leitura via
+ *   rs.getString) — o driver xerial não parseia timestamp no formato
+ *   SQLite "yyyy-MM-dd HH:mm:ss", causando "Error parsing time stamp".
+ *
+ * v2.1 - Alinhado ao Usuario v3.1 (PK String/UUID + colunas de sync)
+ *   - PK Long → String (UUID v4)
+ *   - INSERT inclui id, device_id, deleted e timestamps
+ *   - UPDATE grava device_id
+ *   - Funções MySQL → timestamps Java (SQL portável)
+ *   - getBooleanNullable: NULL vira null
+ *   - getLoginsPorPeriodo retorna record LoginPorDia
  */
 @Repository
 public class UsuariosRepository {
@@ -41,7 +44,6 @@ public class UsuariosRepository {
     // TIPOS AUXILIARES
     // ============================================================
 
-    /** Resultado agregado de logins por dia (substitui o antigo Object[]). */
     public record LoginPorDia(LocalDate data, int total) {}
 
     // ============================================================
@@ -87,7 +89,6 @@ public class UsuariosRepository {
             WHERE funcionario_id = ?
             """.formatted(TABLE);
 
-    // ✅ "expiracao_sessao > ?" — o "agora" vem do Java como parâmetro
     private static final String SQL_FIND_BY_SESSAO = """
             SELECT * FROM %s
             WHERE sessao_atual = ? AND expiracao_sessao > ?
@@ -129,7 +130,6 @@ public class UsuariosRepository {
             ORDER BY nome
             """.formatted(TABLE);
 
-    // ✅ era DATE_SUB(NOW(), INTERVAL ? DAY) — não existe em SQLite
     private static final String SQL_FIND_RECENTES_LOGIN = """
             SELECT * FROM %s
             WHERE ultimo_login >= ?
@@ -143,7 +143,6 @@ public class UsuariosRepository {
             ORDER BY ultimo_login
             """.formatted(TABLE);
 
-    // ✅ era BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL ? MINUTE)
     private static final String SQL_FIND_SESSOES_PRESTES_EXPIRAR = """
             SELECT * FROM %s
             WHERE sessao_atual IS NOT NULL
@@ -151,7 +150,6 @@ public class UsuariosRepository {
             ORDER BY expiracao_sessao
             """.formatted(TABLE);
 
-    // ✅ id/device_id/deleted/timestamps incluídos — a fábrica já os gerou
     private static final String SQL_INSERT = """
             INSERT INTO %s (
                 id, funcionario_id, nome, email, senha_hash,
@@ -191,7 +189,6 @@ public class UsuariosRepository {
             WHERE id = ?
             """.formatted(TABLE);
 
-    // ⚠️ Sem WHERE — derruba a sessão de TODOS os usuários. Intencional?
     private static final String SQL_INVALIDAR_TODAS_SESSOES = """
             UPDATE %s
             SET sessao_atual = NULL, expiracao_sessao = NULL, device_id = ?, updated_at = CURRENT_TIMESTAMP
@@ -248,42 +245,32 @@ public class UsuariosRepository {
     }
 
     public Optional<Usuario> findById(String id) throws SQLException {
-        if (id == null || id.isBlank()) {
-            return Optional.empty();
-        }
+        if (id == null || id.isBlank()) return Optional.empty();
         List<Usuario> resultado = executeQuery(SQL_FIND_BY_ID, id);
         return resultado.isEmpty() ? Optional.empty() : Optional.of(resultado.get(0));
     }
 
     public Optional<Usuario> findByEmail(String email) throws SQLException {
-        if (email == null || email.isBlank()) {
-            return Optional.empty();
-        }
+        if (email == null || email.isBlank()) return Optional.empty();
         List<Usuario> resultado = executeQuery(SQL_FIND_BY_EMAIL, email);
         return resultado.isEmpty() ? Optional.empty() : Optional.of(resultado.get(0));
     }
 
     public Optional<Usuario> findByFuncionarioId(String funcionarioId) throws SQLException {
-        if (funcionarioId == null || funcionarioId.isBlank()) {
-            return Optional.empty();
-        }
+        if (funcionarioId == null || funcionarioId.isBlank()) return Optional.empty();
         List<Usuario> resultado = executeQuery(SQL_FIND_BY_FUNCIONARIO, funcionarioId);
         return resultado.isEmpty() ? Optional.empty() : Optional.of(resultado.get(0));
     }
 
     public Optional<Usuario> findBySessao(String token) throws SQLException {
-        if (token == null || token.isBlank()) {
-            return Optional.empty();
-        }
+        if (token == null || token.isBlank()) return Optional.empty();
         List<Usuario> resultado = executeQuery(SQL_FIND_BY_SESSAO,
                 token, Timestamp.valueOf(LocalDateTime.now()));
         return resultado.isEmpty() ? Optional.empty() : Optional.of(resultado.get(0));
     }
 
     public List<Usuario> findByNivelAcesso(String nivel) throws SQLException {
-        if (nivel == null || nivel.isBlank()) {
-            return List.of();
-        }
+        if (nivel == null || nivel.isBlank()) return List.of();
         return executeQuery(SQL_FIND_BY_NIVEL, nivel);
     }
 
@@ -292,16 +279,12 @@ public class UsuariosRepository {
     }
 
     public List<Usuario> findByNomeContaining(String nome) throws SQLException {
-        if (nome == null || nome.isBlank()) {
-            return List.of();
-        }
+        if (nome == null || nome.isBlank()) return List.of();
         return executeQuery(SQL_FIND_BY_NOME_LIKE, "%" + nome + "%");
     }
 
     public List<Usuario> findByEmailContaining(String email) throws SQLException {
-        if (email == null || email.isBlank()) {
-            return List.of();
-        }
+        if (email == null || email.isBlank()) return List.of();
         return executeQuery(SQL_FIND_BY_EMAIL_LIKE, "%" + email + "%");
     }
 
@@ -336,12 +319,6 @@ public class UsuariosRepository {
     // CRUD — ESCRITAS
     // ============================================================
 
-    /**
-     * Insere o usuário. O id (UUID v4) JÁ veio da fábrica do record —
-     * aqui só persistimos; não há "generated keys" a recuperar.
-     *
-     * @return o id do usuário inserido (o mesmo que veio no objeto)
-     */
     public String insert(Usuario usuario) throws SQLException {
         if (usuario == null) {
             throw new IllegalArgumentException("Usuário inválido");
@@ -429,7 +406,6 @@ public class UsuariosRepository {
         }
     }
 
-    /** ⚠️ Derruba a sessão de TODOS os usuários. */
     public void invalidarTodasSessoes() throws SQLException {
         executeUpdate(SQL_INVALIDAR_TODAS_SESSOES, getDeviceId());
     }
@@ -510,8 +486,6 @@ public class UsuariosRepository {
         }
         if (dataLoginInicio != null && dataLoginFim != null) {
             sql.append(" AND ultimo_login BETWEEN ? AND ?");
-            // ✅ Timestamp.valueOf explícito — setObject com LocalDateTime
-            //    nem sempre é aceito pelo driver
             params.add(Timestamp.valueOf(dataLoginInicio));
             params.add(Timestamp.valueOf(dataLoginFim));
         }
@@ -563,7 +537,6 @@ public class UsuariosRepository {
         return countGroupBy(sql);
     }
 
-    // ✅ CURDATE()/NOW() → limites calculados no Java
     public Map<String, Integer> getEstatisticasAtividade() throws SQLException {
         LocalDateTime agora = LocalDateTime.now();
         LocalDateTime inicioDoDia = agora.toLocalDate().atStartOfDay();
@@ -583,9 +556,7 @@ public class UsuariosRepository {
     }
 
     public List<LoginPorDia> getLoginsPorPeriodo(LocalDateTime inicio, LocalDateTime fim) throws SQLException {
-        if (inicio == null || fim == null) {
-            return List.of();
-        }
+        if (inicio == null || fim == null) return List.of();
 
         String sql = """
                 SELECT DATE(ultimo_login) as data, COUNT(*) as total
@@ -617,10 +588,6 @@ public class UsuariosRepository {
     // MÉTODOS PRIVADOS (helpers)
     // ============================================================
 
-    /**
-     * Executa um SELECT com parâmetros variádicos e mapeia o resultado.
-     * Centraliza o try-with-resources que antes se repetia em cada método.
-     */
     private List<Usuario> executeQuery(String sql, Object... params) throws SQLException {
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -633,7 +600,6 @@ public class UsuariosRepository {
         }
     }
 
-    /** Executa um UPDATE/INSERT/DELETE com parâmetros variádicos. */
     private int executeUpdate(String sql, Object... params) throws SQLException {
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -682,7 +648,6 @@ public class UsuariosRepository {
         return List.copyOf(list);
     }
 
-    // ✅ 15 componentes — alinhado ao Usuario v3.1
     private Usuario mapResultSet(ResultSet rs) throws SQLException {
         return new Usuario(
                 rs.getString("id"),
@@ -709,16 +674,17 @@ public class UsuariosRepository {
         return rs.wasNull() ? null : valor != 0;
     }
 
+    /**
+     * Leitura tolerante de timestamp: aceita ISO com T, formato SQLite
+     * "yyyy-MM-dd HH:mm:ss" e ms Unix legado. Substitui rs.getTimestamp —
+     * o driver xerial não parseia o formato default do SQLite e estoura
+     * "Error parsing time stamp".
+     */
     private LocalDateTime getLocalDateTime(ResultSet rs, String column) throws SQLException {
-        Timestamp ts = rs.getTimestamp(column);
-        return ts != null ? ts.toLocalDateTime() : null;
+        String raw = rs.getString(column);
+        return DateUtils.parseDateTimeTolerante(raw);
     }
 
-    /**
-     * Identidade do device de origem (sync LWW — "repository preenche na escrita").
-     * TODO (Degrau 2 do sync): substituir por DeviceIdentityService (@Service)
-     * que persista o UUID do device em arquivo/config.
-     */
     private String getDeviceId() {
         return "UNKNOWN-DEVICE";
     }

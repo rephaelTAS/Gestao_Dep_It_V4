@@ -1,0 +1,262 @@
+/* relatorio-simples.css v1.0 — Relatório Simples */
+
+/* ============================================================
+   RAIZ
+   ============================================================ */
+.relatorio-simples-root {
+    -fx-background-color: #F8FAFC;
+    -fx-font-family: "Segoe UI", "Inter", "Roboto", sans-serif;
+    -fx-font-size: 13px;
+}
+
+.relatorio-simples-container {
+    -fx-padding: 20 24 20 24;
+}
+
+/* ============================================================
+   CABEÇALHO
+   ============================================================ */
+.header-card {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 12;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 12;
+    -fx-padding: 16 20 16 20;
+    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.05), 8, 0, 0, 2);
+}
+
+.page-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E293B;
+}
+
+.page-subtitle {
+    -fx-font-size: 12px;
+    -fx-text-fill: #64748B;
+}
+
+/* ============================================================
+   CARD DE CONFIGURAÇÃO
+   ============================================================ */
+.config-card {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 12;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 12;
+    -fx-padding: 16 20 16 20;
+    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.04), 6, 0, 0, 2);
+}
+
+.config-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E293B;
+}
+
+.config-label {
+    -fx-font-size: 11px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #475569;
+}
+
+.config-checkbox {
+    -fx-font-size: 12px;
+    -fx-text-fill: #334155;
+}
+
+.filter-separator {
+    -fx-text-fill: #94A3B8;
+    -fx-font-size: 11px;
+    -fx-padding: 8 4 0 4;
+}
+
+/* ============================================================
+   CAMPOS
+   ============================================================ */
+.text-field,
+.combo-box,
+.date-picker {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-font-size: 12px;
+    -fx-padding: 6 10 6 10;
+}
+.text-field:focused,
+.combo-box:focused,
+.date-picker:focused {
+    -fx-border-color: #4F46E5;
+    -fx-effect: dropshadow(gaussian, rgba(79,70,229,0.20), 4, 0, 0, 0);
+}
+.combo-box .list-cell {
+    -fx-padding: 6 10 6 10;
+}
+.date-picker > .text-field {
+    -fx-border-color: transparent;
+    -fx-background-color: transparent;
+}
+
+.check-box .box {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+.check-box:selected .box {
+    -fx-background-color: #4F46E5;
+    -fx-border-color: #4F46E5;
+}
+.check-box:selected .mark {
+    -fx-background-color: #FFFFFF;
+}
+
+/* ============================================================
+   CARD DA TABELA
+   ============================================================ */
+.table-card {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 12;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 12;
+    -fx-padding: 16 20 16 20;
+    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.04), 6, 0, 0, 2);
+}
+
+.table-title {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E293B;
+}
+
+.table-total {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #4F46E5;
+}
+
+.table-placeholder {
+    -fx-text-fill: #94A3B8;
+    -fx-font-size: 12px;
+}
+
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+.table-view .column-header-background {
+    -fx-background-color: #F1F5F9;
+    -fx-background-radius: 8 8 0 0;
+}
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #E2E8F0 transparent;
+    -fx-padding: 10 8 10 8;
+}
+.table-view .column-header .label {
+    -fx-text-fill: #475569;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+.table-view .table-row-cell {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: transparent transparent #F1F5F9 transparent;
+    -fx-cell-size: 32px;
+}
+.table-view .table-row-cell:odd {
+    -fx-background-color: #FAFBFC;
+}
+.table-view .table-row-cell:selected {
+    -fx-background-color: #EEF2FF;
+    -fx-text-fill: #1E293B;
+}
+.table-view .table-cell {
+    -fx-text-fill: #334155;
+    -fx-font-size: 12px;
+    -fx-padding: 6 8 6 8;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* ============================================================
+   STATUS BAR
+   ============================================================ */
+.status-bar {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 10;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 10;
+    -fx-padding: 10 16 10 16;
+}
+
+.status-text {
+    -fx-font-size: 11px;
+    -fx-text-fill: #64748B;
+}
+
+.status-filter {
+    -fx-font-size: 11px;
+    -fx-text-fill: #4F46E5;
+    -fx-font-style: italic;
+}
+
+/* ============================================================
+   BOTÕES
+   ============================================================ */
+.btn-primary {
+    -fx-background-color: linear-gradient(to bottom right, #4F46E5, #4338CA);
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 14 8 14;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.btn-primary:hover {
+    -fx-background-color: linear-gradient(to bottom right, #4338CA, #3730A3);
+}
+.btn-primary:pressed {
+    -fx-background-color: #3730A3;
+}
+
+.btn-success {
+    -fx-background-color: linear-gradient(to bottom right, #22C55E, #16A34A);
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 14 8 14;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.btn-success:hover {
+    -fx-background-color: linear-gradient(to bottom right, #16A34A, #15803D);
+}
+.btn-success:pressed {
+    -fx-background-color: #15803D;
+}
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+.scroll-bar:vertical .thumb,
+.scroll-bar:horizontal .thumb {
+    -fx-background-color: #CBD5E1;
+    -fx-background-radius: 4;
+}
+.scroll-bar:vertical .thumb:hover,
+.scroll-bar:horizontal .thumb:hover {
+    -fx-background-color: #94A3B8;
+}
+
+/* ============================================================
+   TOOLTIP
+   ============================================================ */
+.tooltip {
+    -fx-background-color: #1E293B;
+    -fx-text-fill: #F8FAFC;
+    -fx-font-size: 11px;
+    -fx-background-radius: 6;
+    -fx-padding: 6 10 6 10;
+}

@@ -21,11 +21,11 @@ import java.util.List;
  * Adicione sempre no fim, respeitando a ordem crescente de privilégio.
  */
 public enum Hierarquia {
-    NIVEL_READONLY,
-    NIVEL_OPERADOR,
-    NIVEL_SUPERVISOR,
-    NIVEL_GESTOR,
-    NIVEL_ADMIN;
+    READONLY,
+    OPERADOR,
+    SUPERVISOR,
+    GESTOR,
+    ADMIN;
 
     /** true se este nível é igual ou superior ao requerido. */
     public boolean temPermissao(Hierarquia requerido) {

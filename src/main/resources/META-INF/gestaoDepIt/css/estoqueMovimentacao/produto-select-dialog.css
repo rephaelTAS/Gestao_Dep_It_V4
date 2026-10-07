@@ -1,0 +1,174 @@
+/* produto-select-dialog.css v1.0 — Diálogo de Seleção de Produto */
+
+/* ============================================================
+   RAIZ
+   ============================================================ */
+.dialog-root {
+    -fx-background-color: #FFFFFF;
+    -fx-font-family: "Segoe UI", "Inter", "Roboto", sans-serif;
+    -fx-font-size: 13px;
+}
+
+/* ============================================================
+   CABEÇALHO — título, busca e contador
+   ============================================================ */
+.dialog-header {
+    -fx-background-color: #F8FAFC;
+    -fx-border-color: transparent transparent #E2E8F0 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.dialog-title {
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E293B;
+}
+
+.dialog-search {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-size: 13px;
+    -fx-padding: 8 12 8 12;
+}
+.dialog-search:focused {
+    -fx-border-color: #4F46E5;
+    -fx-effect: dropshadow(gaussian, rgba(79,70,229,0.20), 4, 0, 0, 0);
+}
+
+.dialog-counter {
+    -fx-font-size: 11px;
+    -fx-text-fill: #64748B;
+}
+
+/* ============================================================
+   TABELA
+   ============================================================ */
+.table-view-dialog {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: transparent;
+}
+.table-view-dialog .column-header-background {
+    -fx-background-color: #F1F5F9;
+}
+.table-view-dialog .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #E2E8F0 transparent;
+    -fx-padding: 10 8 10 8;
+}
+.table-view-dialog .column-header .label {
+    -fx-text-fill: #475569;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+.table-view-dialog .table-row-cell {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: transparent transparent #F1F5F9 transparent;
+    -fx-cell-size: 34px;
+}
+.table-view-dialog .table-row-cell:odd {
+    -fx-background-color: #FAFBFC;
+}
+.table-view-dialog .table-row-cell:selected {
+    -fx-background-color: #EEF2FF;
+    -fx-text-fill: #1E293B;
+}
+.table-view-dialog .table-cell {
+    -fx-text-fill: #334155;
+    -fx-font-size: 12px;
+    -fx-padding: 6 10 6 10;
+    -fx-alignment: CENTER_LEFT;
+}
+.table-view-dialog .placeholder .label {
+    -fx-text-fill: #94A3B8;
+    -fx-font-size: 12px;
+}
+
+/* ============================================================
+   RODAPÉ
+   ============================================================ */
+.dialog-footer {
+    -fx-background-color: #F8FAFC;
+    -fx-border-color: #E2E8F0 transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+/* ============================================================
+   BOTÕES
+   ============================================================ */
+.btn-primary {
+    -fx-background-color: linear-gradient(to bottom right, #4F46E5, #4338CA);
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 14 8 14;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.btn-primary:hover {
+    -fx-background-color: linear-gradient(to bottom right, #4338CA, #3730A3);
+}
+.btn-primary:pressed {
+    -fx-background-color: #3730A3;
+}
+
+.btn-secondary {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #334155;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-padding: 8 16 8 16;
+    -fx-background-radius: 8;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 8;
+    -fx-cursor: hand;
+}
+.btn-secondary:hover {
+    -fx-background-color: #F1F5F9;
+    -fx-border-color: #94A3B8;
+}
+
+.btn-success {
+    -fx-background-color: linear-gradient(to bottom right, #22C55E, #16A34A);
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 16 8 16;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.btn-success:hover {
+    -fx-background-color: linear-gradient(to bottom right, #16A34A, #15803D);
+}
+.btn-success:pressed {
+    -fx-background-color: #15803D;
+}
+.btn-success:disabled {
+    -fx-opacity: 0.5;
+    -fx-cursor: default;
+}
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+.scroll-bar:vertical .thumb,
+.scroll-bar:horizontal .thumb {
+    -fx-background-color: #CBD5E1;
+    -fx-background-radius: 4;
+}
+.scroll-bar:vertical .thumb:hover,
+.scroll-bar:horizontal .thumb:hover {
+    -fx-background-color: #94A3B8;
+}
+
+/* ============================================================
+   TOOLTIP
+   ============================================================ */
+.tooltip {
+    -fx-background-color: #1E293B;
+    -fx-text-fill: #F8FAFC;
+    -fx-font-size: 11px;
+    -fx-background-radius: 6;
+    -fx-padding: 6 10 6 10;
+}

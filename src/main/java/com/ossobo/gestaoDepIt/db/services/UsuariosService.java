@@ -459,15 +459,15 @@ public class UsuariosService {
     }
 
     public boolean isAdmin(String usuarioId) throws SQLException {
-        return verificarPermissao(usuarioId, Hierarquia.NIVEL_ADMIN);
+        return verificarPermissao(usuarioId, Hierarquia.ADMIN);
     }
 
     public boolean isGestorOuSuperior(String usuarioId) throws SQLException {
-        return verificarPermissao(usuarioId, Hierarquia.NIVEL_GESTOR);
+        return verificarPermissao(usuarioId, Hierarquia.GESTOR);
     }
 
     public boolean isSupervisorOuSuperior(String usuarioId) throws SQLException {
-        return verificarPermissao(usuarioId, Hierarquia.NIVEL_SUPERVISOR);
+        return verificarPermissao(usuarioId, Hierarquia.SUPERVISOR);
     }
 
     // ===== UTILITÁRIOS =====

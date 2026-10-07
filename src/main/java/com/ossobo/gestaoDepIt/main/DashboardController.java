@@ -49,12 +49,12 @@ import java.util.stream.Collectors;
 @Controller(proxy = false)
 @RegisterView(
         id = ViewConstant.Main.DASHBOARD,
-        fxml = "/META-INF/gestaoDepIt/fxmls/dashboard/dashboard.fxml",
+        fxml = "/META-INF/gestaoDepIt/fxmls/main/dashboard.fxml",
         title = "Dashboard - Gestão de TI",
         width = 1200,
         height = 800,
         centered = true,
-        primaryCss = "/META-INF/gestaoDepIt/css/dashboard/dashboard.css"
+        primaryCss = "/META-INF/gestaoDepIt/css/main/dashboard.css"
 )
 public class DashboardController implements Initializable, WinterFXController {
     private static final Logger LOGGER = System.getLogger(DashboardController.class.getName());

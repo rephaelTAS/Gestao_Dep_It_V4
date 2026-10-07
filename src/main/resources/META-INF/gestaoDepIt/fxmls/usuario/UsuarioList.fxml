@@ -86,11 +86,11 @@
 
             <!-- ===== PAGINAÇÃO ===== -->
             <HBox spacing="10.0" alignment="CENTER" styleClass="pagination-bar">
-                <Button fx:id="btn_primeira" text="<<<" styleClass="btn-pagination" />
-                <Button fx:id="btn_anterior" text="<" styleClass="btn-pagination" />
+                <Button fx:id="btn_primeira" text="&lt;&lt;&lt;" styleClass="btn-pagination" />
+                <Button fx:id="btn_anterior" text="&lt;" styleClass="btn-pagination" />
                 <Label fx:id="labelPagina" text="Página 1 de 1" styleClass="pagination-label" />
-                <Button fx:id="btn_proxima" text=">" styleClass="btn-pagination" />
-                <Button fx:id="btn_ultima" text=">>>" styleClass="btn-pagination" />
+                <Button fx:id="btn_proxima"  text="&gt;" styleClass="btn-pagination" />
+                <Button fx:id="btn_ultima"   text="&gt;&gt;&gt;" styleClass="btn-pagination" />
                 <ComboBox fx:id="comboItensPorPagina" prefWidth="80.0" />
             </HBox>
         </VBox>

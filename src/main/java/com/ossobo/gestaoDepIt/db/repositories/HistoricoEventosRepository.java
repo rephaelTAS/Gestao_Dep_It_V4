@@ -68,7 +68,7 @@ public class HistoricoEventosRepository {
             """.formatted(TABLE);
 
     private static final String SQL_FIND_BY_NUM_SERIE = """
-            SELECT * FROM %s WHERE num_serie = ?
+            SELECT * FROM %s WHERE numSerie = ?
             ORDER BY created_at DESC
             """.formatted(TABLE);
 
@@ -103,7 +103,7 @@ public class HistoricoEventosRepository {
 
     private static final String SQL_INSERT = """
             INSERT INTO %s (
-                id, tipo_evento, sku_produto, num_serie, funcionario_id,
+                id, tipo_evento, sku_produto, numSerie, funcionario_id,
                 descricao_funcionario, dados_anteriores, dados_novos,
                 created_at, device_id
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -120,7 +120,7 @@ public class HistoricoEventosRepository {
     // Chave RÍGIDA: as 3 colunas juntas identificam o equipamento físico.
     private static final String SQL_ULTIMO_DADOS_NOVOS = """
             SELECT dados_novos FROM %s
-            WHERE sku_produto = ? AND funcionario_id = ? AND num_serie = ?
+            WHERE sku_produto = ? AND funcionario_id = ? AND numSerie = ?
             ORDER BY created_at DESC
             LIMIT 1
             """.formatted(TABLE);
@@ -490,7 +490,7 @@ public class HistoricoEventosRepository {
                 rs.getString("id"),
                 rs.getString("tipo_evento"),
                 rs.getString("sku_produto"),
-                rs.getString("num_serie"),
+                rs.getString("numSerie"),
                 rs.getString("funcionario_id"),
                 rs.getString("descricao_funcionario"),
                 rs.getString("dados_anteriores"),

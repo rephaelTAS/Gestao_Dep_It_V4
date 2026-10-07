@@ -4,83 +4,88 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/21"
-            xmlns:fx="http://javafx.com/fxml/1"
-            prefHeight="800.0" prefWidth="1400.0">
+<!--
+    Catalogo.fxml v1.0
+    Objetivo: tela de catálogo de produtos (header, filtros, tabela, paginação, status).
+    Regras visuais: cards surface com elevação clay; primitivos .clay-* e .page-*.
+    Estilização em Catalogo.css.
+-->
+<AnchorPane styleClass="page-root"
+            stylesheets="@Catalogo.css"
+            xmlns="http://javafx.com/javafx/21.0"
+            xmlns:fx="http://javafx.com/fxml/1">
 
-    <VBox spacing="20" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+    <VBox spacing="18" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
           AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 
         <!-- ========== HEADER ========== -->
-        <HBox alignment="CENTER_LEFT" spacing="20" styleClass="list-header">
-            <padding>
-                <Insets bottom="10" left="20" right="20" top="20" />
-            </padding>
-            <Label text="Catálogo de Produtos" styleClass="list-title" />
+        <HBox alignment="CENTER_LEFT" spacing="16" styleClass="page-header">
+            <padding><Insets bottom="4" left="4" right="4" top="4" /></padding>
+            <Label text="Catálogo de Produtos" styleClass="page-title" />
             <Region HBox.hgrow="ALWAYS" />
-            <Button fx:id="btn_novo" text="+ Novo Produto" styleClass="btn-primary" />
+            <Button fx:id="btn_novo" text="+ Novo Produto"
+                    styleClass="clay-button clay-button-primary elevation-1" />
         </HBox>
 
         <!-- ========== FILTROS ========== -->
-        <VBox spacing="10" styleClass="list-card">
-            <padding>
-                <Insets bottom="15" left="20" right="20" top="15" />
-            </padding>
-            <Label text="Filtros" styleClass="list-card-header" />
-            <GridPane hgap="10" vgap="10">
+        <VBox spacing="12" styleClass="clay-card page-card elevation-2">
+            <padding><Insets bottom="18" left="20" right="20" top="18" /></padding>
+            <Label text="Filtros" styleClass="page-card-header" />
+
+            <GridPane hgap="12" vgap="12">
                 <columnConstraints>
                     <ColumnConstraints hgrow="SOMETIMES" minWidth="100" prefWidth="120" />
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="100" prefWidth="150" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="120" prefWidth="160" />
                     <ColumnConstraints hgrow="SOMETIMES" minWidth="100" prefWidth="120" />
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="100" prefWidth="150" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="120" prefWidth="160" />
                     <ColumnConstraints hgrow="SOMETIMES" minWidth="100" prefWidth="120" />
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="100" prefWidth="150" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="120" prefWidth="160" />
                 </columnConstraints>
 
-                <Label text="Tipo:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
-                <ComboBox fx:id="filtroTipo" promptText="Todos tipos"
-                          GridPane.rowIndex="0" GridPane.columnIndex="1" />
+                <Label text="Tipo:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="page-field-label" />
+                <ComboBox fx:id="filtroTipo" promptText="Todos tipos" maxWidth="Infinity"
+                          GridPane.rowIndex="0" GridPane.columnIndex="1" styleClass="clay-input-compact" />
 
-                <Label text="Categoria:" GridPane.rowIndex="0" GridPane.columnIndex="2" />
-                <TextField fx:id="filtroCategoria" promptText="Categoria..."
-                           GridPane.rowIndex="0" GridPane.columnIndex="3" />
+                <Label text="Categoria:" GridPane.rowIndex="0" GridPane.columnIndex="2" styleClass="page-field-label" />
+                <TextField fx:id="filtroCategoria" promptText="Categoria..." maxWidth="Infinity"
+                           GridPane.rowIndex="0" GridPane.columnIndex="3" styleClass="clay-input-compact" />
 
-                <Label text="Estoque:" GridPane.rowIndex="0" GridPane.columnIndex="4" />
-                <ComboBox fx:id="filtroEstoque" promptText="Todos"
-                          GridPane.rowIndex="0" GridPane.columnIndex="5" />
+                <Label text="Estoque:" GridPane.rowIndex="0" GridPane.columnIndex="4" styleClass="page-field-label" />
+                <ComboBox fx:id="filtroEstoque" promptText="Todos" maxWidth="Infinity"
+                          GridPane.rowIndex="0" GridPane.columnIndex="5" styleClass="clay-input-compact" />
 
-                <Label text="Marca:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
-                <TextField fx:id="filtroMarca" promptText="Marca..."
-                           GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                <Label text="Marca:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="page-field-label" />
+                <TextField fx:id="filtroMarca" promptText="Marca..." maxWidth="Infinity"
+                           GridPane.rowIndex="1" GridPane.columnIndex="1" styleClass="clay-input-compact" />
 
-                <Label text="Modelo:" GridPane.rowIndex="1" GridPane.columnIndex="2" />
-                <TextField fx:id="filtroModelo" promptText="Modelo..."
-                           GridPane.rowIndex="1" GridPane.columnIndex="3" />
+                <Label text="Modelo:" GridPane.rowIndex="1" GridPane.columnIndex="2" styleClass="page-field-label" />
+                <TextField fx:id="filtroModelo" promptText="Modelo..." maxWidth="Infinity"
+                           GridPane.rowIndex="1" GridPane.columnIndex="3" styleClass="clay-input-compact" />
 
-                <Label text="Status:" GridPane.rowIndex="1" GridPane.columnIndex="4" />
-                <ComboBox fx:id="filtroStatus" promptText="Todos status"
-                          GridPane.rowIndex="1" GridPane.columnIndex="5" />
+                <Label text="Status:" GridPane.rowIndex="1" GridPane.columnIndex="4" styleClass="page-field-label" />
+                <ComboBox fx:id="filtroStatus" promptText="Todos status" maxWidth="Infinity"
+                          GridPane.rowIndex="1" GridPane.columnIndex="5" styleClass="clay-input-compact" />
 
                 <HBox spacing="10" GridPane.rowIndex="2" GridPane.columnIndex="4"
                       alignment="CENTER_RIGHT" GridPane.columnSpan="2">
-                    <Button fx:id="btn_limparFiltros" text="Limpar Filtros" styleClass="btn-secondary" />
-                    <Button fx:id="btn_aplicarFiltros" text="Aplicar Filtros" styleClass="btn-primary" />
+                    <Button fx:id="btn_limparFiltros" text="Limpar Filtros"
+                            styleClass="clay-button clay-button-ghost" />
+                    <Button fx:id="btn_aplicarFiltros" text="Aplicar Filtros"
+                            styleClass="clay-button clay-button-primary elevation-1" />
                 </HBox>
             </GridPane>
         </VBox>
 
         <!-- ========== ESTATÍSTICAS ========== -->
-        <HBox spacing="20" alignment="CENTER_LEFT">
-            <padding>
-                <Insets left="20" />
-            </padding>
-            <Label fx:id="estatisticasLabel" text="Carregando estatísticas..." styleClass="list-statistics" />
-            <Label fx:id="filtrosAtivosLabel" text="" styleClass="list-active-filters" />
+        <HBox spacing="16" alignment="CENTER_LEFT" styleClass="page-stats-row">
+            <Label fx:id="estatisticasLabel" text="Carregando estatísticas..." styleClass="page-statistics" />
+            <Label fx:id="filtrosAtivosLabel" text="" styleClass="page-active-filters" />
         </HBox>
 
         <!-- ========== TABELA ========== -->
-        <VBox VBox.vgrow="ALWAYS">
-            <TableView fx:id="produtosTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+        <VBox VBox.vgrow="ALWAYS" spacing="12">
+            <TableView fx:id="produtosTable" VBox.vgrow="ALWAYS"
+                       styleClass="page-table elevation-2">
                 <columns>
                     <TableColumn fx:id="colSku" text="SKU" prefWidth="120" />
                     <TableColumn fx:id="colTipo" text="Tipo" prefWidth="100" />
@@ -97,23 +102,23 @@
                 </columns>
             </TableView>
 
-            <!-- Paginação -->
-            <HBox spacing="10" alignment="CENTER" styleClass="pagination-bar">
-                <Button fx:id="btn_primeira" text="&lt;&lt;&lt;" styleClass="btn-pagination" />
-                <Button fx:id="btn_anterior" text="&lt;" styleClass="btn-pagination" />
-                <Label fx:id="labelPagina" text="Página 1 de 1" styleClass="pagination-label" />
-                <Button fx:id="btn_proxima" text="&gt;" styleClass="btn-pagination" />
-                <Button fx:id="btn_ultima" text="&gt;&gt;&gt;" styleClass="btn-pagination" />
-                <Label text="Itens por página:" />
-                <ComboBox fx:id="comboItensPorPagina" prefWidth="80" />
+            <HBox spacing="10" alignment="CENTER" styleClass="page-pagination-bar">
+                <Button fx:id="btn_primeira" text="&lt;&lt;&lt;" styleClass="clay-button clay-button-ghost page-btn-page" />
+                <Button fx:id="btn_anterior" text="&lt;" styleClass="clay-button clay-button-ghost page-btn-page" />
+                <Label fx:id="labelPagina" text="Página 1 de 1" styleClass="page-pagination-label" />
+                <Button fx:id="btn_proxima" text="&gt;" styleClass="clay-button clay-button-ghost page-btn-page" />
+                <Button fx:id="btn_ultima" text="&gt;&gt;&gt;" styleClass="clay-button clay-button-ghost page-btn-page" />
+                <Label text="Itens por página:" styleClass="page-pagination-label" />
+                <ComboBox fx:id="comboItensPorPagina" prefWidth="90" styleClass="clay-input-compact" />
             </HBox>
         </VBox>
 
         <!-- ========== STATUS BAR ========== -->
-        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="status-bar">
-            <Label fx:id="statusLabel" text="Pronto" styleClass="status-text" />
+        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="page-status-bar">
+            <Label fx:id="statusLabel" text="Pronto" styleClass="page-status-text" />
             <Region HBox.hgrow="ALWAYS" />
-            <ProgressIndicator fx:id="progressIndicator" progress="0.0" visible="false" styleClass="progress-indicator" />
+            <ProgressIndicator fx:id="progressIndicator" progress="0.0"
+                               visible="false" styleClass="page-progress" />
         </HBox>
     </VBox>
 </AnchorPane>

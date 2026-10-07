@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/25.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            prefHeight="440.0" prefWidth="640.0"
+            styleClass="usuario-form-root">
+
+    <!-- ===== TOPO: título + funcionário vinculado ===== -->
+    <top>
+        <VBox spacing="12" styleClass="usuario-form-header">
+            <padding><Insets top="18" right="24" bottom="16" left="24" /></padding>
+
+            <Label fx:id="lab_criarEditar"
+                   text="Criar Usuário"
+                   styleClass="usuario-form-title" />
+
+            <HBox spacing="16" alignment="CENTER_LEFT">
+                <VBox spacing="4" HBox.hgrow="SOMETIMES">
+                    <Label text="Funcionário:" styleClass="usuario-form-label" />
+                    <ComboBox fx:id="combo_funcionario"
+                              prefWidth="240"
+                              promptText="Selecione o funcionário..." />
+                </VBox>
+
+                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                    <Label text="Vínculo:" styleClass="usuario-form-label" />
+                    <HBox spacing="14" alignment="CENTER_LEFT" styleClass="usuario-form-vinculo">
+                        <Label fx:id="lab_codDep"      text="—" styleClass="usuario-form-vinculo-value" />
+                        <Label fx:id="lab_nome"        text="—" styleClass="usuario-form-vinculo-value" />
+                        <Label fx:id="lab_departamento" text="—" styleClass="usuario-form-vinculo-value" />
+                        <Label fx:id="lab_funcao"      text="—" styleClass="usuario-form-vinculo-value" />
+                    </HBox>
+                </VBox>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- ===== CENTRO: credenciais ===== -->
+    <center>
+        <GridPane hgap="16" vgap="14" styleClass="usuario-form-grid">
+            <padding><Insets top="8" right="24" bottom="8" left="24" /></padding>
+
+            <columnConstraints>
+                <ColumnConstraints minWidth="140" prefWidth="140" hgrow="NEVER" />
+                <ColumnConstraints minWidth="240" hgrow="ALWAYS" />
+            </columnConstraints>
+
+            <Label text="Nova Senha"
+                   styleClass="usuario-form-field-label"
+                   GridPane.columnIndex="0" GridPane.rowIndex="0" />
+            <PasswordField fx:id="fiel_novasenha"
+                           promptText="Digite a nova senha"
+                           GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+            <Label text="Confirmar Senha"
+                   styleClass="usuario-form-field-label"
+                   GridPane.columnIndex="0" GridPane.rowIndex="1" />
+            <PasswordField fx:id="fiel_confirmarSenha"
+                           promptText="Repita a senha"
+                           GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+            <Label text="Nível de Permissão"
+                   styleClass="usuario-form-field-label"
+                   GridPane.columnIndex="0" GridPane.rowIndex="2" />
+            <ComboBox fx:id="combo_nivelPermicao"
+                      prefWidth="240"
+                      promptText="Selecione o nível..."
+                      GridPane.columnIndex="1" GridPane.rowIndex="2" />
+        </GridPane>
+    </center>
+
+    <!-- ===== RODAPÉ: ações ===== -->
+    <bottom>
+        <HBox spacing="12" alignment="CENTER_RIGHT" styleClass="usuario-form-footer">
+            <padding><Insets top="14" right="24" bottom="18" left="24" /></padding>
+            <Button fx:id="btn_cancelar" text="Cancelar" styleClass="btn-secondary" />
+            <Button fx:id="btn_salvar"   text="Salvar"   styleClass="btn-primary" />
+        </HBox>
+    </bottom>
+</BorderPane>

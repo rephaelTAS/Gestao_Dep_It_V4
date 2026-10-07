@@ -30,7 +30,7 @@ import java.util.*;
         id = ViewConstant.Relatorio.AVANCADO,
         fxml = "/META-INF/gestaoDepIt/fxmls/relatorio/relatorioavancado.fxml",
         title = "Relatório Avançado",
-        primaryCss = "META-INF/gestaoDepIt/css/relatorio/relatorio.css"
+        primaryCss = "META-INF/gestaoDepIt/css/relatorio/relatorioAvancado.css"
 
 )
 public class RelatorioAvancadoController implements Initializable,WinterFXController {

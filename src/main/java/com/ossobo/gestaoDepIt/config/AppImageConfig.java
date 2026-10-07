@@ -129,7 +129,7 @@ import com.ossobo.winterfx.resources.enums.ViewAnimation;
         ),
         @RegisterImage(
                 id = "system.setting",
-                src = "/META-INF/gestaoDepIt/icons/system/setting.png",
+                src = "/META-INF/gestaoDepIt/icons/system/settings.png",
                 imageType = ViewAnimation.ImageType.ICON
         ),
         @RegisterImage(
@@ -197,12 +197,12 @@ import com.ossobo.winterfx.resources.enums.ViewAnimation;
         // ============================================================
         @RegisterImage(
                 id = "system.in.stock",
-                src = "/META-INF/gestaoDepIt/icons/system/in_stock.png",
+                src = "/META-INF/gestaoDepIt/icons/system/in-stock.png",
                 imageType = ViewAnimation.ImageType.ICON
         ),
         @RegisterImage(
                 id = "system.out.of.stock",
-                src = "/META-INF/gestaoDepIt/icons/system/out_of_stock.png",
+                src = "/META-INF/gestaoDepIt/icons/system/stock.png",
                 imageType = ViewAnimation.ImageType.ICON
         ),
         @RegisterImage(
@@ -227,32 +227,32 @@ import com.ossobo.winterfx.resources.enums.ViewAnimation;
         ),
         @RegisterImage(
                 id = "system.success",
-                src = "/META-INF/gestaoDepIt/icons/system/success.png",
+                src = "/META-INF/gestaoDepIt/icons/system/notification.png",
                 imageType = ViewAnimation.ImageType.ICON
         ),
         @RegisterImage(
                 id = "system.error",
-                src = "/META-INF/gestaoDepIt/icons/system/error.png",
+                src = "/META-INF/gestaoDepIt/icons/system/menu.png",
                 imageType = ViewAnimation.ImageType.ICON
         ),
         @RegisterImage(
                 id = "system.warning",
-                src = "/META-INF/gestaoDepIt/icons/system/warning.png",
+                src = "/META-INF/gestaoDepIt/icons/system/menu.png",
                 imageType = ViewAnimation.ImageType.ICON
         ),
         @RegisterImage(
                 id = "system.info",
-                src = "/META-INF/gestaoDepIt/icons/system/info.png",
+                src = "/META-INF/gestaoDepIt/icons/system/menu.png",
                 imageType = ViewAnimation.ImageType.ICON
         ),
         @RegisterImage(
                 id = "system.loading",
-                src = "/META-INF/gestaoDepIt/icons/system/loading.gif",
+                src = "/META-INF/gestaoDepIt/icons/system/menu.png",
                 imageType = ViewAnimation.ImageType.ICON
         ),
         @RegisterImage(
                 id = "system.empty",
-                src = "/META-INF/gestaoDepIt/icons/system/empty.png",
+                src = "/META-INF/gestaoDepIt/icons/system/menu.png",
                 imageType = ViewAnimation.ImageType.ICON
         ),
 
@@ -261,27 +261,27 @@ import com.ossobo.winterfx.resources.enums.ViewAnimation;
         // ============================================================
         @RegisterImage(
                 id = "system.module.login",
-                src = "/META-INF/gestaoDepIt/icons/system/module_login.png",
+                src = "/META-INF/gestaoDepIt/icons/system/menu.png",
                 imageType = ViewAnimation.ImageType.ICON
         ),
         @RegisterImage(
                 id = "system.module.dashboard",
-                src = "/META-INF/gestaoDepIt/icons/system/module_dashboard.png",
+                src = "/META-INF/gestaoDepIt/icons/system/menu.png",
                 imageType = ViewAnimation.ImageType.ICON
         ),
         @RegisterImage(
                 id = "system.module.catalogo",
-                src = "/META-INF/gestaoDepIt/icons/system/module_catalogo.png",
+                src = "/META-INF/gestaoDepIt/icons/system/menu.png",
                 imageType = ViewAnimation.ImageType.ICON
         ),
         @RegisterImage(
                 id = "system.module.estoque",
-                src = "/META-INF/gestaoDepIt/icons/system/module_estoque.png",
+                src = "/META-INF/gestaoDepIt/icons/system/menu.png",
                 imageType = ViewAnimation.ImageType.ICON
         ),
         @RegisterImage(
                 id = "system.module.movimentacoes",
-                src = "/META-INF/gestaoDepIt/icons/system/module_movimentacoes.png",
+                src = "/META-INF/gestaoDepIt/icons/system/menu.png",
                 imageType = ViewAnimation.ImageType.ICON
         ),
 
@@ -290,47 +290,8 @@ import com.ossobo.winterfx.resources.enums.ViewAnimation;
         // ============================================================
         @RegisterImage(
                 id = "modules.login.background",
-                src = "/META-INF/gestaoDepIt/images/login/bg_login.jpg",
+                src = "/META-INF/gestaoDepIt/icons/system/menu.png",
                 imageType = ViewAnimation.ImageType.BACKGROUND
-        ),
-        @RegisterImage(
-                id = "modules.login.logo",
-                src = "/META-INF/gestaoDepIt/images/login/logo_login.png",
-                imageType = ViewAnimation.ImageType.IMAGE,
-                preferredWidth = 150,
-                preferredHeight = 150,
-                preserveRatio = true
-        ),
-        @RegisterImage(
-                id = "modules.dashboard.welcome.background",
-                src = "/META-INF/gestaoDepIt/images/dashboard/welcome_bg.jpg",
-                imageType = ViewAnimation.ImageType.BACKGROUND
-        ),
-        @RegisterImage(
-                id = "modules.catalogo.produto.placeholder",
-                src = "/META-INF/gestaoDepIt/images/catalogo/produto_placeholder.png",
-                imageType = ViewAnimation.ImageType.IMAGE,
-                preferredWidth = 200,
-                preferredHeight = 200,
-                preserveRatio = true
-        ),
-        @RegisterImage(
-                id = "modules.catalogo.empty.state",
-                src = "/META-INF/gestaoDepIt/images/catalogo/empty_state.png",
-                imageType = ViewAnimation.ImageType.IMAGE
-        ),
-        @RegisterImage(
-                id = "modules.inventario.equipamento.default",
-                src = "/META-INF/gestaoDepIt/images/inventario/equipamento_default.png",
-                imageType = ViewAnimation.ImageType.IMAGE,
-                preferredWidth = 150,
-                preferredHeight = 150,
-                preserveRatio = true
-        ),
-        @RegisterImage(
-                id = "modules.inventario.qrcode.placeholder",
-                src = "/META-INF/gestaoDepIt/images/inventario/qrcode_placeholder.png",
-                imageType = ViewAnimation.ImageType.IMAGE
         )
 })
 public final class AppImageConfig {

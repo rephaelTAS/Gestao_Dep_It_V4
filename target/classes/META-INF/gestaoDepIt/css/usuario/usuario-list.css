@@ -1,0 +1,237 @@
+/* usuario-list.css v1.0 — Gestão de Usuários (lista) */
+
+/* ============================================================
+   RAIZ
+   ============================================================ */
+.usuario-list-root {
+    -fx-background-color: #F8FAFC;
+    -fx-font-family: "Segoe UI", "Inter", "Roboto", sans-serif;
+    -fx-font-size: 13px;
+}
+
+/* ============================================================
+   CABEÇALHO
+   ============================================================ */
+.list-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E293B;
+}
+
+/* ============================================================
+   CARD DE FILTROS
+   ============================================================ */
+.list-card {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 12;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.04), 6, 0, 0, 2);
+    -fx-margin: 0 20 0 20;
+}
+
+.list-card-header {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E293B;
+}
+
+.filter-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #475569;
+}
+
+/* ============================================================
+   ESTATÍSTICAS
+   ============================================================ */
+.list-statistics {
+    -fx-font-size: 12px;
+    -fx-text-fill: #475569;
+    -fx-font-weight: 600;
+}
+
+.list-active-filters {
+    -fx-font-size: 11px;
+    -fx-text-fill: #4F46E5;
+    -fx-font-style: italic;
+}
+
+/* ============================================================
+   CAMPOS
+   ============================================================ */
+.text-field,
+.combo-box {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-font-size: 12px;
+    -fx-padding: 6 10 6 10;
+}
+.text-field:focused,
+.combo-box:focused {
+    -fx-border-color: #4F46E5;
+    -fx-effect: dropshadow(gaussian, rgba(79,70,229,0.20), 4, 0, 0, 0);
+}
+.combo-box .list-cell {
+    -fx-padding: 6 10 6 10;
+}
+
+/* ============================================================
+   TABELA
+   ============================================================ */
+.table-view {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.04), 6, 0, 0, 2);
+    -fx-margin: 0 20 0 20;
+}
+.table-view .column-header-background {
+    -fx-background-color: #F1F5F9;
+    -fx-background-radius: 12 12 0 0;
+}
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #E2E8F0 transparent;
+    -fx-padding: 10 8 10 8;
+}
+.table-view .column-header .label {
+    -fx-text-fill: #475569;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+.table-view .table-row-cell {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: transparent transparent #F1F5F9 transparent;
+    -fx-cell-size: 36px;
+}
+.table-view .table-row-cell:odd {
+    -fx-background-color: #FAFBFC;
+}
+.table-view .table-row-cell:selected {
+    -fx-background-color: #EEF2FF;
+    -fx-text-fill: #1E293B;
+}
+.table-view .table-cell {
+    -fx-text-fill: #334155;
+    -fx-font-size: 12px;
+    -fx-padding: 6 10 6 10;
+    -fx-alignment: CENTER_LEFT;
+}
+.table-view .placeholder .label {
+    -fx-text-fill: #94A3B8;
+    -fx-font-size: 12px;
+}
+
+/* ============================================================
+   PAGINAÇÃO
+   ============================================================ */
+.pagination-bar {
+    -fx-padding: 12 20 12 20;
+}
+
+.pagination-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #475569;
+    -fx-font-weight: 600;
+    -fx-padding: 0 8 0 8;
+}
+
+.btn-pagination {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #334155;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 6 12 6 12;
+    -fx-background-radius: 6;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 6;
+    -fx-cursor: hand;
+    -fx-min-width: 36px;
+}
+.btn-pagination:hover {
+    -fx-background-color: #EEF2FF;
+    -fx-border-color: #A5B4FC;
+    -fx-text-fill: #4338CA;
+}
+.btn-pagination:disabled {
+    -fx-opacity: 0.4;
+    -fx-cursor: default;
+}
+
+/* ============================================================
+   STATUS BAR
+   ============================================================ */
+.status-bar {
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 10 20 10 20;
+    -fx-border-color: #E2E8F0 transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+.status-text {
+    -fx-font-size: 11px;
+    -fx-text-fill: #64748B;
+}
+
+.progress-indicator {
+    -fx-progress-color: #4F46E5;
+}
+
+/* ============================================================
+   BOTÕES
+   ============================================================ */
+.btn-primary {
+    -fx-background-color: linear-gradient(to bottom right, #4F46E5, #4338CA);
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 14 8 14;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.btn-primary:hover { -fx-background-color: linear-gradient(to bottom right, #4338CA, #3730A3); }
+.btn-primary:pressed { -fx-background-color: #3730A3; }
+
+.btn-secondary {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #334155;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-padding: 8 14 8 14;
+    -fx-background-radius: 8;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 8;
+    -fx-cursor: hand;
+}
+.btn-secondary:hover {
+    -fx-background-color: #F1F5F9;
+    -fx-border-color: #94A3B8;
+}
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+.scroll-bar:vertical .thumb,
+.scroll-bar:horizontal .thumb {
+    -fx-background-color: #CBD5E1;
+    -fx-background-radius: 4;
+}
+.scroll-bar:vertical .thumb:hover,
+.scroll-bar:horizontal .thumb:hover {
+    -fx-background-color: #94A3B8;
+}
+
+/* ============================================================
+   TOOLTIP
+   ============================================================ */
+.tooltip {
+    -fx-background-color: #1E293B;
+    -fx-text-fill: #F8FAFC;
+    -fx-font-size: 11px;
+    -fx-background-radius: 6;
+    -fx-padding: 6 10 6 10;
+}

@@ -1,0 +1,443 @@
+/* relatorio-dashboard.css v1.0 — Dashboard de Relatórios */
+
+/* ============================================================
+   RAIZ
+   ============================================================ */
+.relatorio-root {
+    -fx-background-color: #F8FAFC;
+    -fx-font-family: "Segoe UI", "Inter", "Roboto", sans-serif;
+    -fx-font-size: 13px;
+}
+
+/* ============================================================
+   TOPO — cabeçalho
+   ============================================================ */
+.header-container {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: transparent transparent #E2E8F0 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.header-row {
+    -fx-padding: 16 24 16 24;
+}
+
+.page-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E293B;
+}
+
+.page-subtitle {
+    -fx-font-size: 12px;
+    -fx-text-fill: #64748B;
+}
+
+/* ============================================================
+   KPIs DO TOPO
+   ============================================================ */
+.kpi-card {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-width: 1;
+    -fx-padding: 10 18 10 18;
+    -fx-min-width: 110;
+}
+
+.kpi-blue {
+    -fx-border-color: #C7D2FE;
+    -fx-background-color: #EEF2FF;
+}
+.kpi-green {
+    -fx-border-color: #BBF7D0;
+    -fx-background-color: #DCFCE7;
+}
+.kpi-red {
+    -fx-border-color: #FECACA;
+    -fx-background-color: #FEF2F2;
+}
+
+.kpi-label {
+    -fx-font-size: 10px;
+    -fx-text-fill: #64748B;
+    -fx-font-weight: bold;
+}
+
+.kpi-value-blue {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #4338CA;
+}
+.kpi-value-green {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #16A34A;
+}
+.kpi-value-red {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #DC2626;
+}
+
+/* ============================================================
+   BARRA DE AÇÕES
+   ============================================================ */
+.action-bar {
+    -fx-padding: 12 24 12 24;
+    -fx-background-color: #FFFFFF;
+}
+
+.action-bar-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #475569;
+}
+
+.last-update {
+    -fx-font-size: 11px;
+    -fx-text-fill: #94A3B8;
+}
+
+/* ============================================================
+   SCROLLPANE / CONTEÚDO
+   ============================================================ */
+.scroll-pane {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+}
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+.content-container {
+    -fx-padding: 20 24 24 24;
+}
+
+/* ============================================================
+   TÍTULOS DE SEÇÃO
+   ============================================================ */
+.section-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E293B;
+}
+
+/* ============================================================
+   CARDS DE AÇÃO (linha 1)
+   ============================================================ */
+.action-card {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 12;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 12;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.05), 8, 0, 0, 2);
+}
+.action-card:hover {
+    -fx-border-color: #CBD5E1;
+    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.08), 12, 0, 0, 3);
+}
+
+.card-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E293B;
+}
+
+.card-desc {
+    -fx-font-size: 11px;
+    -fx-text-fill: #64748B;
+}
+
+.card-subtitle {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #334155;
+}
+
+/* ============================================================
+   CHART-CARD (usado por vários blocos)
+   ============================================================ */
+.chart-card {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 12;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 12;
+    -fx-padding: 16;
+    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.04), 8, 0, 0, 2);
+}
+
+.hint-text {
+    -fx-font-size: 11px;
+    -fx-text-fill: #94A3B8;
+}
+
+/* ============================================================
+   LISTA DE MODELOS
+   ============================================================ */
+.model-list {
+    -fx-background-color: #F8FAFC;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+.model-list .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #334155;
+    -fx-font-size: 12px;
+    -fx-padding: 8 12 8 12;
+    -fx-border-color: transparent transparent #F1F5F9 transparent;
+}
+.model-list .list-cell:hover {
+    -fx-background-color: #EEF2FF;
+}
+.model-list .list-cell:selected {
+    -fx-background-color: #4F46E5;
+    -fx-text-fill: #FFFFFF;
+}
+
+/* ============================================================
+   KPIs RODAPÉ (kpi-box)
+   ============================================================ */
+.kpi-box {
+    -fx-background-color: #F8FAFC;
+    -fx-background-radius: 10;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 10;
+    -fx-padding: 14 10 14 10;
+}
+
+.kpi-box-label {
+    -fx-font-size: 10px;
+    -fx-text-fill: #64748B;
+    -fx-font-weight: bold;
+}
+
+.kpi-box-value-blue {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #4F46E5;
+}
+.kpi-box-value-green {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #16A34A;
+}
+.kpi-box-value-orange {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #D97706;
+}
+.kpi-box-value-purple {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #7C3AED;
+}
+
+/* ============================================================
+   CARDS DE TEMPLATE (exportações rápidas)
+   ============================================================ */
+.template-card {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 12;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 12;
+    -fx-padding: 16;
+    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.04), 6, 0, 0, 2);
+}
+.template-card:hover {
+    -fx-border-color: #CBD5E1;
+}
+
+/* ============================================================
+   TABELAS
+   ============================================================ */
+.table-view {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+.table-view .column-header-background {
+    -fx-background-color: #F1F5F9;
+    -fx-background-radius: 8 8 0 0;
+}
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #E2E8F0 transparent;
+    -fx-padding: 10 8 10 8;
+}
+.table-view .column-header .label {
+    -fx-text-fill: #475569;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+.table-view .table-row-cell {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: transparent transparent #F1F5F9 transparent;
+    -fx-cell-size: 32px;
+}
+.table-view .table-row-cell:odd {
+    -fx-background-color: #FAFBFC;
+}
+.table-view .table-row-cell:selected {
+    -fx-background-color: #EEF2FF;
+    -fx-text-fill: #1E293B;
+}
+.table-view .table-cell {
+    -fx-text-fill: #334155;
+    -fx-font-size: 12px;
+    -fx-padding: 6 8 6 8;
+}
+
+/* ============================================================
+   BAR CHART
+   ============================================================ */
+.chart {
+    -fx-background-color: transparent;
+}
+.chart-plot-background {
+    -fx-background-color: transparent;
+}
+.chart-vertical-grid-lines {
+    -fx-stroke: #E2E8F0;
+}
+.chart-horizontal-grid-lines {
+    -fx-stroke: #E2E8F0;
+}
+.chart-bar {
+    -fx-bar-fill: #4F46E5;
+}
+.default-color0.chart-bar {
+    -fx-bar-fill: #4F46E5;
+}
+.axis {
+    -fx-tick-label-fill: #64748B;
+    -fx-font-size: 10px;
+}
+.axis-label {
+    -fx-text-fill: #64748B;
+    -fx-font-size: 11px;
+}
+
+/* ============================================================
+   BOTÕES
+   ============================================================ */
+.btn-primary {
+    -fx-background-color: linear-gradient(to bottom right, #4F46E5, #4338CA);
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 14 8 14;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.btn-primary:hover {
+    -fx-background-color: linear-gradient(to bottom right, #4338CA, #3730A3);
+}
+.btn-primary:pressed {
+    -fx-background-color: #3730A3;
+}
+
+.btn-secondary {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #334155;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-padding: 8 14 8 14;
+    -fx-background-radius: 8;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 8;
+    -fx-cursor: hand;
+}
+.btn-secondary:hover {
+    -fx-background-color: #F1F5F9;
+    -fx-border-color: #94A3B8;
+}
+
+.btn-success {
+    -fx-background-color: linear-gradient(to bottom right, #22C55E, #16A34A);
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 14 8 14;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.btn-success:hover {
+    -fx-background-color: linear-gradient(to bottom right, #16A34A, #15803D);
+}
+
+.btn-warning {
+    -fx-background-color: linear-gradient(to bottom right, #F59E0B, #D97706);
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 14 8 14;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.btn-warning:hover {
+    -fx-background-color: linear-gradient(to bottom right, #D97706, #B45309);
+}
+
+.btn-outline-danger {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #DC2626;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-padding: 8 14 8 14;
+    -fx-background-radius: 8;
+    -fx-border-color: #FECACA;
+    -fx-border-radius: 8;
+    -fx-cursor: hand;
+}
+.btn-outline-danger:hover {
+    -fx-background-color: #FEF2F2;
+    -fx-border-color: #FCA5A5;
+}
+
+/* ============================================================
+   RODAPÉ
+   ============================================================ */
+.footer {
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 12 24 12 24;
+    -fx-border-color: #E2E8F0 transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+.footer-text {
+    -fx-font-size: 11px;
+    -fx-text-fill: #64748B;
+}
+
+.footer-version {
+    -fx-font-size: 11px;
+    -fx-text-fill: #94A3B8;
+    -fx-font-weight: bold;
+}
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+.scroll-bar:vertical .thumb,
+.scroll-bar:horizontal .thumb {
+    -fx-background-color: #CBD5E1;
+    -fx-background-radius: 4;
+}
+.scroll-bar:vertical .thumb:hover,
+.scroll-bar:horizontal .thumb:hover {
+    -fx-background-color: #94A3B8;
+}
+
+/* ============================================================
+   TOOLTIP
+   ============================================================ */
+.tooltip {
+    -fx-background-color: #1E293B;
+    -fx-text-fill: #F8FAFC;
+    -fx-font-size: 11px;
+    -fx-background-radius: 6;
+    -fx-padding: 6 10 6 10;
+}

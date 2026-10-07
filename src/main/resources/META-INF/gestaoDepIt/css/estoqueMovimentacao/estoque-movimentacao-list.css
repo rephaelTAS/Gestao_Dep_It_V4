@@ -1,0 +1,239 @@
+/* estoque-movimentacao-list.css v1.0 — Lista de Movimentações de Estoque */
+
+/* ============================================================
+   RAIZ
+   ============================================================ */
+.root {
+    -fx-font-family: "Segoe UI", "Inter", "Roboto", sans-serif;
+    -fx-font-size: 13px;
+    -fx-background-color: #F8FAFC;
+}
+
+/* ============================================================
+   CARDS (filtros, gráfico)
+   ============================================================ */
+.list-card {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 12;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.04), 6, 0, 0, 2);
+}
+
+.list-card-header {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E293B;
+}
+
+/* ============================================================
+   FILTROS
+   ============================================================ */
+.filter-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #475569;
+}
+
+.filter-separator {
+    -fx-text-fill: #94A3B8;
+    -fx-font-size: 11px;
+    -fx-padding: 8 4 0 4;
+}
+
+/* ============================================================
+   CAMPOS — TextField, ComboBox, DatePicker
+   ============================================================ */
+.text-field,
+.combo-box,
+.date-picker {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-font-size: 12px;
+    -fx-padding: 6 10 6 10;
+}
+.text-field:focused,
+.combo-box:focused,
+.date-picker:focused {
+    -fx-border-color: #4F46E5;
+    -fx-effect: dropshadow(gaussian, rgba(79,70,229,0.20), 4, 0, 0, 0);
+}
+.combo-box .list-cell {
+    -fx-padding: 6 10 6 10;
+}
+.date-picker > .text-field {
+    -fx-border-color: transparent;
+    -fx-background-color: transparent;
+}
+
+/* ============================================================
+   BOTÕES
+   ============================================================ */
+.btn-primary {
+    -fx-background-color: linear-gradient(to bottom right, #4F46E5, #4338CA);
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 14 8 14;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.btn-primary:hover {
+    -fx-background-color: linear-gradient(to bottom right, #4338CA, #3730A3);
+}
+.btn-primary:pressed {
+    -fx-background-color: #3730A3;
+}
+
+.btn-secondary {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #334155;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-padding: 8 14 8 14;
+    -fx-background-radius: 8;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 8;
+    -fx-cursor: hand;
+}
+.btn-secondary:hover {
+    -fx-background-color: #F1F5F9;
+    -fx-border-color: #94A3B8;
+}
+
+/* ============================================================
+   TABELA
+   ============================================================ */
+.table-view {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 12;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.04), 6, 0, 0, 2);
+}
+.table-view .column-header-background {
+    -fx-background-color: #F1F5F9;
+    -fx-background-radius: 12 12 0 0;
+}
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #E2E8F0 transparent;
+    -fx-padding: 10 8 10 8;
+}
+.table-view .column-header .label {
+    -fx-text-fill: #475569;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+.table-view .table-row-cell {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: transparent transparent #F1F5F9 transparent;
+    -fx-cell-size: 34px;
+}
+.table-view .table-row-cell:odd {
+    -fx-background-color: #FAFBFC;
+}
+.table-view .table-row-cell:selected {
+    -fx-background-color: #EEF2FF;
+    -fx-text-fill: #1E293B;
+}
+.table-view .table-cell {
+    -fx-text-fill: #334155;
+    -fx-font-size: 12px;
+    -fx-padding: 6 8 6 8;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* ============================================================
+   GRÁFICO PIE
+   ============================================================ */
+.pie-chart {
+    -fx-background-color: transparent;
+}
+.pie-chart .chart-title {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E293B;
+}
+.pie-chart .chart-legend {
+    -fx-background-color: transparent;
+    -fx-font-size: 11px;
+}
+.pie-chart .chart-pie-label {
+    -fx-font-size: 10px;
+    -fx-fill: #FFFFFF;
+}
+.pie-chart .default-color0.chart-pie { -fx-pie-color: #4F46E5; }
+.pie-chart .default-color1.chart-pie { -fx-pie-color: #22C55E; }
+.pie-chart .default-color2.chart-pie { -fx-pie-color: #F59E0B; }
+.pie-chart .default-color3.chart-pie { -fx-pie-color: #EF4444; }
+.pie-chart .default-color4.chart-pie { -fx-pie-color: #8B5CF6; }
+.pie-chart .default-color5.chart-pie { -fx-pie-color: #06B6D4; }
+
+/* ============================================================
+   RODAPÉ DE ESTATÍSTICAS
+   ============================================================ */
+.stats-bar {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 12;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 12;
+    -fx-padding: 14 20 14 20;
+    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.04), 6, 0, 0, 2);
+}
+
+.stat-label {
+    -fx-font-size: 10px;
+    -fx-text-fill: #94A3B8;
+    -fx-font-weight: bold;
+}
+
+.stat-value {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E293B;
+}
+
+.stat-value-success {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #16A34A;
+}
+
+.stat-value-danger {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #DC2626;
+}
+
+.stat-value-primary {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #4F46E5;
+}
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+.scroll-bar:vertical .thumb,
+.scroll-bar:horizontal .thumb {
+    -fx-background-color: #CBD5E1;
+    -fx-background-radius: 4;
+}
+.scroll-bar:vertical .thumb:hover,
+.scroll-bar:horizontal .thumb:hover {
+    -fx-background-color: #94A3B8;
+}
+
+/* ============================================================
+   TOOLTIP
+   ============================================================ */
+.tooltip {
+    -fx-background-color: #1E293B;
+    -fx-text-fill: #F8FAFC;
+    -fx-font-size: 11px;
+    -fx-background-radius: 6;
+    -fx-padding: 6 10 6 10;
+}

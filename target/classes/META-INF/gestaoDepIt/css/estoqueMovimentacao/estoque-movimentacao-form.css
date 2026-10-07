@@ -1,0 +1,244 @@
+/* estoque-movimentacao-form.css v1.0 — Formulário de Movimentação de Estoque */
+
+/* ============================================================
+   RAIZ
+   ============================================================ */
+.form-root {
+    -fx-background-color: #F8FAFC;
+    -fx-font-family: "Segoe UI", "Inter", "Roboto", sans-serif;
+    -fx-font-size: 13px;
+}
+
+/* ============================================================
+   CABEÇALHO
+   ============================================================ */
+.form-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E293B;
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: transparent transparent #E2E8F0 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+/* ============================================================
+   BLOCO DE PRODUTO SELECIONADO
+   ============================================================ */
+.form-product-info {
+    -fx-background-color: #EEF2FF;
+    -fx-background-radius: 10;
+    -fx-border-color: #C7D2FE;
+    -fx-border-radius: 10;
+    -fx-spacing: 8;
+}
+
+.form-section-title-blue {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #4338CA;
+}
+
+.form-product-text {
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #1E293B;
+}
+
+.form-saldo-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #4F46E5;
+    -fx-font-weight: bold;
+}
+
+/* ============================================================
+   GRID DO FORMULÁRIO
+   ============================================================ */
+.form-grid {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 12;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.04), 6, 0, 0, 2);
+}
+
+.form-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #475569;
+}
+
+.form-unit-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #94A3B8;
+    -fx-padding: 8 0 0 0;
+}
+
+/* ============================================================
+   CAMPOS — TextField, ComboBox, DatePicker, TextArea
+   ============================================================ */
+.text-field,
+.text-area,
+.combo-box,
+.date-picker {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-font-size: 12px;
+    -fx-padding: 8 10 8 10;
+}
+.text-field:focused,
+.text-area:focused,
+.combo-box:focused,
+.date-picker:focused {
+    -fx-border-color: #4F46E5;
+    -fx-effect: dropshadow(gaussian, rgba(79,70,229,0.20), 4, 0, 0, 0);
+}
+
+.text-area .content {
+    -fx-background-color: transparent;
+    -fx-padding: 2;
+}
+
+.combo-box .list-cell {
+    -fx-padding: 6 10 6 10;
+}
+
+.date-picker > .text-field {
+    -fx-border-color: transparent;
+    -fx-background-color: transparent;
+}
+
+/* ============================================================
+   IMPACTO NO SALDO
+   ============================================================ */
+.form-impacto-box {
+    -fx-background-color: #FFFBEB;
+    -fx-background-radius: 10;
+    -fx-border-color: #FDE68A;
+    -fx-border-radius: 10;
+}
+
+.form-section-title-warning {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #92400E;
+}
+
+.impact-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: #78350F;
+    -fx-font-weight: 600;
+}
+
+.impact-value {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E293B;
+}
+
+.impact-value-movement {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #4F46E5;
+}
+
+.impact-value-new {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #16A34A;
+}
+
+/* ============================================================
+   MENSAGEM DE ERRO
+   ============================================================ */
+.form-message-error {
+    -fx-background-color: #FEF2F2;
+    -fx-text-fill: #991B1B;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-padding: 10 14 10 14;
+    -fx-background-radius: 8;
+    -fx-border-color: #FECACA;
+    -fx-border-radius: 8;
+}
+
+/* ============================================================
+   BOTÕES
+   ============================================================ */
+.btn-primary {
+    -fx-background-color: linear-gradient(to bottom right, #4F46E5, #4338CA);
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 14 8 14;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.btn-primary:hover {
+    -fx-background-color: linear-gradient(to bottom right, #4338CA, #3730A3);
+}
+.btn-primary:pressed {
+    -fx-background-color: #3730A3;
+}
+
+.btn-secondary {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #334155;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-padding: 8 16 8 16;
+    -fx-background-radius: 8;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 8;
+    -fx-cursor: hand;
+}
+.btn-secondary:hover {
+    -fx-background-color: #F1F5F9;
+    -fx-border-color: #94A3B8;
+}
+
+.btn-success {
+    -fx-background-color: linear-gradient(to bottom right, #22C55E, #16A34A);
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 16 8 16;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.btn-success:hover {
+    -fx-background-color: linear-gradient(to bottom right, #16A34A, #15803D);
+}
+.btn-success:pressed {
+    -fx-background-color: #15803D;
+}
+
+/* ============================================================
+   SCROLLPANE
+   ============================================================ */
+.scroll-pane {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+}
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #CBD5E1;
+    -fx-background-radius: 4;
+}
+.scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #94A3B8;
+}
+
+/* ============================================================
+   TOOLTIP
+   ============================================================ */
+.tooltip {
+    -fx-background-color: #1E293B;
+    -fx-text-fill: #F8FAFC;
+    -fx-font-size: 11px;
+    -fx-background-radius: 6;
+    -fx-padding: 6 10 6 10;
+}
