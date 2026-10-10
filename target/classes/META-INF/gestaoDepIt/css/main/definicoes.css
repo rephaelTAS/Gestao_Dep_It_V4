@@ -1,318 +1,576 @@
-/* ============================================
-   DEFINICOES.CSS - Estilos da Tela Definições
-   ============================================ */
+/*
+ * Packt Inventário — Definições do Sistema
+ * File: definicoes.css
+ * JavaFX 21+
+ *
+ * AUTOSSUFICIENTE — não depende de outros CSS.
+ * Inclui a paleta oficial do catálogo §1.
+ *
+ * ATENÇÃO: paleta duplicada. Se mudares aqui, muda em TODOS os CSS de ecrã.
+ */
 
-/* =================== */
-/* 1. CONTAINER PRINCIPAL */
-/* =================== */
+/* ============================================================
+   PALETA OFICIAL — Catálogo §1
+   ============================================================ */
 
-.root {
-    -fx-background-color: #f5f7fa;
-    -fx-font-family: "Segoe UI", "System", sans-serif;
+.root,
+.definicoes-root {
+    /* Azuis */
+    -app-blue-900: #142B4A;
+    -app-blue-800: #1E3A5F;
+    -app-blue-700: #2457A7;
+    -app-blue-600: #326BC5;
+    -app-blue-100: #E8F0FC;
+    -app-blue-50:  #F4F8FE;
+
+    /* Semânticas */
+    -app-red-700:    #A8303C;
+    -app-red-600:    #C83E4D;
+    -app-red-100:    #FDECEF;
+
+    -app-green-700:  #0F6949;
+    -app-green-600:  #16845B;
+    -app-green-100:  #E8F6EF;
+
+    -app-orange-600: #B7791F;
+    -app-orange-100: #FFF4DF;
+
+    -app-info-600:   #2874C8;
+    -app-info-100:   #EAF3FE;
+
+    /* Neutros */
+    -app-neutral-50:  #F8FAFC;
+    -app-neutral-100: #EDF1F5;
+    -app-neutral-200: #E1E7EF;
+    -app-neutral-300: #C8D2E0;
+
+    /* Superfícies */
+    -app-background:     #F5F7FA;
+    -app-surface:        #FFFFFF;
+    -app-border:         #E1E7EF;
+    -app-border-strong:  #C8D2E0;
+    -app-divider:        #E8EDF3;
+
+    /* Texto */
+    -app-text-primary:    #172334;
+    -app-text-secondary:  #68778B;
+    -app-text-disabled:   #98A2B3;
+    -app-text-on-primary: #FFFFFF;
+
+    /* Foco */
+    -app-focus-ring: rgba(50, 107, 197, 0.45);
+
+    /* Fonte */
+    -app-font-family: "Inter", "Segoe UI", sans-serif;
+
+    /* Base */
+    -fx-background-color: -app-background;
+    -fx-font-family: -app-font-family;
 }
 
-/* =================== */
-/* 2. TÍTULOS */
-/* =================== */
+/* ============================================================
+   ROOT / CONTAINER
+   ============================================================ */
+
+.definicoes-root {
+    -fx-background-color: -app-background;
+}
+
+/* ============================================================
+   HEADER (título + status)
+   ============================================================ */
 
 .titulo-principal {
-    -fx-font-size: 22px;
+    -fx-font-size: 24px;
     -fx-font-weight: bold;
-    -fx-text-fill: #2c3e50;
-    -fx-padding: 0 0 5 0;
+    -fx-text-fill: -app-text-primary;
 }
-
-.subtitulo-aba {
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #34495e;
-    -fx-padding: 5 0 5 0;
-}
-
-/* =================== */
-/* 3. STATUS */
-/* =================== */
 
 .status-online {
-    -fx-text-fill: #27ae60;
+    -fx-font-size: 13px;
     -fx-font-weight: bold;
+    -fx-text-fill: -app-green-600;
+    -fx-padding: 4px 10px;
+    -fx-background-color: -app-green-100;
+    -fx-background-radius: 999px;
 }
 
-.status-offline {
-    -fx-text-fill: #e74c3c;
-    -fx-font-weight: bold;
+/* Separator */
+.separator {
+    -fx-background-color: -app-border;
 }
 
-.status-warning {
-    -fx-text-fill: #f39c12;
-    -fx-font-weight: bold;
+.separator .line {
+    -fx-border-color: -app-border;
+    -fx-border-width: 1 0 0 0;
 }
 
-/* =================== */
-/* 4. TABPANE */
-/* =================== */
+/* ============================================================
+   TABPANE — abas
+   ============================================================ */
 
 .tab-pane-config {
     -fx-background-color: transparent;
-    -fx-background-insets: 0;
+    -fx-tab-min-height: 36px;
+    -fx-tab-max-height: 36px;
 }
 
-.tab-pane-config .tab-header-area {
-    -fx-padding: 0 0 10 0;
+.tab-pane-config > .tab-header-area {
+    -fx-padding: 0 0 0 0;
 }
 
-.tab-pane-config .tab {
+.tab-pane-config > .tab-header-area > .tab-header-background {
     -fx-background-color: transparent;
-    -fx-padding: 10 20 10 20;
+    -fx-border-color: transparent transparent -app-border transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.tab-pane-config > .tab-header-area > .headers-region > .tab {
+    -fx-background-color: transparent;
+    -fx-background-radius: 6px 6px 0 0;
+    -fx-padding: 6px 16px;
     -fx-border-color: transparent;
 }
 
-.tab-pane-config .tab:selected {
-    -fx-background-color: #ffffff;
-    -fx-background-radius: 8 8 0 0;
-    -fx-border-color: #3498db #3498db transparent #3498db;
-    -fx-border-width: 2;
-}
-
-.tab-pane-config .tab .tab-label {
-    -fx-font-size: 14px;
-    -fx-font-weight: 500;
-    -fx-text-fill: #7f8c8d;
-}
-
-.tab-pane-config .tab:selected .tab-label {
-    -fx-text-fill: #2c3e50;
+.tab-pane-config > .tab-header-area > .headers-region > .tab .tab-label {
+    -fx-text-fill: -app-text-secondary;
+    -fx-font-size: 13px;
     -fx-font-weight: bold;
 }
 
-.tab-pane-config .tab-content-area {
-    -fx-background-color: #ffffff;
-    -fx-background-radius: 0 8 8 8;
-    -fx-border-color: #e0e0e0;
-    -fx-border-radius: 0 8 8 8;
-    -fx-border-width: 1;
+.tab-pane-config > .tab-header-area > .headers-region > .tab:hover .tab-label {
+    -fx-text-fill: -app-blue-700;
 }
 
-/* =================== */
-/* 5. SCROLLPANE */
-/* =================== */
-
-.scroll-pane {
-    -fx-background: transparent;
-    -fx-background-color: transparent;
+.tab-pane-config > .tab-header-area > .headers-region > .tab:selected {
+    -fx-background-color: -app-surface;
+    -fx-border-color: -app-border -app-border transparent -app-border;
+    -fx-border-width: 1 1 0 1;
+    -fx-border-radius: 6px 6px 0 0;
 }
 
-.scroll-pane .viewport {
-    -fx-background-color: transparent;
+.tab-pane-config > .tab-header-area > .headers-region > .tab:selected .tab-label {
+    -fx-text-fill: -app-blue-700;
 }
 
-/* =================== */
-/* 6. CAMPOS DE FORMULÁRIO */
-/* =================== */
+/* Conteúdo das abas */
+.tab-pane-config > .tab-content-area {
+    -fx-background-color: -app-surface;
+    -fx-background-radius: 0 0 8px 8px;
+    -fx-border-color: -app-border;
+    -fx-border-width: 1px;
+    -fx-border-radius: 0 0 8px 8px;
+    -fx-padding: 0;
+}
 
-.text-field, .password-field, .combo-box, .spinner {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #dce1e8;
-    -fx-border-radius: 5;
-    -fx-background-radius: 5;
-    -fx-padding: 8 12;
+/* ============================================================
+   FORMULÁRIOS — Labels e estrutura
+   ============================================================ */
+
+.label {
+    -fx-text-fill: -app-text-primary;
     -fx-font-size: 13px;
 }
 
-.text-field:focused, .password-field:focused, .combo-box:focused {
-    -fx-border-color: #3498db;
-    -fx-effect: dropshadow(gaussian, rgba(52, 152, 219, 0.3), 8, 0, 0, 0);
+/* Labels de formulário (nas abas) */
+.tab-pane-config .grid-pane > .label {
+    -fx-font-weight: bold;
 }
 
-.text-field:disabled, .password-field:disabled {
+/* Subtítulos dentro das abas */
+.subtitulo-aba {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -app-text-primary;
+    -fx-padding: 4px 0;
+}
+
+/* ============================================================
+   INPUTS — TextField, ComboBox, Spinner
+   ============================================================ */
+
+.text-field,
+.combo-box,
+.spinner {
+    -fx-min-height: 36px;
+    -fx-pref-height: 36px;
+    -fx-padding: 0 12px;
+    -fx-background-color: -app-surface;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-border-color: -app-border;
+    -fx-border-width: 1px;
+    -fx-font-family: -app-font-family;
+    -fx-font-size: 13px;
+    -fx-text-fill: -app-text-primary;
+    -fx-prompt-text-fill: -app-text-disabled;
+}
+
+.text-field:hover,
+.combo-box:hover,
+.spinner:hover {
+    -fx-border-color: -app-border-strong;
+}
+
+.text-field:focused,
+.combo-box:focused,
+.spinner:focused {
+    -fx-border-color: -app-blue-600;
+    -fx-border-width: 1.5px;
+    -fx-effect: dropshadow(gaussian, rgba(50, 107, 197, 0.15), 5, 0, 0, 0);
+}
+
+.text-field:disabled,
+.combo-box:disabled,
+.spinner:disabled {
     -fx-opacity: 0.6;
-    -fx-background-color: #f5f7fa;
+    -fx-background-color: -app-neutral-100;
 }
 
+/* ComboBox — seta */
 .combo-box .arrow-button {
     -fx-background-color: transparent;
+    -fx-padding: 0 8px;
 }
 
-.combo-box .list-cell {
-    -fx-padding: 8 12;
+.combo-box .arrow {
+    -fx-background-color: -app-text-secondary;
+    -fx-padding: 3px;
 }
 
-/* =================== */
-/* 7. CHECKBOXES */
-/* =================== */
+.combo-box:hover .arrow {
+    -fx-background-color: -app-blue-700;
+}
+
+/* Spinner — setas */
+.spinner .increment-arrow-button,
+.spinner .decrement-arrow-button {
+    -fx-background-color: transparent;
+    -fx-border-color: -app-border;
+    -fx-border-width: 0 0 0 1;
+}
+
+.spinner .increment-arrow-button {
+    -fx-border-width: 0 0 1 1;
+}
+
+.spinner .increment-arrow,
+.spinner .decrement-arrow {
+    -fx-background-color: -app-text-secondary;
+    -fx-padding: 3px;
+}
+
+.spinner .increment-arrow-button:hover,
+.spinner .decrement-arrow-button:hover {
+    -fx-background-color: -app-blue-50;
+}
+
+.spinner .increment-arrow-button:hover .increment-arrow,
+.spinner .decrement-arrow-button:hover .decrement-arrow {
+    -fx-background-color: -app-blue-700;
+}
+
+/* ComboBox popup (dropdown) */
+.combo-box-popup .list-view {
+    -fx-background-color: -app-surface;
+    -fx-border-color: -app-border;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.12), 10, 0, 0, 3);
+    -fx-padding: 4px;
+}
+
+.combo-box-popup .list-view .list-cell {
+    -fx-padding: 8px 12px;
+    -fx-text-fill: -app-text-primary;
+    -fx-background-color: transparent;
+    -fx-background-radius: 4px;
+    -fx-font-size: 13px;
+}
+
+.combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: -app-blue-50;
+}
+
+.combo-box-popup .list-view .list-cell:filled:selected {
+    -fx-background-color: -app-blue-100;
+    -fx-text-fill: -app-blue-700;
+    -fx-font-weight: bold;
+}
+
+/* ============================================================
+   CHECKBOX
+   ============================================================ */
 
 .check-box {
     -fx-font-size: 13px;
-    -fx-padding: 5 0;
+    -fx-text-fill: -app-text-primary;
+    -fx-cursor: hand;
 }
 
 .check-box .box {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #bdc3c7;
-    -fx-border-radius: 4;
-    -fx-background-radius: 4;
-    -fx-padding: 3;
+    -fx-background-color: -app-surface;
+    -fx-background-radius: 4px;
+    -fx-border-color: -app-border-strong;
+    -fx-border-radius: 4px;
+    -fx-border-width: 1px;
+    -fx-padding: 3px;
+}
+
+.check-box:hover .box {
+    -fx-border-color: -app-blue-600;
 }
 
 .check-box:selected .box {
-    -fx-background-color: #3498db;
-    -fx-border-color: #3498db;
+    -fx-background-color: -app-blue-700;
+    -fx-border-color: -app-blue-700;
 }
 
-.check-box .mark {
-    -fx-background-color: #ffffff;
-    -fx-shape: "M0,5 L3,8 L8,0 L10,2 L3,10 L-2,5 Z";
-    -fx-scale-shape: false;
+.check-box:selected .mark {
+    -fx-background-color: white;
 }
 
-/* =================== */
-/* 8. BOTÕES */
-/* =================== */
+.check-box:focused {
+    -fx-effect: dropshadow(gaussian, -app-focus-ring, 4, 0, 0, 0);
+}
+
+/* ============================================================
+   BOTÕES
+   ============================================================ */
 
 .button {
-    -fx-background-color: #ecf0f1;
-    -fx-background-radius: 6;
-    -fx-border-color: #bdc3c7;
-    -fx-border-radius: 6;
-    -fx-border-width: 1;
-    -fx-padding: 8 18;
+    -fx-font-family: -app-font-family;
     -fx-font-size: 13px;
-    -fx-font-weight: 500;
+    -fx-font-weight: bold;
+    -fx-min-height: 36px;
+    -fx-padding: 0 16px;
+    -fx-background-color: -app-surface;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-border-color: -app-border;
+    -fx-border-width: 1px;
+    -fx-text-fill: -app-text-primary;
     -fx-cursor: hand;
-    -fx-text-fill: #2c3e50;
+    -fx-graphic-text-gap: 8px;
 }
 
 .button:hover {
-    -fx-background-color: #d5dbdb;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 6, 0, 0, 1);
+    -fx-background-color: -app-neutral-50;
+    -fx-border-color: -app-border-strong;
 }
 
 .button:pressed {
-    -fx-background-color: #bdc3c7;
+    -fx-background-color: -app-neutral-100;
 }
 
-/* Botão Primário */
+.button:focused {
+    -fx-effect: dropshadow(gaussian, -app-focus-ring, 4, 0, 0, 0);
+}
+
+.button:disabled {
+    -fx-opacity: 0.55;
+    -fx-cursor: default;
+}
+
+/* --- btn-novo / btn-primary (ações positivas) --- */
+.btn-novo,
 .btn-primary {
-    -fx-background-color: #3498db;
-    -fx-border-color: #2980b9;
-    -fx-text-fill: #ffffff;
+    -fx-background-color: -app-blue-700;
+    -fx-text-fill: -app-text-on-primary;
+    -fx-border-color: -app-blue-700;
 }
 
+.btn-novo:hover,
 .btn-primary:hover {
-    -fx-background-color: #2980b9;
+    -fx-background-color: -app-blue-800;
+    -fx-border-color: -app-blue-800;
 }
 
-/* Botão Sucesso */
+.btn-novo:pressed,
+.btn-primary:pressed {
+    -fx-background-color: -app-blue-900;
+    -fx-border-color: -app-blue-900;
+}
+
+/* --- btn-success --- */
 .btn-success {
-    -fx-background-color: #27ae60;
-    -fx-border-color: #229954;
-    -fx-text-fill: #ffffff;
+    -fx-background-color: -app-green-600;
+    -fx-text-fill: -app-text-on-primary;
+    -fx-border-color: -app-green-600;
 }
 
 .btn-success:hover {
-    -fx-background-color: #229954;
+    -fx-background-color: -app-green-700;
+    -fx-border-color: -app-green-700;
 }
 
-/* Botão Perigo */
+/* --- btn-danger --- */
 .btn-danger {
-    -fx-background-color: #e74c3c;
-    -fx-border-color: #c0392b;
-    -fx-text-fill: #ffffff;
+    -fx-background-color: -app-red-600;
+    -fx-text-fill: -app-text-on-primary;
+    -fx-border-color: -app-red-600;
 }
 
 .btn-danger:hover {
-    -fx-background-color: #c0392b;
+    -fx-background-color: -app-red-700;
+    -fx-border-color: -app-red-700;
 }
 
-/* Botão Secundário */
+/* --- btn-refresh / btn-secondary --- */
+.btn-refresh,
 .btn-secondary {
-    -fx-background-color: #95a5a6;
-    -fx-border-color: #7f8c8d;
-    -fx-text-fill: #ffffff;
+    -fx-background-color: -app-surface;
+    -fx-text-fill: -app-text-primary;
+    -fx-border-color: -app-border;
 }
 
+.btn-refresh:hover,
 .btn-secondary:hover {
-    -fx-background-color: #7f8c8d;
+    -fx-background-color: -app-blue-50;
+    -fx-border-color: -app-blue-600;
+    -fx-text-fill: -app-blue-700;
 }
 
-/* =================== */
-/* 9. SEPARADORES */
-/* =================== */
-
-.separator .line {
-    -fx-border-color: #e0e0e0;
-    -fx-border-width: 1;
+/* --- btn-testar-todos --- */
+.btn-testar-todos {
+    -fx-background-color: -app-blue-100;
+    -fx-text-fill: -app-blue-700;
+    -fx-border-color: transparent;
 }
 
-/* =================== */
-/* 10. GRID E SPACING */
-/* =================== */
-
-.grid-pane {
-    -fx-hgap: 20;
-    -fx-vgap: 15;
+.btn-testar-todos:hover {
+    -fx-background-color: #D6E4F8;
 }
 
-.label {
+/* ============================================================
+   TABELA DE SERVIDORES
+   ============================================================ */
+
+.tabela {
+    -fx-background-color: -app-surface;
+    -fx-border-color: -app-border;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-table-cell-border-color: -app-divider;
+    -fx-padding: 0;
+}
+
+.tabela .column-header-background {
+    -fx-background-color: -app-neutral-50;
+}
+
+.tabela .column-header,
+.tabela .filler {
+    -fx-size: 40px;
+    -fx-background-color: -app-neutral-50;
+    -fx-border-color: transparent transparent -app-border transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.tabela .column-header .label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -app-text-secondary;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 0 8px;
+}
+
+.tabela .table-row-cell {
+    -fx-cell-size: 42px;
+    -fx-background-color: -app-surface;
+    -fx-border-color: transparent transparent -app-divider transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-cursor: hand;
+}
+
+.tabela .table-row-cell:odd {
+    -fx-background-color: -app-neutral-50;
+}
+
+.tabela .table-row-cell:hover {
+    -fx-background-color: -app-blue-50;
+}
+
+.tabela .table-row-cell:selected {
+    -fx-background-color: -app-blue-100;
+}
+
+.tabela .table-cell {
+    -fx-padding: 0 8px;
+    -fx-font-size: 12px;
+    -fx-text-fill: -app-text-primary;
+    -fx-alignment: CENTER_LEFT;
+    -fx-border-color: transparent;
+}
+
+.tabela .placeholder .label {
     -fx-font-size: 13px;
-    -fx-text-fill: #2c3e50;
+    -fx-text-fill: -app-text-secondary;
 }
 
-/* =================== */
-/* 11. SCROLLBAR PERSONALIZADA */
-/* =================== */
+/* ============================================================
+   TOOLBAR (dentro da aba Banco)
+   ============================================================ */
 
-.scroll-bar:vertical {
+.toolbar {
+    -fx-padding: 4px 0;
+}
+
+/* ============================================================
+   HEADER da aba Banco (título + contador)
+   ============================================================ */
+
+.titulo {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-fill: -app-text-primary;
+}
+
+.total-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: -app-text-secondary;
+    -fx-padding: 4px 10px;
+    -fx-background-color: -app-neutral-100;
+    -fx-background-radius: 999px;
+}
+
+/* ============================================================
+   RODAPÉ COM BOTÕES
+   ============================================================ */
+
+.hbox {
+    /* nada específico */
+}
+
+/* ============================================================
+   SCROLLPANE
+   ============================================================ */
+
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane > .scroll-bar:vertical {
     -fx-background-color: transparent;
     -fx-pref-width: 10;
 }
 
-.scroll-bar:vertical .thumb {
-    -fx-background-color: #d0d3d8;
+.scroll-pane > .scroll-bar:vertical .thumb {
+    -fx-background-color: -app-border-strong;
     -fx-background-radius: 5;
-    -fx-padding: 0 3;
 }
 
-.scroll-bar:vertical .thumb:hover {
-    -fx-background-color: #b0b3b8;
+.scroll-pane > .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: -app-text-disabled;
 }
 
-.scroll-bar:vertical .track {
-    -fx-background-color: transparent;
-}
-
-.scroll-bar:vertical .increment-button,
-.scroll-bar:vertical .decrement-button {
-    -fx-background-color: transparent;
-}
-
-/* =================== */
-/* 12. RESPONSIVIDADE */
-/* =================== */
-
-/* Para telas menores */
-@media screen and (max-width: 800px) {
-    .grid-pane {
-        -fx-hgap: 10;
-        -fx-vgap: 10;
-    }
-
-    .text-field, .password-field {
-        -fx-pref-width: 200;
-    }
-}
-
-@media screen and (max-width: 600px) {
-    .grid-pane {
-        -fx-vgap: 8;
-    }
-
-    .tab-pane-config .tab {
-        -fx-padding: 5 10;
-    }
-
-    .button {
-        -fx-padding: 6 12;
-        -fx-font-size: 12px;
-    }
+.scroll-pane .scroll-bar .increment-button,
+.scroll-pane .scroll-bar .decrement-button {
+    -fx-pref-height: 0;
+    -fx-opacity: 0;
 }

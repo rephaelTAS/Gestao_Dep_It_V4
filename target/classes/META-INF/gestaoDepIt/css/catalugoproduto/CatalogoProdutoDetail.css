@@ -1,114 +1,395 @@
+/*
+ * Packt Inventário — Detalhes do Produto
+ * File: produto.css
+ * JavaFX 21+
+ *
+ * AUTOSSUFICIENTE — não depende de outros CSS.
+ * Inclui a paleta oficial do catálogo §1.
+ *
+ * ATENÇÃO: paleta duplicada. Se mudares aqui, muda em TODOS os CSS de ecrã.
+ */
+
 /* ============================================================
-   CatalogoProdutoDetail.css
-   Paleta harmoniosa: Azul índigo (#4F46E5)
+   PALETA OFICIAL — Catálogo §1
    ============================================================ */
 
-.detail-root {
-    -fx-background-color: #F8FAFC;
+.root,
+.produto-root {
+    /* Azuis */
+    -app-blue-900: #142B4A;
+    -app-blue-800: #1E3A5F;
+    -app-blue-700: #2457A7;
+    -app-blue-600: #326BC5;
+    -app-blue-100: #E8F0FC;
+    -app-blue-50:  #F4F8FE;
+
+    /* Semânticas */
+    -app-red-700:    #A8303C;
+    -app-red-600:    #C83E4D;
+    -app-red-100:    #FDECEF;
+
+    -app-green-700:  #0F6949;
+    -app-green-600:  #16845B;
+    -app-green-100:  #E8F6EF;
+
+    -app-orange-600: #B7791F;
+    -app-orange-100: #FFF4DF;
+
+    -app-info-600:   #2874C8;
+    -app-info-100:   #EAF3FE;
+
+    /* Neutros */
+    -app-neutral-50:  #F8FAFC;
+    -app-neutral-100: #EDF1F5;
+    -app-neutral-200: #E1E7EF;
+    -app-neutral-300: #C8D2E0;
+
+    /* Superfícies */
+    -app-background:     #F5F7FA;
+    -app-surface:        #FFFFFF;
+    -app-border:         #E1E7EF;
+    -app-border-strong:  #C8D2E0;
+    -app-divider:        #E8EDF3;
+
+    /* Texto */
+    -app-text-primary:    #172334;
+    -app-text-secondary:  #68778B;
+    -app-text-disabled:   #98A2B3;
+    -app-text-on-primary: #FFFFFF;
+
+    /* Foco */
+    -app-focus-ring: rgba(50, 107, 197, 0.45);
+
+    /* Fonte */
+    -app-font-family: "Inter", "Segoe UI", sans-serif;
+    -app-font-mono: "JetBrains Mono", "Consolas", "Menlo", monospace;
+
+    /* Base */
+    -fx-background-color: -app-background;
+    -fx-font-family: -app-font-family;
 }
 
-/* ========== HEADER ========== */
-.detail-header {
-    -fx-background-color: white;
-    -fx-border-color: #E2E8F0;
-    -fx-border-width: 0 0 1 0;
+/* ============================================================
+   ROOT / CONTAINER
+   ============================================================ */
+
+.produto-root {
+    -fx-background-color: -app-background;
 }
 
-.detail-title {
+.produto-scroll {
+    -fx-background-color: -app-background;
+    -fx-background: -app-background;
+}
+
+.produto-scroll > .viewport {
+    -fx-background-color: -app-background;
+}
+
+.produto-container {
+    -fx-background-color: -app-background;
+    -fx-spacing: 20px;
+    -fx-padding: 0 0 24px 0;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.produto-header {
+    -fx-padding: 20px 20px 10px 20px;
+}
+
+.produto-title {
     -fx-font-size: 22px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1E293B;
+    -fx-text-fill: -app-text-primary;
 }
 
-.detail-subtitle {
-    -fx-font-size: 14px;
-    -fx-text-fill: #64748B;
+.produto-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: -app-text-secondary;
+    -fx-font-family: -app-font-mono;
 }
 
-/* ========== CARDS ========== */
-.detail-card {
-    -fx-background-color: white;
+/* ============================================================
+   CONTEÚDO (2 colunas)
+   ============================================================ */
+
+.produto-content {
+    -fx-padding: 0 20px;
+}
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+
+.produto-card {
+    -fx-background-color: -app-surface;
     -fx-background-radius: 12px;
-    -fx-border-color: #E2E8F0;
-    -fx-border-width: 1px;
     -fx-border-radius: 12px;
-    -fx-padding: 15px;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 2);
+    -fx-border-color: -app-border;
+    -fx-border-width: 1px;
+    -fx-padding: 20px;
+    -fx-spacing: 12px;
 }
 
-.detail-card-header {
-    -fx-font-size: 14px;
+.produto-card-accent {
+    -fx-background-color: -app-blue-50;
+    -fx-border-color: -app-blue-600;
+}
+
+.produto-card-header {
+    -fx-font-size: 15px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1E293B;
-    -fx-border-color: #E2E8F0;
+    -fx-text-fill: -app-text-primary;
+    -fx-padding: 0 0 8px 0;
+    -fx-border-color: transparent transparent -app-divider transparent;
     -fx-border-width: 0 0 1 0;
-    -fx-padding: 0 0 8 0;
 }
 
-.detail-value {
+/* ============================================================
+   GRID DE DADOS
+   ============================================================ */
+
+.produto-grid {
+    -fx-padding: 4px 0;
+}
+
+.produto-label {
+    -fx-font-size: 13px;
     -fx-font-weight: bold;
-    -fx-text-fill: #4F46E5;
+    -fx-text-fill: -app-text-secondary;
 }
 
-.value-highlight {
+.produto-value {
+    -fx-font-size: 14px;
+    -fx-text-fill: -app-text-primary;
+}
+
+.produto-value-mono {
+    -fx-font-family: -app-font-mono;
+    -fx-font-size: 13px;
+    -fx-text-fill: -app-blue-700;
+    -fx-background-color: -app-neutral-50;
+    -fx-background-radius: 6px;
+    -fx-padding: 4px 8px;
+}
+
+.produto-value-highlight {
     -fx-font-size: 16px;
     -fx-font-weight: bold;
-    -fx-text-fill: #22C55E;
+    -fx-text-fill: -app-blue-700;
 }
 
-.label-bold {
+.produto-status {
     -fx-font-weight: bold;
-    -fx-text-fill: #475569;
-}
-
-.detail-textarea {
-    -fx-background-color: #F8FAFC;
-    -fx-border-color: #E2E8F0;
-    -fx-border-radius: 6px;
+    -fx-text-fill: -app-green-700;
+    -fx-background-color: -app-green-100;
     -fx-background-radius: 6px;
+    -fx-padding: 4px 10px;
 }
 
-/* ========== BOTÕES ========== */
-.btn-primary {
-    -fx-background-color: #4F46E5;
-    -fx-text-fill: white;
+/* ============================================================
+   LABELS/VALUES INLINE (dentro de cards)
+   ============================================================ */
+
+.produto-label-inline {
+    -fx-font-size: 13px;
+    -fx-text-fill: -app-text-secondary;
+}
+
+.produto-value-inline {
+    -fx-font-size: 13px;
+    -fx-text-fill: -app-text-primary;
     -fx-font-weight: bold;
-    -fx-background-radius: 8px;
-    -fx-padding: 8 16 8 16;
-    -fx-cursor: hand;
 }
 
-.btn-primary:hover {
-    -fx-background-color: #4338CA;
-}
-
-.btn-secondary {
-    -fx-background-color: #E2E8F0;
-    -fx-text-fill: #1E293B;
+.produto-label-uppercase {
+    -fx-font-size: 11px;
     -fx-font-weight: bold;
-    -fx-background-radius: 8px;
-    -fx-padding: 8 16 8 16;
-    -fx-cursor: hand;
+    -fx-text-fill: -app-text-secondary;
 }
 
-.btn-secondary:hover {
-    -fx-background-color: #CBD5E1;
-}
+/* ============================================================
+   STATS
+   ============================================================ */
 
-.btn-danger {
-    -fx-background-color: #EF4444;
-    -fx-text-fill: white;
+.produto-stat-value {
+    -fx-font-size: 24px;
     -fx-font-weight: bold;
-    -fx-background-radius: 8px;
-    -fx-padding: 8 16 8 16;
+    -fx-text-fill: -app-text-primary;
+}
+
+.produto-stat-highlight {
+    -fx-font-size: 28px;
+    -fx-text-fill: -app-blue-700;
+}
+
+.produto-stat-inline {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -app-text-primary;
+}
+
+/* ============================================================
+   TEXTAREA (descrição / características)
+   ============================================================ */
+
+.produto-textarea {
+    -fx-font-family: -app-font-family;
+    -fx-font-size: 13px;
+    -fx-text-fill: -app-text-primary;
+    -fx-padding: 8px 10px;
+    -fx-background-color: -app-neutral-50;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-border-color: -app-border;
+    -fx-border-width: 1px;
+}
+
+.produto-textarea:focused {
+    -fx-border-color: -app-blue-600;
+    -fx-effect: dropshadow(gaussian, rgba(50, 107, 197, 0.15), 5, 0, 0, 0);
+}
+
+.produto-textarea .content {
+    -fx-background-color: transparent;
+}
+
+.produto-textarea .scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.produto-textarea .scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+/* ============================================================
+   BOTÕES
+   ============================================================ */
+
+.clay-button {
+    -fx-font-family: -app-font-family;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-min-height: 38px;
+    -fx-padding: 0 18px;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-border-width: 1px;
+    -fx-border-color: transparent;
     -fx-cursor: hand;
+    -fx-graphic-text-gap: 8px;
 }
 
-.btn-danger:hover {
-    -fx-background-color: #DC2626;
+.clay-button:focused {
+    -fx-effect: dropshadow(gaussian, -app-focus-ring, 4, 0, 0, 0);
 }
 
-/* ========== GRID LABELS ========== */
-.detail-card .label {
-    -fx-text-fill: #475569;
+.clay-button:disabled {
+    -fx-opacity: 0.55;
+    -fx-cursor: default;
+}
+
+/* --- Primary --- */
+.clay-button-primary {
+    -fx-background-color: -app-blue-700;
+    -fx-text-fill: -app-text-on-primary;
+    -fx-border-color: -app-blue-700;
+}
+
+.clay-button-primary:hover {
+    -fx-background-color: -app-blue-800;
+    -fx-border-color: -app-blue-800;
+}
+
+.clay-button-primary:pressed {
+    -fx-background-color: -app-blue-900;
+    -fx-border-color: -app-blue-900;
+}
+
+/* --- Soft --- */
+.clay-button-soft {
+    -fx-background-color: -app-blue-100;
+    -fx-text-fill: -app-blue-700;
+    -fx-border-color: transparent;
+}
+
+.clay-button-soft:hover {
+    -fx-background-color: #D6E4F8;
+}
+
+.clay-button-soft:pressed {
+    -fx-background-color: #C3D6F0;
+}
+
+/* --- Ghost --- */
+.clay-button-ghost {
+    -fx-background-color: transparent;
+    -fx-text-fill: -app-text-secondary;
+    -fx-border-color: -app-border;
+}
+
+.clay-button-ghost:hover {
+    -fx-background-color: -app-neutral-50;
+    -fx-text-fill: -app-text-primary;
+    -fx-border-color: -app-border-strong;
+}
+
+.clay-button-ghost:pressed {
+    -fx-background-color: -app-neutral-100;
+}
+
+/* --- Danger --- */
+.clay-button-danger {
+    -fx-background-color: -app-red-600;
+    -fx-text-fill: -app-text-on-primary;
+    -fx-border-color: -app-red-600;
+}
+
+.clay-button-danger:hover {
+    -fx-background-color: -app-red-700;
+    -fx-border-color: -app-red-700;
+}
+
+.clay-button-danger:pressed {
+    -fx-background-color: -app-red-700;
+}
+
+/* ============================================================
+   SCROLLBAR GLOBAL
+   ============================================================ */
+
+.scroll-bar:vertical,
+.scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar:vertical {
+    -fx-pref-width: 10;
+}
+
+.scroll-bar:horizontal {
+    -fx-pref-height: 10;
+}
+
+.scroll-bar .track {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: -app-border-strong;
+    -fx-background-radius: 5;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: -app-text-disabled;
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-pref-height: 0;
+    -fx-pref-width: 0;
+    -fx-opacity: 0;
 }

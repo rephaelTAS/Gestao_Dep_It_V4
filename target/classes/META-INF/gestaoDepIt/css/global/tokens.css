@@ -1,0 +1,237 @@
+/*
+ * JavaFX Design System
+ * File: tokens.css
+ * Purpose: Global design tokens (single source of truth)
+ *
+ * REGRA: Este ficheiro SÓ contém variáveis -app-*.
+ * NUNCA deve conter classes utilitárias ou componentes.
+ *
+ * Alinhado com: Catálogo Oficial §1 (Fundamentos visuais)
+ */
+
+.root {
+    /* ============================================================
+       §1.1 · AZUL — Ações, seleção, navegação
+       ============================================================ */
+    -app-blue-50:  #F4F8FE;   /* hover de superfícies */
+    -app-blue-100: #E8F0FC;   /* tonal, fundos suaves, seleção */
+    -app-blue-600: #326BC5;   /* interação, foco, links */
+    -app-blue-700: #2457A7;   /* ação principal */
+    -app-blue-800: #1E3A5F;   /* hover de primário */
+    -app-blue-900: #142B4A;   /* pressed de primário, sidebar */
+
+    /* ============================================================
+       §1.2 · VERMELHO — Erro e ações destrutivas
+       ============================================================ */
+    -app-red-50:  #FEF5F6;
+    -app-red-100: #FDECEF;
+    -app-red-600: #C83E4D;
+    -app-red-700: #A8303C;
+    -app-red-900: #6B1F28;
+
+    /* ============================================================
+       §1.3 · VERDE — Sucesso
+       ============================================================ */
+    -app-green-50:  #F3FAF6;
+    -app-green-100: #E8F6EF;
+    -app-green-600: #16845B;
+    -app-green-700: #0F6949;
+    -app-green-900: #0A422E;
+
+    /* ============================================================
+       §1.4 · LARANJA — Aviso
+       ============================================================ */
+    -app-orange-50:  #FFFBF3;
+    -app-orange-100: #FFF4DF;
+    -app-orange-600: #B7791F;
+    -app-orange-700: #8F5D12;
+    -app-orange-900: #5C3B0C;
+
+    /* ============================================================
+       §1.5 · AZUL INFO — Mensagens informativas
+       ============================================================ */
+    -app-info-50:  #F5F9FE;
+    -app-info-100: #EAF3FE;
+    -app-info-600: #2874C8;
+    -app-info-700: #1F5DA1;
+
+    /* ============================================================
+       §1.6 · NEUTROS — Texto, fundos, bordas
+       ============================================================ */
+    -app-neutral-50:  #F8FAFC;   /* zebra de tabela */
+    -app-neutral-100: #EDF1F5;   /* fundo de campo disabled */
+    -app-neutral-200: #E1E7EF;   /* borda padrão */
+    -app-neutral-300: #C8D2E0;   /* borda hover/focus */
+    -app-neutral-400: #98A2B3;   /* texto disabled */
+    -app-neutral-500: #68778B;   /* texto secundário */
+    -app-neutral-700: #172334;   /* texto principal */
+    -app-neutral-900: #0B1220;   /* sombra de texto forte */
+
+    /* ============================================================
+       §1.7 · SUPERFÍCIES — Semântico
+       ============================================================ */
+    -app-background:     #F5F7FA;   /* Fundo geral */
+    -app-surface:        #FFFFFF;   /* Cartões, campos, diálogos */
+    -app-border:         #E1E7EF;   /* Separadores e contornos */
+    -app-border-strong:  #C8D2E0;   /* Contornos em hover/focus */
+    -app-divider:        #E8EDF3;   /* Divisores internos */
+
+    /* ============================================================
+       §1.8 · TEXTO — Cores semânticas
+       ============================================================ */
+    -app-text-primary:    #172334;
+    -app-text-secondary:  #68778B;
+    -app-text-disabled:   #98A2B3;
+    -app-text-on-primary: #FFFFFF;
+    -app-text-on-danger:  #FFFFFF;
+    -app-text-on-success: #FFFFFF;
+    -app-text-on-warning: #FFFFFF;
+
+    /* ============================================================
+       §1.9 · SEMÂNTICAS — Cores + Fundos
+       ============================================================ */
+    -app-success:     -app-green-600;
+    -app-success-bg:  -app-green-100;
+    -app-success-fg:  -app-green-700;
+
+    -app-warning:     -app-orange-600;
+    -app-warning-bg:  -app-orange-100;
+    -app-warning-fg:  -app-orange-700;
+
+    -app-danger:      -app-red-600;
+    -app-danger-bg:   -app-red-100;
+    -app-danger-fg:   -app-red-700;
+
+    -app-info:        -app-info-600;
+    -app-info-bg:     -app-info-100;
+    -app-info-fg:     -app-info-700;
+
+    /* ============================================================
+       §1.10 · FOCO — Acessibilidade (WCAG AA)
+       ============================================================ */
+    -app-focus-ring:        rgba(50, 107, 197, 0.45);
+    -app-focus-ring-danger: rgba(200, 62, 77, 0.45);
+
+    /* ============================================================
+       §1.11 · SOMBRAS — Elevação
+       ============================================================ */
+    -app-shadow-sm: dropshadow(gaussian, rgba(16,24,40,0.05), 4, 0, 0, 1);
+    -app-shadow-md: dropshadow(gaussian, rgba(16,24,40,0.08), 8, 0, 0, 2);
+    -app-shadow-lg: dropshadow(gaussian, rgba(16,24,40,0.12), 16, 0, 0, 4);
+
+    /* Sombras específicas de botão (feedback tátil) */
+    -app-shadow-button:         dropshadow(gaussian, rgba(16,24,40,0.10), 4, 0, 0, 1);
+    -app-shadow-button-hover:   dropshadow(gaussian, rgba(16,24,40,0.14), 6, 0, 0, 2);
+    -app-shadow-button-pressed: dropshadow(gaussian, rgba(16,24,40,0.06), 2, 0, 0, 0);
+
+    /* ============================================================
+       §1.12 · ESPAÇAMENTO — Escala 4px
+       ============================================================ */
+    -app-space-1:  4px;
+    -app-space-2:  8px;
+    -app-space-3:  12px;
+    -app-space-4:  16px;
+    -app-space-5:  20px;
+    -app-space-6:  24px;
+    -app-space-8:  32px;
+    -app-space-10: 40px;
+    -app-space-12: 48px;
+
+    /* ============================================================
+       §1.13 · RAIOS
+       ============================================================ */
+    -app-radius-sm:   4px;    /* inputs pequenos, checkboxes */
+    -app-radius-md:   6px;    /* inputs padrão */
+    -app-radius-lg:   8px;    /* botões, chips, badges */
+    -app-radius-xl:   12px;   /* cards, diálogos */
+    -app-radius-pill: 999px;  /* badges pill, avatares */
+
+    /* ============================================================
+       §1.14 · ALTURAS DE CONTROLO
+       ============================================================ */
+    -app-control-height-sm: 32px;   /* compacto */
+    -app-control-height-md: 36px;   /* intermédio */
+    -app-control-height-lg: 40px;   /* padrão */
+    -app-control-height-xl: 44px;   /* confortável */
+
+    /* ============================================================
+       §1.15 · ÍCONES
+       ============================================================ */
+    -app-icon-size-sm: 16px;   /* ações compactas */
+    -app-icon-size-md: 20px;   /* padrão */
+    -app-icon-size-lg: 24px;   /* destaque */
+    -app-icon-size-xl: 32px;   /* empty states */
+
+    /* ============================================================
+       §1.16 · LAYOUT
+       ============================================================ */
+    -app-sidebar-width:         240px;
+    -app-sidebar-compact-width: 72px;
+    -app-topbar-height:         64px;
+    -app-footer-height:         40px;
+
+    /* ============================================================
+       §1.17 · PADDING DE CARD
+       ============================================================ */
+    -app-card-padding-sm: 16px;
+    -app-card-padding-md: 20px;
+    -app-card-padding-lg: 24px;
+
+    /* ============================================================
+       §6 · TIPOGRAFIA — Escala
+       ============================================================ */
+    -app-font-size-xs:  12px;   /* caption */
+    -app-font-size-sm:  13px;   /* label, body pequeno */
+    -app-font-size-md:  14px;   /* body padrão */
+    -app-font-size-lg:  16px;   /* card title */
+    -app-font-size-xl:  18px;   /* subtitle */
+    -app-font-size-2xl: 20px;   /* section title */
+    -app-font-size-3xl: 24px;   /* page title pequeno */
+    -app-font-size-4xl: 28px;   /* page title */
+    -app-font-size-kpi: 32px;   /* KPI value */
+
+    -app-font-weight-regular:  400;
+    -app-font-weight-medium:   500;
+    -app-font-weight-semibold: 600;
+    -app-font-weight-bold:     700;
+
+    -app-font-family: "Inter", "Segoe UI", sans-serif;
+
+    /* ============================================================
+       §1.18 · Z-INDEX — Camadas
+       ============================================================ */
+    -app-z-base:      0;
+    -app-z-dropdown:  100;
+    -app-z-sticky:    200;
+    -app-z-overlay:   300;
+    -app-z-modal:     400;
+    -app-z-toast:     500;
+}
+
+/* ============================================================
+   DARK THEME — Override de tokens
+   ============================================================ */
+.root.dark {
+    /* Superfícies */
+    -app-background:     #0F1720;
+    -app-surface:        #1A2332;
+    -app-border:         #2A3547;
+    -app-border-strong:  #3A4658;
+    -app-divider:        #2A3547;
+
+    /* Texto */
+    -app-text-primary:   #E8EDF3;
+    -app-text-secondary: #98A2B3;
+    -app-text-disabled:  #68778B;
+
+    /* Azul (inverter tons) */
+    -app-blue-50:  #0F1B2E;
+    -app-blue-100: #1E3A5F;
+    -app-blue-900: #0B1828;
+
+    /* Neutros (inverter tons) */
+    -app-neutral-50:  #1A2332;
+    -app-neutral-100: #232F42;
+    -app-neutral-200: #2A3547;
+    -app-neutral-300: #3A4658;
+}

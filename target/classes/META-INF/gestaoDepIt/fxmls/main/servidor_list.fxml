@@ -8,51 +8,75 @@
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/21"
+<!--
+    ListaServidores.fxml v1.1
+    Listagem de servidores cadastrados (CRUD).
+    Estilização em servidores.css.
+-->
+<AnchorPane styleClass="servidores-root"
+            xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1">
 
-    <VBox spacing="15" AnchorPane.topAnchor="20" AnchorPane.leftAnchor="20"
+    <VBox spacing="15" styleClass="servidores-container"
+          AnchorPane.topAnchor="20" AnchorPane.leftAnchor="20"
           AnchorPane.rightAnchor="20" AnchorPane.bottomAnchor="20">
 
-        <!-- TÍTULO -->
-        <HBox spacing="10" styleClass="header">
-            <Text text="🌐 Configurações de Servidor" styleClass="titulo" />
-            <Label fx:id="lblTotal" text="Total: 0" styleClass="total-label" />
+        <!-- ==================== CABEÇALHO ==================== -->
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="servidores-header">
+            <Text text="🌐 Configurações de Servidor"
+                  styleClass="servidores-title"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="lblTotal" text="Total: 0"
+                   styleClass="servidores-count"/>
         </HBox>
 
-        <Separator />
+        <Separator styleClass="servidores-separator"/>
 
-        <!-- BARRA DE FERRAMENTAS -->
-        <HBox spacing="10" styleClass="toolbar">
-            <Button fx:id="btnNovo" text="➕ Novo Servidor" styleClass="btn-novo" />
-            <Button fx:id="btnRefresh" text="🔄 Atualizar" styleClass="btn-refresh" />
-            <Button fx:id="btnTestarTodos" text="🔌 Testar Todos" styleClass="btn-testar-todos" />
+        <!-- ==================== TOOLBAR ==================== -->
+        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="servidores-toolbar">
+            <Button fx:id="btnNovo" text="➕ Novo Servidor"
+                    styleClass="clay-button clay-button-primary"/>
+
+            <Button fx:id="btnRefresh" text="🔄 Atualizar"
+                    styleClass="clay-button clay-button-soft"/>
+
+            <Button fx:id="btnTestarTodos" text="🔌 Testar Todos"
+                    styleClass="clay-button clay-button-soft"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
         </HBox>
 
-        <!-- TABELA -->
-        <TableView fx:id="tblServidores" styleClass="tabela" VBox.vgrow="ALWAYS">
+        <!-- ==================== TABELA ==================== -->
+        <TableView fx:id="tblServidores"
+                   styleClass="servidores-table"
+                   VBox.vgrow="ALWAYS">
+
+            <placeholder>
+                <Label text="Nenhum servidor cadastrado. Clique em 'Novo Servidor' para começar."
+                       styleClass="servidores-empty"/>
+            </placeholder>
 
             <columns>
-                <TableColumn fx:id="colStatus" text="Status" prefWidth="100" styleClass="col-status" />
-                <TableColumn fx:id="colNome" text="Nome" prefWidth="180" styleClass="col-nome" />
-                <TableColumn fx:id="colTipo" text="Tipo" prefWidth="100" styleClass="col-tipo" />
-                <TableColumn fx:id="colHost" text="Host" prefWidth="180" styleClass="col-host" />
-                <TableColumn fx:id="colPorta" text="Porta" prefWidth="80" styleClass="col-porta" />
-                <TableColumn fx:id="colDatabase" text="Database" prefWidth="150" styleClass="col-database" />
-                <TableColumn fx:id="colUsuario" text="Usuário" prefWidth="120" styleClass="col-usuario" />
-                <TableColumn fx:id="colUltimaConexao" text="Última Conexão" prefWidth="180" styleClass="col-ultima" />
-                <TableColumn fx:id="colAcoes" text="Ações" prefWidth="180" styleClass="col-acoes" />
+                <TableColumn fx:id="colStatus"         text="Status"          prefWidth="100"/>
+                <TableColumn fx:id="colNome"           text="Nome"            prefWidth="180"/>
+                <TableColumn fx:id="colTipo"           text="Tipo"            prefWidth="100"/>
+                <TableColumn fx:id="colHost"           text="Host"            prefWidth="180"/>
+                <TableColumn fx:id="colPorta"          text="Porta"           prefWidth="80"/>
+                <TableColumn fx:id="colDatabase"       text="Database"        prefWidth="150"/>
+                <TableColumn fx:id="colUsuario"        text="Usuário"         prefWidth="120"/>
+                <TableColumn fx:id="colUltimaConexao"  text="Última Conexão"  prefWidth="180"/>
+                <TableColumn fx:id="colAcoes"          text="Ações"           prefWidth="180"/>
             </columns>
 
             <columnResizePolicy>
-                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN"/>
             </columnResizePolicy>
 
         </TableView>
 
     </VBox>
-
 </AnchorPane>

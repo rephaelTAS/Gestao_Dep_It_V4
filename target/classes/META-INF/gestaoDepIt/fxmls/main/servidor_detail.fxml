@@ -3,82 +3,135 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/21"
+<!--
+    DetalhesServidor.fxml v1.1
+    Tela de detalhes (read-only) de um servidor + ações.
+    Estilização em detalhes.css.
+-->
+<AnchorPane styleClass="detalhes-root"
+            xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1">
 
-    <VBox spacing="15" AnchorPane.topAnchor="20" AnchorPane.leftAnchor="20"
+    <VBox spacing="15" styleClass="detalhes-container"
+          AnchorPane.topAnchor="20" AnchorPane.leftAnchor="20"
           AnchorPane.rightAnchor="20" AnchorPane.bottomAnchor="20">
 
-        <!-- TÍTULO -->
-        <HBox spacing="10" styleClass="header">
-            <Text fx:id="txtTitulo" text="🔍 Detalhes do Servidor" styleClass="titulo" />
-            <Label fx:id="lblStatus" text="Status: --" styleClass="status-badge" />
+        <!-- ==================== CABEÇALHO ==================== -->
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="detalhes-header">
+            <Text fx:id="txtTitulo"
+                  text="🔍 Detalhes do Servidor"
+                  styleClass="detalhes-title"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="lblStatus"
+                   text="Status: --"
+                   styleClass="detalhes-status-badge"/>
         </HBox>
 
-        <Separator />
+        <Separator styleClass="detalhes-separator"/>
 
-        <!-- DADOS DO SERVIDOR (READ-ONLY) -->
+        <!-- ==================== DADOS ==================== -->
         <GridPane hgap="15" vgap="10" styleClass="detalhes-grid">
+            <columnConstraints>
+                <ColumnConstraints minWidth="160" prefWidth="180" hgrow="NEVER"/>
+                <ColumnConstraints minWidth="200" hgrow="ALWAYS"/>
+            </columnConstraints>
 
-            <Label text="Nome:" styleClass="label-detalhe" GridPane.rowIndex="0" GridPane.columnIndex="0" />
-            <Label fx:id="lblNome" text="--" styleClass="valor-detalhe" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+            <Label text="Nome:" styleClass="detalhes-label"
+                   GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <Label fx:id="lblNome" text="--" styleClass="detalhes-value"
+                   wrapText="true"
+                   GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-            <Label text="Tipo:" styleClass="label-detalhe" GridPane.rowIndex="1" GridPane.columnIndex="0" />
-            <Label fx:id="lblTipo" text="--" styleClass="valor-detalhe" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+            <Label text="Tipo:" styleClass="detalhes-label"
+                   GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <Label fx:id="lblTipo" text="--" styleClass="detalhes-value"
+                   GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-            <Label text="Host:" styleClass="label-detalhe" GridPane.rowIndex="2" GridPane.columnIndex="0" />
-            <Label fx:id="lblHost" text="--" styleClass="valor-detalhe" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+            <Label text="Host:" styleClass="detalhes-label"
+                   GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+            <Label fx:id="lblHost" text="--" styleClass="detalhes-value"
+                   GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
-            <Label text="Porta:" styleClass="label-detalhe" GridPane.rowIndex="3" GridPane.columnIndex="0" />
-            <Label fx:id="lblPorta" text="--" styleClass="valor-detalhe" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+            <Label text="Porta:" styleClass="detalhes-label"
+                   GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+            <Label fx:id="lblPorta" text="--" styleClass="detalhes-value"
+                   GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
-            <Label text="Database:" styleClass="label-detalhe" GridPane.rowIndex="4" GridPane.columnIndex="0" />
-            <Label fx:id="lblDatabase" text="--" styleClass="valor-detalhe" GridPane.rowIndex="4" GridPane.columnIndex="1" />
+            <Label text="Database:" styleClass="detalhes-label"
+                   GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+            <Label fx:id="lblDatabase" text="--" styleClass="detalhes-value"
+                   GridPane.rowIndex="4" GridPane.columnIndex="1"/>
 
-            <Label text="Usuário:" styleClass="label-detalhe" GridPane.rowIndex="5" GridPane.columnIndex="0" />
-            <Label fx:id="lblUsuario" text="--" styleClass="valor-detalhe" GridPane.rowIndex="5" GridPane.columnIndex="1" />
+            <Label text="Usuário:" styleClass="detalhes-label"
+                   GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+            <Label fx:id="lblUsuario" text="--" styleClass="detalhes-value"
+                   GridPane.rowIndex="5" GridPane.columnIndex="1"/>
 
-            <Label text="Senha:" styleClass="label-detalhe" GridPane.rowIndex="6" GridPane.columnIndex="0" />
-            <Label fx:id="lblSenha" text="••••••••" styleClass="valor-detalhe" GridPane.rowIndex="6" GridPane.columnIndex="1" />
+            <Label text="Senha:" styleClass="detalhes-label"
+                   GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+            <Label fx:id="lblSenha" text="••••••••" styleClass="detalhes-value detalhes-value-mono"
+                   GridPane.rowIndex="6" GridPane.columnIndex="1"/>
 
-            <Label text="Parâmetros:" styleClass="label-detalhe" GridPane.rowIndex="7" GridPane.columnIndex="0" />
-            <Label fx:id="lblParametros" text="--" styleClass="valor-detalhe" GridPane.rowIndex="7" GridPane.columnIndex="1" />
+            <Label text="Parâmetros:" styleClass="detalhes-label"
+                   GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+            <Label fx:id="lblParametros" text="--"
+                   styleClass="detalhes-value detalhes-value-mono"
+                   wrapText="true"
+                   GridPane.rowIndex="7" GridPane.columnIndex="1"/>
 
-            <Label text="Última Conexão:" styleClass="label-detalhe" GridPane.rowIndex="8" GridPane.columnIndex="0" />
-            <Label fx:id="lblUltimaConexao" text="--" styleClass="valor-detalhe" GridPane.rowIndex="8" GridPane.columnIndex="1" />
+            <Label text="Última Conexão:" styleClass="detalhes-label"
+                   GridPane.rowIndex="8" GridPane.columnIndex="0"/>
+            <Label fx:id="lblUltimaConexao" text="--" styleClass="detalhes-value"
+                   GridPane.rowIndex="8" GridPane.columnIndex="1"/>
 
-            <Label text="Criado em:" styleClass="label-detalhe" GridPane.rowIndex="9" GridPane.columnIndex="0" />
-            <Label fx:id="lblCreatedAt" text="--" styleClass="valor-detalhe" GridPane.rowIndex="9" GridPane.columnIndex="1" />
+            <Label text="Criado em:" styleClass="detalhes-label"
+                   GridPane.rowIndex="9" GridPane.columnIndex="0"/>
+            <Label fx:id="lblCreatedAt" text="--" styleClass="detalhes-value"
+                   GridPane.rowIndex="9" GridPane.columnIndex="1"/>
 
-            <Label text="Atualizado em:" styleClass="label-detalhe" GridPane.rowIndex="10" GridPane.columnIndex="0" />
-            <Label fx:id="lblUpdatedAt" text="--" styleClass="valor-detalhe" GridPane.rowIndex="10" GridPane.columnIndex="1" />
-
+            <Label text="Atualizado em:" styleClass="detalhes-label"
+                   GridPane.rowIndex="10" GridPane.columnIndex="0"/>
+            <Label fx:id="lblUpdatedAt" text="--" styleClass="detalhes-value"
+                   GridPane.rowIndex="10" GridPane.columnIndex="1"/>
         </GridPane>
 
-        <Separator />
+        <Separator styleClass="detalhes-separator"/>
 
-        <!-- URL DA CONEXÃO -->
-        <HBox spacing="10" styleClass="url-box">
-            <Label text="URL:" styleClass="label-detalhe" />
-            <Label fx:id="lblUrl" text="--" styleClass="valor-url" />
-        </HBox>
+        <!-- ==================== URL DE CONEXÃO ==================== -->
+        <VBox spacing="6" styleClass="detalhes-url-box">
+            <Label text="URL de Conexão" styleClass="detalhes-url-label"/>
+            <Label fx:id="lblUrl" text="--"
+                   styleClass="detalhes-url-value"
+                   wrapText="true"/>
+        </VBox>
 
-        <!-- BOTÕES DE AÇÃO -->
-        <HBox spacing="15" styleClass="button-bar">
-            <Button fx:id="btnTestar" text="🔌 Testar Conexão" styleClass="btn-testar" />
-            <Button fx:id="btnAtivar" text="✅ Ativar" styleClass="btn-ativar" />
-            <Button fx:id="btnDesativar" text="❌ Desativar" styleClass="btn-desativar" />
-            <Button fx:id="btnEditar" text="✏️ Editar" styleClass="btn-editar" />
-            <Button fx:id="btnVoltar" text="◀ Voltar" styleClass="btn-voltar" />
+        <!-- ==================== BOTÕES DE AÇÃO ==================== -->
+        <HBox alignment="CENTER_RIGHT" spacing="10" styleClass="detalhes-button-bar">
+            <Button fx:id="btnVoltar" text="◀ Voltar"
+                    styleClass="clay-button clay-button-ghost"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <Button fx:id="btnTestar" text="🔌 Testar Conexão"
+                    styleClass="clay-button clay-button-soft"/>
+
+            <Button fx:id="btnDesativar" text="❌ Desativar"
+                    styleClass="clay-button clay-button-danger"/>
+
+            <Button fx:id="btnAtivar" text="✅ Ativar"
+                    styleClass="clay-button clay-button-success"/>
+
+            <Button fx:id="btnEditar" text="✏️ Editar"
+                    styleClass="clay-button clay-button-primary"/>
         </HBox>
 
     </VBox>
-
 </AnchorPane>

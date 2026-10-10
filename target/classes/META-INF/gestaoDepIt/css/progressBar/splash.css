@@ -1,0 +1,178 @@
+/*
+ * Packt Inventário — Splash Screen
+ * File: splash.css
+ * JavaFX 21+
+ *
+ * AUTOSSUFICIENTE — não depende de outros CSS.
+ * Inclui a paleta oficial do catálogo §1.
+ *
+ * NOTA: O splash usa variantes ESCURAS da paleta oficial
+ *       (blue-900 + blue-800), não cores inventadas.
+ */
+
+/* ============================================================
+   PALETA OFICIAL — Catálogo §1
+   ============================================================ */
+
+.root,
+.splash-root {
+    /* Azuis */
+    -app-blue-900: #142B4A;
+    -app-blue-800: #1E3A5F;
+    -app-blue-700: #2457A7;
+    -app-blue-600: #326BC5;
+    -app-blue-100: #E8F0FC;
+    -app-blue-50:  #F4F8FE;
+
+    /* Semânticas */
+    -app-red-700:    #A8303C;
+    -app-red-600:    #C83E4D;
+    -app-red-100:    #FDECEF;
+
+    -app-green-700:  #0F6949;
+    -app-green-600:  #16845B;
+    -app-green-100:  #E8F6EF;
+
+    -app-orange-600: #B7791F;
+    -app-orange-100: #FFF4DF;
+
+    -app-info-600:   #2874C8;
+    -app-info-100:   #EAF3FE;
+
+    /* Neutros */
+    -app-neutral-50:  #F8FAFC;
+    -app-neutral-100: #EDF1F5;
+    -app-neutral-200: #E1E7EF;
+    -app-neutral-300: #C8D2E0;
+
+    /* Superfícies */
+    -app-background:     #F5F7FA;
+    -app-surface:        #FFFFFF;
+    -app-border:         #E1E7EF;
+    -app-border-strong:  #C8D2E0;
+    -app-divider:        #E8EDF3;
+
+    /* Texto */
+    -app-text-primary:    #172334;
+    -app-text-secondary:  #68778B;
+    -app-text-disabled:   #98A2B3;
+    -app-text-on-primary: #FFFFFF;
+
+    /* Foco */
+    -app-focus-ring: rgba(50, 107, 197, 0.45);
+
+    /* Fonte */
+    -app-font-family: "Inter", "Segoe UI", sans-serif;
+
+    /* ============================================================
+       TOKENS LOCAIS DO SPLASH (derivados da paleta oficial)
+       ============================================================ */
+
+    /* Gradiente de fundo — tons profundos da marca */
+    -splash-bg-top:    -app-blue-900;   /* #142B4A */
+    -splash-bg-bottom: #0B1828;         /* mais escuro que blue-900 (única exceção) */
+    -splash-border:    -app-blue-800;   /* #1E3A5F */
+
+    /* Texto — sobre fundo escuro */
+    -splash-text-primary:   #FFFFFF;
+    -splash-text-secondary: rgba(255, 255, 255, 0.75);
+    -splash-text-muted:     rgba(255, 255, 255, 0.60);
+    -splash-text-disabled:  rgba(255, 255, 255, 0.40);
+
+    /* Progresso */
+    -splash-accent: -app-blue-600;      /* #326BC5 — azul de interação */
+    -splash-track:  rgba(255, 255, 255, 0.12);
+
+    /* DEV badge */
+    -splash-warning: -app-orange-600;   /* #B7791F */
+
+    /* Base */
+    -fx-font-family: -app-font-family;
+}
+
+/* ============================================================
+   ROOT / CONTAINER
+   ============================================================ */
+
+.splash-root {
+    -fx-background-color: linear-gradient(to bottom, -splash-bg-top, -splash-bg-bottom);
+    -fx-border-color: -splash-border;
+    -fx-border-width: 1px;
+}
+
+/* ============================================================
+   TÍTULO PRINCIPAL
+   ============================================================ */
+
+.splash-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -splash-text-primary;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.30), 4, 0, 0, 2);
+}
+
+/* ============================================================
+   SUBTÍTULO
+   ============================================================ */
+
+.splash-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: -splash-text-secondary;
+    -fx-font-weight: normal;
+}
+
+/* ============================================================
+   BARRA DE PROGRESSO
+   ============================================================ */
+
+.splash-progress {
+    -fx-pref-width: 400px;
+    -fx-min-height: 10px;
+    -fx-pref-height: 10px;
+}
+
+.splash-progress .track {
+    -fx-background-color: -splash-track;
+    -fx-background-radius: 999px;
+    -fx-border-radius: 999px;
+}
+
+.splash-progress .bar {
+    -fx-background-color: -splash-accent;
+    -fx-background-radius: 999px;
+    -fx-padding: 0;
+    -fx-background-insets: 0;
+}
+
+/* ============================================================
+   STATUS / MENSAGEM
+   ============================================================ */
+
+.splash-status {
+    -fx-font-size: 13px;
+    -fx-text-fill: -splash-text-muted;
+    -fx-text-alignment: center;
+    -fx-wrap-text: true;
+}
+
+/* ============================================================
+   VERSÃO
+   ============================================================ */
+
+.splash-version {
+    -fx-font-size: 11px;
+    -fx-text-fill: -splash-text-disabled;
+}
+
+/* ============================================================
+   DEV MODE BADGE
+   ============================================================ */
+
+.splash-dev-badge {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -splash-warning;
+    -fx-background-color: rgba(0, 0, 0, 0.35);
+    -fx-background-radius: 999px;
+    -fx-padding: 4px 14px;
+}

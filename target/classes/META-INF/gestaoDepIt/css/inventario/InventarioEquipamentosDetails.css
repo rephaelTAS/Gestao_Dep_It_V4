@@ -1,91 +1,284 @@
+/*
+ * Packt Inventário — Detalhes do Equipamento
+ * File: equipamento-detalhe.css
+ * JavaFX 21+
+ *
+ * AUTOSSUFICIENTE — não depende de outros CSS.
+ * Inclui a paleta oficial do catálogo §1.
+ */
+
 /* ============================================================
-   InventarioEquipamentosDetails.css
-   Janela de detalhes de um equipamento.
-   Tema claro, cards com cabeçalho colorido.
+   PALETA OFICIAL — Catálogo §1
+   ============================================================ */
+
+.root,
+.detail-root {
+    /* Azuis */
+    -app-blue-900: #142B4A;
+    -app-blue-800: #1E3A5F;
+    -app-blue-700: #2457A7;
+    -app-blue-600: #326BC5;
+    -app-blue-100: #E8F0FC;
+    -app-blue-50:  #F4F8FE;
+
+    /* Semânticas */
+    -app-red-700:    #A8303C;
+    -app-red-600:    #C83E4D;
+    -app-red-100:    #FDECEF;
+
+    -app-green-700:  #0F6949;
+    -app-green-600:  #16845B;
+    -app-green-100:  #E8F6EF;
+
+    -app-orange-600: #B7791F;
+    -app-orange-100: #FFF4DF;
+
+    -app-info-600:   #2874C8;
+    -app-info-100:   #EAF3FE;
+
+    /* Roxo (Ações Rápidas) */
+    -app-purple-700: #6D28D9;
+    -app-purple-600: #7C3AED;
+    -app-purple-100: #F3E8FF;
+
+    /* Rosa (Histórico) */
+    -app-pink-700:   #BE185D;
+    -app-pink-600:   #DB2777;
+    -app-pink-100:   #FCE7F3;
+
+    /* Cinza (Baixar) */
+    -app-gray-600:   #4B5563;
+    -app-gray-100:   #F3F4F6;
+
+    /* Neutros */
+    -app-neutral-50:  #F8FAFC;
+    -app-neutral-100: #EDF1F5;
+    -app-neutral-200: #E1E7EF;
+    -app-neutral-300: #C8D2E0;
+
+    /* Superfícies */
+    -app-background:     #F5F7FA;
+    -app-surface:        #FFFFFF;
+    -app-border:         #E1E7EF;
+    -app-border-strong:  #C8D2E0;
+    -app-divider:        #E8EDF3;
+
+    /* Texto */
+    -app-text-primary:    #172334;
+    -app-text-secondary:  #68778B;
+    -app-text-disabled:   #98A2B3;
+    -app-text-on-primary: #FFFFFF;
+
+    /* Foco */
+    -app-focus-ring: rgba(50, 107, 197, 0.45);
+
+    /* Fonte */
+    -app-font-family: "Inter", "Segoe UI", sans-serif;
+    -app-font-mono: "JetBrains Mono", "Consolas", "Menlo", monospace;
+
+    /* Base */
+    -fx-background-color: -app-background;
+    -fx-font-family: -app-font-family;
+}
+
+/* ============================================================
+   ROOT / CONTAINER
    ============================================================ */
 
 .detail-root {
-    -fx-background-color: #f9fafb;
-    -fx-font-family: "Segoe UI", "Helvetica Neue", sans-serif;
-    -fx-font-size: 13px;
+    -fx-background-color: -app-background;
 }
 
-/* ===== Header ===== */
+/* ============================================================
+   HEADER (top)
+   ============================================================ */
+
 .detail-header-bar {
-    -fx-background-color: #ffffff;
-    -fx-border-color: transparent transparent #e5e7eb transparent;
+    -fx-background-color: -app-surface;
+    -fx-padding: 16px 20px;
+    -fx-border-color: transparent transparent -app-border transparent;
     -fx-border-width: 0 0 1 0;
-    -fx-padding: 15 20 15 20;
+    -fx-spacing: 20px;
 }
 
 .detail-title {
-    -fx-font-size: 18px;
+    -fx-font-size: 20px;
     -fx-font-weight: bold;
-    -fx-text-fill: #111827;
+    -fx-text-fill: -app-text-primary;
 }
 
 .detail-subtitle {
     -fx-font-size: 12px;
-    -fx-text-fill: #6b7280;
+    -fx-text-fill: -app-text-secondary;
 }
 
-/* ===== Badges de status ===== */
-.badge-status,
-.badge-condicao {
-    -fx-padding: 4 12 4 12;
-    -fx-background-radius: 12;
-    -fx-text-fill: white;
+/* ============================================================
+   BADGES (status + condição)
+   ============================================================ */
+
+.badge-status {
+    -fx-padding: 6px 14px;
+    -fx-background-radius: 999px;
+    -fx-font-size: 12px;
     -fx-font-weight: bold;
-    -fx-font-size: 11px;
-    -fx-background-color: #6b7280;
+    -fx-background-color: -app-green-100;
+    -fx-text-fill: -app-green-700;
 }
 
-/* ===== Barra de info rápida ===== */
+.badge-condicao {
+    -fx-padding: 6px 14px;
+    -fx-background-radius: 999px;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-color: -app-blue-100;
+    -fx-text-fill: -app-blue-700;
+}
+
+/* ============================================================
+   INFO BAR (header inferior)
+   ============================================================ */
+
 .detail-info-bar {
-    -fx-background-color: #f9fafb;
-    -fx-border-color: transparent transparent #e5e7eb transparent;
+    -fx-background-color: -app-surface;
+    -fx-padding: 12px 20px;
+    -fx-border-color: transparent transparent -app-border transparent;
     -fx-border-width: 0 0 1 0;
-    -fx-padding: 10 20 10 20;
+    -fx-spacing: 30px;
 }
 
 .info-label {
-    -fx-text-fill: #6b7280;
     -fx-font-size: 12px;
+    -fx-text-fill: -app-text-secondary;
 }
 
 .info-value {
-    -fx-text-fill: #1f2937;
-    -fx-font-size: 12px;
+    -fx-font-size: 13px;
     -fx-font-weight: bold;
+    -fx-text-fill: -app-text-primary;
 }
 
-/* ===== Conteúdo ===== */
+/* ProgressBar de performance */
+.detail-info-bar .progress-bar {
+    -fx-min-height: 8px;
+    -fx-pref-height: 8px;
+    -fx-pref-width: 150px;
+}
+
+.detail-info-bar .progress-bar .track {
+    -fx-background-color: -app-neutral-100;
+    -fx-background-radius: 999px;
+}
+
+.detail-info-bar .progress-bar .bar {
+    -fx-background-color: -app-blue-600;
+    -fx-background-radius: 999px;
+    -fx-padding: 0;
+    -fx-background-insets: 0;
+}
+
+/* ============================================================
+   SCROLL + CONTENT (center)
+   ============================================================ */
+
 .detail-scroll {
-    -fx-background-color: transparent;
-    -fx-background: transparent;
+    -fx-background-color: -app-background;
+    -fx-background: -app-background;
+}
+
+.detail-scroll > .viewport {
+    -fx-background-color: -app-background;
 }
 
 .detail-content {
-    -fx-padding: 20;
+    -fx-background-color: -app-background;
+    -fx-spacing: 20px;
+    -fx-padding: 20px;
 }
 
-/* ===== Cards ===== */
+/* ============================================================
+   CARDS
+   ============================================================ */
+
 .detail-card {
-    -fx-background-color: #ffffff;
-    -fx-background-radius: 8;
-    -fx-border-radius: 8;
-    -fx-border-color: #e5e7eb;
-    -fx-border-width: 1;
-    -fx-padding: 15;
+    -fx-background-color: -app-surface;
+    -fx-background-radius: 12px;
+    -fx-border-radius: 12px;
+    -fx-border-color: -app-border;
+    -fx-border-width: 1px;
+    -fx-padding: 16px;
+    -fx-spacing: 12px;
 }
 
-.detail-card-header-primary   { -fx-background-color: #dbeafe; -fx-padding: 8 12 8 12; -fx-background-radius: 6; }
-.detail-card-header-secondary { -fx-background-color: #e0e7ff; -fx-padding: 8 12 8 12; -fx-background-radius: 6; }
-.detail-card-header-success   { -fx-background-color: #d1fae5; -fx-padding: 8 12 8 12; -fx-background-radius: 6; }
-.detail-card-header-warning   { -fx-background-color: #fef3c7; -fx-padding: 8 12 8 12; -fx-background-radius: 6; }
-.detail-card-header-purple    { -fx-background-color: #ede9fe; -fx-padding: 8 12 8 12; -fx-background-radius: 6; }
-.detail-card-header-pink      { -fx-background-color: #fce7f3; -fx-padding: 8 12 8 12; -fx-background-radius: 6; }
+/* ============================================================
+   CARD HEADERS COLORIDOS
+   ============================================================ */
 
+.detail-card-header-primary,
+.detail-card-header-secondary,
+.detail-card-header-success,
+.detail-card-header-purple,
+.detail-card-header-warning,
+.detail-card-header-pink {
+    -fx-padding: 8px 12px;
+    -fx-background-radius: 8px;
+    -fx-spacing: 10px;
+}
+
+/* Primary — Azul (Identificação) */
+.detail-card-header-primary {
+    -fx-background-color: -app-blue-100;
+}
+
+.detail-card-header-primary .card-header-title {
+    -fx-text-fill: -app-blue-700;
+}
+
+/* Secondary — Azul escuro (Localização) */
+.detail-card-header-secondary {
+    -fx-background-color: -app-info-100;
+}
+
+.detail-card-header-secondary .card-header-title {
+    -fx-text-fill: -app-info-600;
+}
+
+/* Success — Verde (Status) */
+.detail-card-header-success {
+    -fx-background-color: -app-green-100;
+}
+
+.detail-card-header-success .card-header-title {
+    -fx-text-fill: -app-green-700;
+}
+
+/* Purple — Roxo (Ações Rápidas) */
+.detail-card-header-purple {
+    -fx-background-color: -app-purple-100;
+}
+
+.detail-card-header-purple .card-header-title {
+    -fx-text-fill: -app-purple-700;
+}
+
+/* Warning — Laranja (Dados Técnicos) */
+.detail-card-header-warning {
+    -fx-background-color: -app-orange-100;
+}
+
+.detail-card-header-warning .card-header-title {
+    -fx-text-fill: -app-orange-600;
+}
+
+/* Pink — Rosa (Histórico) */
+.detail-card-header-pink {
+    -fx-background-color: -app-pink-100;
+}
+
+.detail-card-header-pink .card-header-title {
+    -fx-text-fill: -app-pink-700;
+}
+
+/* Comuns a todos os headers */
 .card-icon {
     -fx-font-size: 16px;
 }
@@ -93,199 +286,429 @@
 .card-header-title {
     -fx-font-size: 12px;
     -fx-font-weight: bold;
-    -fx-text-fill: #374151;
 }
+
+/* ============================================================
+   CARD CONTENT
+   ============================================================ */
 
 .card-content {
-    -fx-padding: 5 0 0 0;
+    -fx-padding: 4px 4px 0 4px;
 }
 
-/* ===== Labels e valores ===== */
+/* Labels e valores */
 .label-bold {
-    -fx-text-fill: #6b7280;
     -fx-font-size: 12px;
     -fx-font-weight: bold;
+    -fx-text-fill: -app-text-secondary;
 }
 
 .value-highlight {
-    -fx-text-fill: #111827;
+    -fx-font-family: -app-font-mono;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
+    -fx-text-fill: -app-blue-700;
+    -fx-background-color: -app-blue-50;
+    -fx-background-radius: 4px;
+    -fx-padding: 2px 6px;
 }
 
-/* ===== Score de saúde ===== */
+.card-content .grid-pane .label:not(.label-bold):not(.value-highlight) {
+    -fx-font-size: 13px;
+    -fx-text-fill: -app-text-primary;
+}
+
+/* ============================================================
+   SCORE CIRCLE (Card Status)
+   ============================================================ */
+
 .score-label {
-    -fx-text-fill: #111827;
     -fx-font-size: 22px;
     -fx-font-weight: bold;
+    -fx-text-fill: -app-text-primary;
 }
 
 .score-subtitle {
-    -fx-text-fill: #9ca3af;
     -fx-font-size: 11px;
+    -fx-text-fill: -app-text-secondary;
 }
 
-/* ===== Ações rápidas (botões) ===== */
+/* ============================================================
+   BOTÕES DE AÇÃO RÁPIDA
+   ============================================================ */
+
 .btn-action-info,
 .btn-action-danger,
 .btn-action-success,
 .btn-action-purple,
 .btn-action-gray {
-    -fx-padding: 8 12 8 12;
-    -fx-background-radius: 6;
-    -fx-border-radius: 6;
-    -fx-cursor: hand;
+    -fx-font-family: -app-font-family;
     -fx-font-size: 12px;
     -fx-font-weight: bold;
-    -fx-text-fill: white;
-    -fx-alignment: CENTER_LEFT;
+    -fx-min-height: 36px;
+    -fx-padding: 0 12px;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-border-width: 1px;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+    -fx-alignment: center-left;
+    -fx-graphic-text-gap: 8px;
+    -fx-max-width: Infinity;
 }
 
-.btn-action-info    { -fx-background-color: #3b82f6; }
-.btn-action-info:hover { -fx-background-color: #2563eb; }
+.btn-action-info:focused,
+.btn-action-danger:focused,
+.btn-action-success:focused,
+.btn-action-purple:focused,
+.btn-action-gray:focused {
+    -fx-effect: dropshadow(gaussian, -app-focus-ring, 4, 0, 0, 0);
+}
 
-.btn-action-danger  { -fx-background-color: #ef4444; }
-.btn-action-danger:hover { -fx-background-color: #dc2626; }
+/* Info (Azul claro) */
+.btn-action-info {
+    -fx-background-color: -app-blue-100;
+    -fx-text-fill: -app-blue-700;
+}
 
-.btn-action-success { -fx-background-color: #10b981; }
-.btn-action-success:hover { -fx-background-color: #059669; }
+.btn-action-info:hover {
+    -fx-background-color: #D6E4F8;
+}
 
-.btn-action-purple  { -fx-background-color: #8b5cf6; }
-.btn-action-purple:hover { -fx-background-color: #7c3aed; }
+/* Danger (Vermelho claro) */
+.btn-action-danger {
+    -fx-background-color: -app-red-100;
+    -fx-text-fill: -app-red-700;
+}
 
-.btn-action-gray    { -fx-background-color: #6b7280; }
-.btn-action-gray:hover { -fx-background-color: #4b5563; }
+.btn-action-danger:hover {
+    -fx-background-color: #FAD5DB;
+}
 
-/* ===== Caixa técnica ===== */
+/* Success (Verde claro) */
+.btn-action-success {
+    -fx-background-color: -app-green-100;
+    -fx-text-fill: -app-green-700;
+}
+
+.btn-action-success:hover {
+    -fx-background-color: #C6E8D5;
+}
+
+/* Purple (Roxo claro) */
+.btn-action-purple {
+    -fx-background-color: -app-purple-100;
+    -fx-text-fill: -app-purple-700;
+}
+
+.btn-action-purple:hover {
+    -fx-background-color: #E4D4FF;
+}
+
+/* Gray (Cinza) */
+.btn-action-gray {
+    -fx-background-color: -app-gray-100;
+    -fx-text-fill: -app-gray-600;
+}
+
+.btn-action-gray:hover {
+    -fx-background-color: #E5E7EB;
+}
+
+/* Separator no card */
+.card-content .separator {
+    -fx-background-color: -app-border;
+}
+
+.card-content .separator .line {
+    -fx-border-color: -app-border;
+    -fx-border-width: 1 0 0 0;
+}
+
+/* ============================================================
+   DADOS TÉCNICOS — caixas de texto
+   ============================================================ */
+
 .detail-tech-box {
-    -fx-background-color: #f9fafb;
-    -fx-background-radius: 6;
-    -fx-border-radius: 6;
-    -fx-border-color: #e5e7eb;
-    -fx-border-width: 1;
-    -fx-padding: 10;
+    -fx-background-color: -app-neutral-50;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-color: -app-border;
+    -fx-border-width: 1px;
+    -fx-padding: 12px;
+    -fx-spacing: 8px;
 }
 
 .detail-textarea {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #d1d5db;
-    -fx-border-width: 1;
-    -fx-border-radius: 4;
-    -fx-background-radius: 4;
+    -fx-font-family: -app-font-family;
     -fx-font-size: 12px;
-    -fx-text-fill: #1f2937;
+    -fx-text-fill: -app-text-primary;
+    -fx-padding: 8px 10px;
+    -fx-background-color: -app-surface;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-border-color: -app-border;
+    -fx-border-width: 1px;
 }
 
-/* ===== Abas ===== */
+.detail-textarea:disabled,
+.detail-textarea:readonly {
+    -fx-opacity: 1;
+    -fx-background-color: -app-surface;
+}
+
+.detail-textarea .content {
+    -fx-background-color: transparent;
+}
+
+.detail-textarea .scroll-pane {
+    -fx-background-color: transparent;
+}
+
+/* ============================================================
+   TABPANE (Histórico)
+   ============================================================ */
+
 .detail-tab-pane {
     -fx-background-color: transparent;
-    -fx-tab-min-width: 100px;
+    -fx-tab-min-height: 32px;
+    -fx-tab-max-height: 32px;
 }
 
-.detail-tab-pane .tab-header-background {
-    -fx-background-color: #f3f4f6;
-    -fx-background-radius: 6 6 0 0;
+.detail-tab-pane > .tab-header-area {
+    -fx-padding: 0;
 }
 
-.detail-tab-pane .tab {
+.detail-tab-pane > .tab-header-area > .tab-header-background {
     -fx-background-color: transparent;
-    -fx-padding: 6 12 6 12;
+    -fx-border-color: transparent transparent -app-border transparent;
+    -fx-border-width: 0 0 1 0;
 }
 
-.detail-tab-pane .tab:selected {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #3b82f6 transparent transparent transparent;
-    -fx-border-width: 2 0 0 0;
+.detail-tab-pane > .tab-header-area > .headers-region > .tab {
+    -fx-background-color: transparent;
+    -fx-background-radius: 6px 6px 0 0;
+    -fx-padding: 6px 14px;
+    -fx-border-color: transparent;
 }
 
-.detail-tab-pane .tab-label {
-    -fx-text-fill: #374151;
+.detail-tab-pane > .tab-header-area > .headers-region > .tab .tab-label {
+    -fx-text-fill: -app-text-secondary;
     -fx-font-size: 12px;
+    -fx-font-weight: bold;
 }
 
-.detail-tab-pane .tab:selected .tab-label {
-    -fx-font-weight: bold;
-    -fx-text-fill: #1f2937;
+.detail-tab-pane > .tab-header-area > .headers-region > .tab:hover .tab-label {
+    -fx-text-fill: -app-blue-700;
+}
+
+.detail-tab-pane > .tab-header-area > .headers-region > .tab:selected {
+    -fx-background-color: -app-surface;
+    -fx-border-color: -app-border -app-border transparent -app-border;
+    -fx-border-width: 1 1 0 1;
+    -fx-border-radius: 6px 6px 0 0;
+}
+
+.detail-tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-label {
+    -fx-text-fill: -app-blue-700;
+}
+
+.detail-tab-pane > .tab-content-area {
+    -fx-background-color: -app-surface;
+    -fx-border-color: -app-border;
+    -fx-border-width: 1px;
+    -fx-border-radius: 0 0 8px 8px;
+    -fx-background-radius: 0 0 8px 8px;
+    -fx-padding: 0;
 }
 
 .tab-content {
-    -fx-padding: 10;
+    -fx-padding: 12px;
 }
 
-/* ===== ListView ===== */
+/* ============================================================
+   LISTVIEW (dentro das abas)
+   ============================================================ */
+
 .list-view {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #e5e7eb;
-    -fx-border-width: 1;
-    -fx-border-radius: 4;
-    -fx-background-radius: 4;
+    -fx-background-color: -app-surface;
+    -fx-border-color: -app-border;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 4px;
 }
 
 .list-view .list-cell {
     -fx-background-color: transparent;
-    -fx-text-fill: #1f2937;
-    -fx-padding: 6 10 6 10;
+    -fx-text-fill: -app-text-primary;
     -fx-font-size: 12px;
+    -fx-padding: 8px 12px;
+    -fx-background-radius: 4px;
+    -fx-border-radius: 4px;
 }
 
-.list-view .list-cell:filled:selected {
-    -fx-background-color: #dbeafe;
-    -fx-text-fill: #1e40af;
+.list-view .list-cell:odd {
+    -fx-background-color: -app-neutral-50;
 }
 
-/* ===== Bottom ===== */
+.list-view .list-cell:hover {
+    -fx-background-color: -app-blue-50;
+}
+
+.list-view .list-cell:selected {
+    -fx-background-color: -app-blue-100;
+    -fx-text-fill: -app-blue-700;
+    -fx-font-weight: bold;
+}
+
+/* ============================================================
+   BOTTOM BAR
+   ============================================================ */
+
 .detail-bottom-bar {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #e5e7eb transparent transparent transparent;
+    -fx-background-color: -app-surface;
+    -fx-padding: 12px 20px;
+    -fx-border-color: -app-border transparent transparent transparent;
     -fx-border-width: 1 0 0 0;
-    -fx-padding: 10 20 10 20;
+    -fx-spacing: 30px;
 }
 
 .bottom-label {
-    -fx-text-fill: #9ca3af;
     -fx-font-size: 11px;
+    -fx-text-fill: -app-text-secondary;
 }
 
 .bottom-value {
-    -fx-text-fill: #374151;
     -fx-font-size: 12px;
+    -fx-text-fill: -app-text-primary;
 }
 
 .bottom-value-highlight {
-    -fx-text-fill: #111827;
+    -fx-font-family: -app-font-mono;
     -fx-font-size: 12px;
     -fx-font-weight: bold;
+    -fx-text-fill: -app-blue-700;
+    -fx-background-color: -app-blue-50;
+    -fx-background-radius: 4px;
+    -fx-padding: 2px 8px;
 }
 
-/* ===== Botões (reaproveitamento) ===== */
-.btn-primary {
-    -fx-background-color: #3b82f6;
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-background-radius: 6;
-    -fx-padding: 6 14 6 14;
-    -fx-cursor: hand;
-}
-.btn-primary:hover { -fx-background-color: #2563eb; }
+/* ============================================================
+   BOTÕES PRINCIPAIS (btn-primary, btn-secondary, btn-danger)
+   ============================================================ */
 
-.btn-secondary {
-    -fx-background-color: #ffffff;
-    -fx-text-fill: #374151;
-    -fx-border-color: #d1d5db;
-    -fx-border-width: 1;
-    -fx-border-radius: 6;
-    -fx-background-radius: 6;
-    -fx-padding: 6 14 6 14;
-    -fx-cursor: hand;
-}
-.btn-secondary:hover { -fx-background-color: #f3f4f6; }
-
+.btn-primary,
+.btn-secondary,
 .btn-danger {
-    -fx-background-color: #ef4444;
-    -fx-text-fill: white;
+    -fx-font-family: -app-font-family;
+    -fx-font-size: 13px;
     -fx-font-weight: bold;
-    -fx-background-radius: 6;
-    -fx-padding: 6 14 6 14;
+    -fx-min-height: 36px;
+    -fx-padding: 0 16px;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-border-width: 1px;
+    -fx-border-color: transparent;
     -fx-cursor: hand;
+    -fx-graphic-text-gap: 8px;
 }
-.btn-danger:hover { -fx-background-color: #dc2626; }
+
+.btn-primary:focused,
+.btn-secondary:focused,
+.btn-danger:focused {
+    -fx-effect: dropshadow(gaussian, -app-focus-ring, 4, 0, 0, 0);
+}
+
+.btn-primary:disabled,
+.btn-secondary:disabled,
+.btn-danger:disabled {
+    -fx-opacity: 0.55;
+    -fx-cursor: default;
+}
+
+/* --- Primary --- */
+.btn-primary {
+    -fx-background-color: -app-blue-700;
+    -fx-text-fill: -app-text-on-primary;
+    -fx-border-color: -app-blue-700;
+}
+
+.btn-primary:hover {
+    -fx-background-color: -app-blue-800;
+    -fx-border-color: -app-blue-800;
+}
+
+.btn-primary:pressed {
+    -fx-background-color: -app-blue-900;
+    -fx-border-color: -app-blue-900;
+}
+
+/* --- Secondary --- */
+.btn-secondary {
+    -fx-background-color: -app-surface;
+    -fx-text-fill: -app-text-primary;
+    -fx-border-color: -app-border;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: -app-blue-50;
+    -fx-border-color: -app-blue-600;
+    -fx-text-fill: -app-blue-700;
+}
+
+.btn-secondary:pressed {
+    -fx-background-color: -app-blue-100;
+}
+
+/* --- Danger --- */
+.btn-danger {
+    -fx-background-color: -app-red-600;
+    -fx-text-fill: -app-text-on-primary;
+    -fx-border-color: -app-red-600;
+}
+
+.btn-danger:hover {
+    -fx-background-color: -app-red-700;
+    -fx-border-color: -app-red-700;
+}
+
+.btn-danger:pressed {
+    -fx-background-color: -app-red-700;
+}
+
+/* ============================================================
+   SCROLLBAR GLOBAL
+   ============================================================ */
+
+.scroll-bar:vertical,
+.scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar:vertical {
+    -fx-pref-width: 10;
+}
+
+.scroll-bar:horizontal {
+    -fx-pref-height: 10;
+}
+
+.scroll-bar .track {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: -app-border-strong;
+    -fx-background-radius: 5;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: -app-text-disabled;
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-pref-height: 0;
+    -fx-pref-width: 0;
+    -fx-opacity: 0;
+}

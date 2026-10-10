@@ -1,257 +1,358 @@
-/* movimento-detail.css v1.0 — Detalhes da Movimentação (EstoqueMovimentacaoDetail) */
+/*
+ * Packt Inventário — Detalhes da Movimentação
+ * File: movimentacao-detalhe.css
+ * JavaFX 21+
+ *
+ * NOTA: O FXML usa estilos inline. Este CSS cobre APENAS as classes
+ *       (styleClass="..."). Os estilos inline continuam a ganhar.
+ *
+ * AUTOSSUFICIENTE — não depende de outros CSS.
+ */
 
 /* ============================================================
-   RAIZ
+   PALETA OFICIAL — Catálogo §1
    ============================================================ */
+
 .root {
-    -fx-font-family: "Segoe UI", "Inter", "Roboto", sans-serif;
+    /* Azuis */
+    -app-blue-900: #142B4A;
+    -app-blue-800: #1E3A5F;
+    -app-blue-700: #2457A7;
+    -app-blue-600: #326BC5;
+    -app-blue-100: #E8F0FC;
+    -app-blue-50:  #F4F8FE;
+
+    /* Semânticas */
+    -app-red-700:    #A8303C;
+    -app-red-600:    #C83E4D;
+    -app-red-100:    #FDECEF;
+
+    -app-green-700:  #0F6949;
+    -app-green-600:  #16845B;
+    -app-green-100:  #E8F6EF;
+
+    -app-orange-600: #B7791F;
+    -app-orange-100: #FFF4DF;
+
+    -app-info-600:   #2874C8;
+    -app-info-100:   #EAF3FE;
+
+    /* Neutros */
+    -app-neutral-50:  #F8FAFC;
+    -app-neutral-100: #EDF1F5;
+    -app-neutral-200: #E1E7EF;
+    -app-neutral-300: #C8D2E0;
+
+    /* Superfícies */
+    -app-background:     #F5F7FA;
+    -app-surface:        #FFFFFF;
+    -app-border:         #E1E7EF;
+    -app-border-strong:  #C8D2E0;
+    -app-divider:        #E8EDF3;
+
+    /* Texto */
+    -app-text-primary:    #172334;
+    -app-text-secondary:  #68778B;
+    -app-text-disabled:   #98A2B3;
+    -app-text-on-primary: #FFFFFF;
+
+    /* Foco */
+    -app-focus-ring: rgba(50, 107, 197, 0.45);
+
+    /* Fontes */
+    -app-font-family: "Inter", "Segoe UI", sans-serif;
+    -app-font-mono: "Consolas", "JetBrains Mono", monospace;
+
+    /* Base */
+    -fx-font-family: -app-font-family;
 }
 
 /* ============================================================
-   CARDS DE RESUMO (topo) — compactos
+   ROOT — botões de ícone (header)
    ============================================================ */
+
+.btn-icon-gray,
+.btn-icon-green,
+.btn-icon-danger,
+.btn-icon {
+    -fx-min-width: 34px;
+    -fx-pref-width: 34px;
+    -fx-min-height: 34px;
+    -fx-pref-height: 34px;
+    -fx-padding: 0;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-border-width: 1px;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-alignment: center;
+}
+
+.btn-icon-gray {
+    -fx-background-color: -app-neutral-100;
+    -fx-border-color: transparent;
+    -fx-text-fill: -app-text-secondary;
+}
+.btn-icon-gray:hover {
+    -fx-background-color: -app-neutral-200;
+    -fx-text-fill: -app-text-primary;
+}
+
+.btn-icon-green {
+    -fx-background-color: -app-green-100;
+    -fx-border-color: transparent;
+    -fx-text-fill: -app-green-700;
+}
+.btn-icon-green:hover {
+    -fx-background-color: #C6E8D5;
+}
+
+.btn-icon-danger {
+    -fx-background-color: -app-red-100;
+    -fx-border-color: transparent;
+    -fx-text-fill: -app-red-600;
+}
+.btn-icon-danger:hover {
+    -fx-background-color: #FAD5DB;
+}
+
+.btn-icon {
+    -fx-background-color: transparent;
+    -fx-border-color: -app-border;
+    -fx-text-fill: -app-text-secondary;
+}
+.btn-icon:hover {
+    -fx-background-color: -app-blue-50;
+    -fx-border-color: -app-blue-600;
+    -fx-text-fill: -app-blue-700;
+}
+
+.btn-icon-gray:focused,
+.btn-icon-green:focused,
+.btn-icon-danger:focused,
+.btn-icon:focused {
+    -fx-effect: dropshadow(gaussian, -app-focus-ring, 4, 0, 0, 0);
+}
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+
+/* Card compacto (topo — Tipo, Quantidade, Status, Rastreabilidade) */
 .detail-card-compact {
-    -fx-background-color: #FFFFFF;
-    -fx-background-radius: 10;
-    -fx-border-color: #E2E8F0;
-    -fx-border-radius: 10;
-    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.06), 6, 0, 0, 2);
-}
-.detail-card-compact:hover {
-    -fx-border-color: #CBD5E1;
-    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.10), 10, 0, 0, 3);
+    -fx-background-color: -app-surface;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-border-color: -app-border;
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(gaussian, rgba(16, 24, 40, 0.04), 4, 0, 0, 1);
 }
 
-/* ============================================================
-   CARDS PRINCIPAIS (Info, Detalhes, Observações, etc.)
-   ============================================================ */
+/* Card normal */
 .detail-card {
-    -fx-background-color: #FFFFFF;
-    -fx-background-radius: 12;
-    -fx-border-color: #E2E8F0;
-    -fx-border-radius: 12;
-    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.05), 8, 0, 0, 2);
+    -fx-background-color: -app-surface;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-border-color: -app-border;
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(gaussian, rgba(16, 24, 40, 0.04), 4, 0, 0, 1);
 }
 
 /* ============================================================
-   TEXTAREA DE DETALHES (somente leitura)
+   TEXTAREA (motivo, observações)
    ============================================================ */
+
 .detail-textarea {
-    -fx-background-color: #F8FAFC;
-    -fx-border-color: #E2E8F0;
-    -fx-border-radius: 6;
-    -fx-background-radius: 6;
-    -fx-text-fill: #334155;
+    -fx-font-family: -app-font-family;
     -fx-font-size: 12px;
-    -fx-padding: 6;
+    -fx-text-fill: -app-text-primary;
+    -fx-padding: 8px 10px;
+    -fx-background-color: -app-neutral-50;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-border-color: -app-border;
+    -fx-border-width: 1px;
 }
+
 .detail-textarea:focused {
-    -fx-border-color: #CBD5E1;
-    -fx-background-color: #F8FAFC;
+    -fx-border-color: -app-blue-600;
+    -fx-effect: dropshadow(gaussian, rgba(50, 107, 197, 0.15), 5, 0, 0, 0);
 }
+
 .detail-textarea .content {
     -fx-background-color: transparent;
 }
 
+.detail-textarea .scroll-pane {
+    -fx-background-color: transparent;
+}
+
 /* ============================================================
-   BADGE DE STATUS (ex.: validade)
+   STATUS BADGE (validade)
    ============================================================ */
+
 .status-badge {
-    -fx-background-color: #E2E8F0;
-    -fx-text-fill: #475569;
+    -fx-padding: 2px 8px;
+    -fx-background-radius: 999px;
     -fx-font-size: 10px;
     -fx-font-weight: bold;
-    -fx-padding: 2 8 2 8;
-    -fx-background-radius: 10;
+    -fx-background-color: -app-green-100;
+    -fx-text-fill: -app-green-700;
 }
-.status-badge.ok {
-    -fx-background-color: #DCFCE7;
-    -fx-text-fill: #166534;
-}
-.status-badge.warn {
-    -fx-background-color: #FEF3C7;
-    -fx-text-fill: #92400E;
-}
+
+/* Variantes trocadas pelo controller */
+.status-badge.expired,
 .status-badge.danger {
-    -fx-background-color: #FEE2E2;
-    -fx-text-fill: #991B1B;
+    -fx-background-color: -app-red-100;
+    -fx-text-fill: -app-red-600;
+}
+
+.status-badge.warning {
+    -fx-background-color: -app-orange-100;
+    -fx-text-fill: -app-orange-600;
 }
 
 /* ============================================================
-   BOTÕES DO CABEÇALHO (ícones grandes, circulares)
+   BOTÕES (btn-primary + btn-action-*)
    ============================================================ */
-.btn-icon-gray,
-.btn-icon-green,
-.btn-icon-danger {
-    -fx-font-size: 15px;
-    -fx-padding: 8 12 8 12;
-    -fx-background-radius: 8;
-    -fx-border-radius: 8;
-    -fx-border-width: 1;
-    -fx-cursor: hand;
-}
 
-.btn-icon-gray {
-    -fx-background-color: #F1F5F9;
-    -fx-text-fill: #334155;
-    -fx-border-color: #E2E8F0;
-}
-.btn-icon-gray:hover {
-    -fx-background-color: #E2E8F0;
-}
-
-.btn-icon-green {
-    -fx-background-color: #DCFCE7;
-    -fx-text-fill: #166534;
-    -fx-border-color: #BBF7D0;
-}
-.btn-icon-green:hover {
-    -fx-background-color: #BBF7D0;
-}
-
-.btn-icon-danger {
-    -fx-background-color: #FEE2E2;
-    -fx-text-fill: #991B1B;
-    -fx-border-color: #FECACA;
-}
-.btn-icon-danger:hover {
-    -fx-background-color: #FECACA;
-}
-
-/* ============================================================
-   BOTÃO PEQUENO DE ÍCONE (ex.: botão mapa)
-   ============================================================ */
-.btn-icon {
-    -fx-font-size: 12px;
-    -fx-padding: 2 6 2 6;
-    -fx-background-color: transparent;
-    -fx-text-fill: #4F46E5;
-    -fx-cursor: hand;
-    -fx-border-color: transparent;
-}
-.btn-icon:hover {
-    -fx-background-color: #EEF2FF;
-    -fx-background-radius: 6;
-}
-
-/* ============================================================
-   BOTÃO PRIMÁRIO (Mensagem, etc.)
-   ============================================================ */
 .btn-primary {
-    -fx-background-color: linear-gradient(to bottom right, #4F46E5, #4338CA);
-    -fx-text-fill: #FFFFFF;
+    -fx-font-family: -app-font-family;
     -fx-font-size: 12px;
     -fx-font-weight: bold;
-    -fx-padding: 8 14 8 14;
-    -fx-background-radius: 8;
+    -fx-min-height: 34px;
+    -fx-padding: 0 14px;
+    -fx-background-color: -app-blue-700;
+    -fx-text-fill: -app-text-on-primary;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-border-width: 1px;
+    -fx-border-color: -app-blue-700;
     -fx-cursor: hand;
-}
-.btn-primary:hover {
-    -fx-background-color: linear-gradient(to bottom right, #4338CA, #3730A3);
-}
-.btn-primary:pressed {
-    -fx-background-color: #3730A3;
+    -fx-graphic-text-gap: 6px;
+    -fx-max-width: Infinity;
 }
 
-/* ============================================================
-   BOTÕES DE AÇÃO (card AÇÕES)
-   ============================================================ */
+.btn-primary:hover {
+    -fx-background-color: -app-blue-800;
+    -fx-border-color: -app-blue-800;
+}
+
+.btn-primary:pressed {
+    -fx-background-color: -app-blue-900;
+    -fx-border-color: -app-blue-900;
+}
+
+.btn-primary:focused {
+    -fx-effect: dropshadow(gaussian, -app-focus-ring, 4, 0, 0, 0);
+}
+
+/* Ações rápidas */
 .btn-action-warning,
 .btn-action-gray,
 .btn-action-danger {
+    -fx-font-family: -app-font-family;
     -fx-font-size: 12px;
-    -fx-font-weight: 600;
-    -fx-padding: 8 12 8 12;
-    -fx-background-radius: 8;
-    -fx-border-radius: 8;
-    -fx-border-width: 1;
-    -fx-alignment: CENTER_LEFT;
+    -fx-font-weight: bold;
+    -fx-min-height: 34px;
+    -fx-padding: 0 12px;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-border-width: 1px;
+    -fx-border-color: transparent;
     -fx-cursor: hand;
+    -fx-alignment: center-left;
+    -fx-graphic-text-gap: 6px;
+    -fx-max-width: Infinity;
 }
 
+/* Warning — Editar */
 .btn-action-warning {
-    -fx-background-color: #FFFBEB;
-    -fx-text-fill: #92400E;
-    -fx-border-color: #FDE68A;
+    -fx-background-color: -app-blue-100;
+    -fx-text-fill: -app-blue-700;
 }
 .btn-action-warning:hover {
-    -fx-background-color: #FEF3C7;
+    -fx-background-color: #D6E4F8;
 }
 
+/* Gray — Duplicar */
 .btn-action-gray {
-    -fx-background-color: #F8FAFC;
-    -fx-text-fill: #334155;
-    -fx-border-color: #E2E8F0;
+    -fx-background-color: -app-neutral-100;
+    -fx-text-fill: -app-text-primary;
 }
 .btn-action-gray:hover {
-    -fx-background-color: #F1F5F9;
+    -fx-background-color: -app-neutral-200;
 }
 
+/* Danger — Excluir */
 .btn-action-danger {
-    -fx-background-color: #FEF2F2;
-    -fx-text-fill: #991B1B;
-    -fx-border-color: #FECACA;
+    -fx-background-color: -app-red-100;
+    -fx-text-fill: -app-red-700;
 }
 .btn-action-danger:hover {
-    -fx-background-color: #FEE2E2;
+    -fx-background-color: #FAD5DB;
 }
 
 /* ============================================================
-   TOOLTIP
+   TIMELINE (container dinâmico)
    ============================================================ */
-.tooltip {
-    -fx-background-color: #1E293B;
-    -fx-text-fill: #F8FAFC;
-    -fx-font-size: 11px;
-    -fx-background-radius: 6;
-    -fx-padding: 6 10 6 10;
+
+.timeline-container {
+    -fx-spacing: 6px;
 }
 
-/* ============================================================
-   SCROLLPANE — esconder fundo e barra quando transparente
-   ============================================================ */
-.scroll-pane {
-    -fx-background: transparent;
-    -fx-background-color: transparent;
-}
-.scroll-pane > .viewport {
-    -fx-background-color: transparent;
-}
-.scroll-bar:vertical .thumb {
-    -fx-background-color: #CBD5E1;
-    -fx-background-radius: 4;
-}
-.scroll-bar:vertical .thumb:hover {
-    -fx-background-color: #94A3B8;
-}
-
-/* ============================================================
-   TIMELINE — container e itens dinâmicos
-   ============================================================ */
-#timelineContainer {
-    -fx-padding: 4 0 4 0;
-}
-
+/* Se o controller adicionar items com classes: */
 .timeline-item {
-    -fx-background-color: #F8FAFC;
-    -fx-background-radius: 6;
-    -fx-padding: 8 10 8 10;
-    -fx-border-color: transparent transparent transparent #4F46E5;
-    -fx-border-width: 0 0 0 3;
-}
-
-.timeline-item-title {
-    -fx-font-size: 11px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #1E293B;
+    -fx-background-color: -app-neutral-50;
+    -fx-background-radius: 8px;
+    -fx-padding: 8px 12px;
+    -fx-spacing: 4px;
 }
 
 .timeline-item-time {
     -fx-font-size: 10px;
-    -fx-text-fill: #94A3B8;
+    -fx-text-fill: -app-text-secondary;
+    -fx-font-family: -app-font-mono;
 }
 
-.timeline-item-desc {
-    -fx-font-size: 10px;
-    -fx-text-fill: #64748B;
+.timeline-item-description {
+    -fx-font-size: 12px;
+    -fx-text-fill: -app-text-primary;
+}
+
+/* ============================================================
+   SCROLLBAR (global)
+   ============================================================ */
+
+.scroll-bar:vertical,
+.scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar:vertical {
+    -fx-pref-width: 10;
+}
+
+.scroll-bar:horizontal {
+    -fx-pref-height: 10;
+}
+
+.scroll-bar .track {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: -app-border-strong;
+    -fx-background-radius: 5;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: -app-text-disabled;
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-pref-height: 0;
+    -fx-pref-width: 0;
+    -fx-opacity: 0;
 }

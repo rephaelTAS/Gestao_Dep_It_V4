@@ -1,180 +1,307 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/21"
-            xmlns:fx="http://javafx.com/fxml/1"
-            prefHeight="750.0" prefWidth="1000.0">
+<!--
+    DetalhesProduto.fxml v1.1
+    Tela de detalhes de produto (read-only + ações).
+    Estilização em produto.css.
+-->
+<AnchorPane prefHeight="750.0" prefWidth="1000.0"
+            styleClass="produto-root"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1">
 
     <ScrollPane fitToWidth="true" hbarPolicy="NEVER"
+                styleClass="produto-scroll"
                 AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
                 AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 
-        <VBox spacing="20" styleClass="detail-root">
+        <VBox spacing="20" styleClass="produto-container">
 
-            <!-- ========== HEADER ========== -->
-            <HBox alignment="CENTER_LEFT" spacing="15" styleClass="detail-header">
+            <!-- ==================== HEADER ==================== -->
+            <HBox alignment="CENTER_LEFT" spacing="15" styleClass="produto-header">
                 <padding>
-                    <Insets bottom="10" left="20" right="20" top="20" />
+                    <Insets bottom="10" left="20" right="20" top="20"/>
                 </padding>
-                <Button fx:id="btn_voltar" text="← Voltar" styleClass="btn-secondary" />
+
+                <Button fx:id="btn_voltar" text="← Voltar"
+                        styleClass="clay-button clay-button-ghost"/>
+
                 <VBox spacing="2">
-                    <Label fx:id="tituloLabel" text="Detalhes do Produto" styleClass="detail-title" />
-                    <Label fx:id="subtituloLabel" text="SKU: -" styleClass="detail-subtitle" />
+                    <Label fx:id="tituloLabel" text="Detalhes do Produto"
+                           styleClass="produto-title"/>
+                    <Label fx:id="subtituloLabel" text="SKU: -"
+                           styleClass="produto-subtitle"/>
                 </VBox>
-                <Region HBox.hgrow="ALWAYS" />
-                <HBox spacing="10">
-                    <Button fx:id="btn_editar" text="Editar" styleClass="btn-primary" />
-                    <Button fx:id="btn_desativar" text="Desativar" styleClass="btn-danger" />
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <HBox spacing="10" alignment="CENTER_RIGHT">
+                    <Button fx:id="btn_editar" text="✏️ Editar"
+                            styleClass="clay-button clay-button-primary"/>
+                    <Button fx:id="btn_desativar" text="🚫 Desativar"
+                            styleClass="clay-button clay-button-danger"/>
                 </HBox>
             </HBox>
 
-            <!-- ========== CONTENT ========== -->
-            <HBox spacing="20" alignment="TOP_LEFT">
+            <!-- ==================== CONTEÚDO (2 COLUNAS) ==================== -->
+            <HBox spacing="20" alignment="TOP_LEFT" styleClass="produto-content">
                 <padding>
-                    <Insets left="20" right="20" />
+                    <Insets left="20" right="20"/>
                 </padding>
 
-                <!-- ========== LEFT COLUMN ========== -->
-                <VBox spacing="15" prefWidth="550">
+                <!-- ==================== COLUNA ESQUERDA ==================== -->
+                <VBox spacing="15" prefWidth="550"
+                      HBox.hgrow="ALWAYS" maxWidth="Infinity">
 
                     <!-- Card: Informações do Produto -->
-                    <VBox spacing="10" styleClass="detail-card">
-                        <Label text="Informações do Produto" styleClass="detail-card-header" />
-                        <GridPane hgap="10" vgap="8">
+                    <VBox spacing="12" styleClass="produto-card">
+                        <Label text="Informações do Produto"
+                               styleClass="produto-card-header"/>
+
+                        <GridPane hgap="10" vgap="10" styleClass="produto-grid">
                             <columnConstraints>
-                                <ColumnConstraints hgrow="SOMETIMES" minWidth="140" prefWidth="140" />
-                                <ColumnConstraints hgrow="ALWAYS" minWidth="200" />
+                                <ColumnConstraints minWidth="150" prefWidth="150" hgrow="NEVER"/>
+                                <ColumnConstraints minWidth="200" hgrow="ALWAYS"/>
                             </columnConstraints>
 
-                            <Label text="SKU:" GridPane.rowIndex="0" />
-                            <Label fx:id="detailSku" GridPane.rowIndex="0" GridPane.columnIndex="1" styleClass="detail-value" />
+                            <Label text="SKU:" styleClass="produto-label"
+                                   GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                            <Label fx:id="detailSku" text="-"
+                                   styleClass="produto-value produto-value-mono"
+                                   GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-                            <Label text="Tipo:" GridPane.rowIndex="1" />
-                            <Label fx:id="detailTipo" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                            <Label text="Tipo:" styleClass="produto-label"
+                                   GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                            <Label fx:id="detailTipo" text="-"
+                                   styleClass="produto-value"
+                                   GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-                            <Label text="Categoria:" GridPane.rowIndex="2" />
-                            <Label fx:id="detailCategoria" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+                            <Label text="Categoria:" styleClass="produto-label"
+                                   GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                            <Label fx:id="detailCategoria" text="-"
+                                   styleClass="produto-value"
+                                   GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
-                            <Label text="Marca:" GridPane.rowIndex="3" />
-                            <Label fx:id="detailMarca" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+                            <Label text="Marca:" styleClass="produto-label"
+                                   GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                            <Label fx:id="detailMarca" text="-"
+                                   styleClass="produto-value"
+                                   GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
-                            <Label text="Modelo:" GridPane.rowIndex="4" />
-                            <Label fx:id="detailModelo" GridPane.rowIndex="4" GridPane.columnIndex="1" />
+                            <Label text="Modelo:" styleClass="produto-label"
+                                   GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                            <Label fx:id="detailModelo" text="-"
+                                   styleClass="produto-value"
+                                   GridPane.rowIndex="4" GridPane.columnIndex="1"/>
 
-                            <Label text="Cor:" GridPane.rowIndex="5" />
-                            <Label fx:id="detailCor" GridPane.rowIndex="5" GridPane.columnIndex="1" />
+                            <Label text="Cor:" styleClass="produto-label"
+                                   GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                            <Label fx:id="detailCor" text="-"
+                                   styleClass="produto-value"
+                                   GridPane.rowIndex="5" GridPane.columnIndex="1"/>
 
-                            <Label text="Preço Unitário:" GridPane.rowIndex="6" />
-                            <Label fx:id="detailPrecoUnitario" GridPane.rowIndex="6" GridPane.columnIndex="1" />
+                            <Label text="Preço Unitário:" styleClass="produto-label"
+                                   GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+                            <Label fx:id="detailPrecoUnitario" text="-"
+                                   styleClass="produto-value"
+                                   GridPane.rowIndex="6" GridPane.columnIndex="1"/>
 
-                            <Label text="IVA:" GridPane.rowIndex="7" />
-                            <Label fx:id="detailIva" GridPane.rowIndex="7" GridPane.columnIndex="1" />
+                            <Label text="IVA:" styleClass="produto-label"
+                                   GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+                            <Label fx:id="detailIva" text="-"
+                                   styleClass="produto-value"
+                                   GridPane.rowIndex="7" GridPane.columnIndex="1"/>
 
-                            <Label text="Preço Total:" GridPane.rowIndex="8" />
-                            <Label fx:id="detailPrecoTotal" GridPane.rowIndex="8" GridPane.columnIndex="1" />
+                            <Label text="Preço Total:" styleClass="produto-label"
+                                   GridPane.rowIndex="8" GridPane.columnIndex="0"/>
+                            <Label fx:id="detailPrecoTotal" text="-"
+                                   styleClass="produto-value produto-value-highlight"
+                                   GridPane.rowIndex="8" GridPane.columnIndex="1"/>
 
-                            <Label text="Estoque:" GridPane.rowIndex="9" />
-                            <Label fx:id="detailEstoque" GridPane.rowIndex="9" GridPane.columnIndex="1" />
+                            <Label text="Estoque:" styleClass="produto-label"
+                                   GridPane.rowIndex="9" GridPane.columnIndex="0"/>
+                            <Label fx:id="detailEstoque" text="-"
+                                   styleClass="produto-value"
+                                   GridPane.rowIndex="9" GridPane.columnIndex="1"/>
 
-                            <Label text="Status:" GridPane.rowIndex="10" />
-                            <Label fx:id="detailStatus" GridPane.rowIndex="10" GridPane.columnIndex="1" />
+                            <Label text="Status:" styleClass="produto-label"
+                                   GridPane.rowIndex="10" GridPane.columnIndex="0"/>
+                            <Label fx:id="detailStatus" text="-"
+                                   styleClass="produto-value produto-status"
+                                   GridPane.rowIndex="10" GridPane.columnIndex="1"/>
 
-                            <Label text="Fornecedor:" GridPane.rowIndex="11" />
-                            <Label fx:id="detailFornecedor" GridPane.rowIndex="11" GridPane.columnIndex="1" />
+                            <Label text="Fornecedor:" styleClass="produto-label"
+                                   GridPane.rowIndex="11" GridPane.columnIndex="0"/>
+                            <Label fx:id="detailFornecedor" text="-"
+                                   styleClass="produto-value"
+                                   wrapText="true"
+                                   GridPane.rowIndex="11" GridPane.columnIndex="1"/>
 
-                            <Label text="Nº Fatura:" GridPane.rowIndex="12" />
-                            <Label fx:id="detailNumeroFatura" GridPane.rowIndex="12" GridPane.columnIndex="1" />
+                            <Label text="Nº Fatura:" styleClass="produto-label"
+                                   GridPane.rowIndex="12" GridPane.columnIndex="0"/>
+                            <Label fx:id="detailNumeroFatura" text="-"
+                                   styleClass="produto-value produto-value-mono"
+                                   GridPane.rowIndex="12" GridPane.columnIndex="1"/>
                         </GridPane>
                     </VBox>
 
                     <!-- Card: Descrição -->
-                    <VBox spacing="10" styleClass="detail-card">
-                        <Label text="Descrição" styleClass="detail-card-header" />
-                        <TextArea fx:id="detailDescricao" wrapText="true" editable="false" prefRowCount="4" styleClass="detail-textarea" />
+                    <VBox spacing="10" styleClass="produto-card">
+                        <Label text="Descrição" styleClass="produto-card-header"/>
+                        <TextArea fx:id="detailDescricao" wrapText="true" editable="false"
+                                  prefRowCount="4"
+                                  styleClass="produto-textarea"/>
                     </VBox>
 
                     <!-- Card: Características Técnicas -->
-                    <VBox spacing="10" styleClass="detail-card">
-                        <Label text="Características Técnicas" styleClass="detail-card-header" />
-                        <TextArea fx:id="detailCaracteristicas" wrapText="true" editable="false" prefRowCount="6" styleClass="detail-textarea" />
+                    <VBox spacing="10" styleClass="produto-card">
+                        <Label text="Características Técnicas"
+                               styleClass="produto-card-header"/>
+                        <TextArea fx:id="detailCaracteristicas" wrapText="true" editable="false"
+                                  prefRowCount="6"
+                                  styleClass="produto-textarea"/>
                     </VBox>
 
                     <!-- Card: Fatura de Compra -->
-                    <VBox spacing="10" styleClass="detail-card">
-                        <Label text="Fatura de Compra" styleClass="detail-card-header" />
-                        <VBox spacing="8">
+                    <VBox spacing="10" styleClass="produto-card">
+                        <Label text="Fatura de Compra" styleClass="produto-card-header"/>
+                        <VBox spacing="10">
                             <HBox spacing="10" alignment="CENTER_LEFT">
-                                <Label text="Anexo:" styleClass="label-bold" />
-                                <Label fx:id="detailFaturaStatus" text="Sem anexo" />
+                                <Label text="Anexo:" styleClass="produto-label-inline"/>
+                                <Label fx:id="detailFaturaStatus" text="Sem anexo"
+                                       styleClass="produto-value-inline"/>
                             </HBox>
                             <HBox spacing="10">
                                 <Button fx:id="btn_baixarFatura" text="📥 Baixar Fatura"
-                                        styleClass="btn-primary" disable="true" />
+                                        styleClass="clay-button clay-button-soft"
+                                        disable="true"/>
                                 <Button fx:id="btn_abrirFatura" text="👁 Abrir Fatura"
-                                        styleClass="btn-secondary" disable="true" />
+                                        styleClass="clay-button clay-button-ghost"
+                                        disable="true"/>
                             </HBox>
                         </VBox>
                     </VBox>
                 </VBox>
 
-                <!-- ========== RIGHT COLUMN ========== -->
-                <VBox spacing="15" VBox.vgrow="ALWAYS">
+                <!-- ==================== COLUNA DIREITA ==================== -->
+                <VBox spacing="15" minWidth="280" prefWidth="320"
+                      HBox.hgrow="NEVER">
 
                     <!-- Card: Informações Financeiras -->
-                    <VBox spacing="10" styleClass="detail-card">
-                        <Label text="Informações Financeiras" styleClass="detail-card-header" />
-                        <VBox spacing="8">
-                            <HBox spacing="10">
-                                <Label text="Valor Total em Estoque:" styleClass="label-bold" />
-                                <Label fx:id="statValorTotal" text="€ 0,00" styleClass="value-highlight" />
+                    <VBox spacing="12" styleClass="produto-card produto-card-accent">
+                        <Label text="Informações Financeiras"
+                               styleClass="produto-card-header"/>
+                        <VBox spacing="10">
+                            <VBox spacing="2">
+                                <Label text="VALOR TOTAL EM ESTOQUE"
+                                       styleClass="produto-label-uppercase"/>
+                                <Label fx:id="statValorTotal" text="€ 0,00"
+                                       styleClass="produto-stat-value produto-stat-highlight"/>
+                            </VBox>
+
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <Label text="Preço Unitário:" styleClass="produto-label-inline"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="statPrecoUnitario" text="€ 0,00"
+                                       styleClass="produto-stat-inline"/>
                             </HBox>
-                            <HBox spacing="10">
-                                <Label text="Preço Unitário:" styleClass="label-bold" />
-                                <Label fx:id="statPrecoUnitario" text="€ 0,00" />
+
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <Label text="IVA:" styleClass="produto-label-inline"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="statIva" text="0%"
+                                       styleClass="produto-stat-inline"/>
                             </HBox>
-                            <HBox spacing="10">
-                                <Label text="IVA:" styleClass="label-bold" />
-                                <Label fx:id="statIva" text="0%" />
-                            </HBox>
-                            <HBox spacing="10">
-                                <Label text="Quantidade em Estoque:" styleClass="label-bold" />
-                                <Label fx:id="statQuantidadeEstoque" text="0 unidades" />
+
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <Label text="Quantidade:" styleClass="produto-label-inline"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="statQuantidadeEstoque" text="0 un."
+                                       styleClass="produto-stat-inline"/>
                             </HBox>
                         </VBox>
                     </VBox>
 
                     <!-- Card: Estatísticas -->
-                    <VBox spacing="10" styleClass="detail-card">
-                        <Label text="Estatísticas" styleClass="detail-card-header" />
-                        <VBox spacing="8">
-                            <Label fx:id="statEquipamentos" text="Equipamentos: -" />
-                            <Label fx:id="statMovimentacoes" text="Movimentações: -" />
-                            <Label fx:id="statToners" text="Toners: -" />
+                    <VBox spacing="12" styleClass="produto-card">
+                        <Label text="Estatísticas" styleClass="produto-card-header"/>
+                        <VBox spacing="10">
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <Label text="Equipamentos:" styleClass="produto-label-inline"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="statEquipamentos" text="-"
+                                       styleClass="produto-stat-inline"/>
+                            </HBox>
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <Label text="Movimentações:" styleClass="produto-label-inline"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="statMovimentacoes" text="-"
+                                       styleClass="produto-stat-inline"/>
+                            </HBox>
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <Label text="Toners:" styleClass="produto-label-inline"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="statToners" text="-"
+                                       styleClass="produto-stat-inline"/>
+                            </HBox>
                         </VBox>
                     </VBox>
 
                     <!-- Card: Datas -->
-                    <VBox spacing="10" styleClass="detail-card">
-                        <Label text="Datas" styleClass="detail-card-header" />
-                        <GridPane hgap="10" vgap="8">
-                            <Label text="Criado em:" GridPane.rowIndex="0" />
-                            <Label fx:id="detailCriadoEm" GridPane.rowIndex="0" GridPane.columnIndex="1" />
-                            <Label text="Atualizado em:" GridPane.rowIndex="1" />
-                            <Label fx:id="detailAtualizadoEm" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                    <VBox spacing="12" styleClass="produto-card">
+                        <Label text="Datas" styleClass="produto-card-header"/>
+                        <GridPane hgap="10" vgap="10">
+                            <columnConstraints>
+                                <ColumnConstraints minWidth="110" hgrow="NEVER"/>
+                                <ColumnConstraints hgrow="ALWAYS"/>
+                            </columnConstraints>
+
+                            <Label text="Criado em:" styleClass="produto-label-inline"
+                                   GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                            <Label fx:id="detailCriadoEm" text="-"
+                                   styleClass="produto-value-inline"
+                                   GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                            <Label text="Atualizado em:" styleClass="produto-label-inline"
+                                   GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                            <Label fx:id="detailAtualizadoEm" text="-"
+                                   styleClass="produto-value-inline"
+                                   GridPane.rowIndex="1" GridPane.columnIndex="1"/>
                         </GridPane>
                     </VBox>
 
                     <!-- Card: Ações Rápidas -->
-                    <VBox spacing="10" styleClass="detail-card">
-                        <Label text="Ações Rápidas" styleClass="detail-card-header" />
+                    <VBox spacing="12" styleClass="produto-card">
+                        <Label text="Ações Rápidas" styleClass="produto-card-header"/>
                         <VBox spacing="8">
-                            <Button fx:id="btn_ajustarEstoque" text="Ajustar Estoque" styleClass="btn-primary" />
-                            <Button fx:id="btn_atualizarPreco" text="Atualizar Preço" styleClass="btn-secondary" />
-                            <Button fx:id="btn_movimentar" text="Registrar Movimentação" styleClass="btn-secondary" />
-                            <Button fx:id="btn_historico" text="Ver Histórico" styleClass="btn-secondary" />
+                            <Button fx:id="btn_ajustarEstoque"
+                                    text="📦 Ajustar Estoque"
+                                    maxWidth="Infinity"
+                                    styleClass="clay-button clay-button-primary"/>
+                            <Button fx:id="btn_atualizarPreco"
+                                    text="💰 Atualizar Preço"
+                                    maxWidth="Infinity"
+                                    styleClass="clay-button clay-button-soft"/>
+                            <Button fx:id="btn_movimentar"
+                                    text="🔄 Registrar Movimentação"
+                                    maxWidth="Infinity"
+                                    styleClass="clay-button clay-button-soft"/>
+                            <Button fx:id="btn_historico"
+                                    text="📜 Ver Histórico"
+                                    maxWidth="Infinity"
+                                    styleClass="clay-button clay-button-ghost"/>
                         </VBox>
                     </VBox>
                 </VBox>

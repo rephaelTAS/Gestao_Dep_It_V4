@@ -1,130 +1,283 @@
+/*
+ * Packt Inventário — Detalhes do Servidor
+ * File: detalhes.css
+ * JavaFX 21+
+ *
+ * AUTOSSUFICIENTE — não depende de outros CSS.
+ * Inclui a paleta oficial do catálogo §1.
+ *
+ * ATENÇÃO: paleta duplicada. Se mudares aqui, muda em TODOS os CSS de ecrã.
+ */
+
 /* ============================================================
-   SERVIDOR_DETAIL.CSS - Detalhes do Servidor
-   v1.0
+   PALETA OFICIAL — Catálogo §1
    ============================================================ */
 
-.header {
-    -fx-alignment: center-left;
+.root,
+.detalhes-root {
+    /* Azuis */
+    -app-blue-900: #142B4A;
+    -app-blue-800: #1E3A5F;
+    -app-blue-700: #2457A7;
+    -app-blue-600: #326BC5;
+    -app-blue-100: #E8F0FC;
+    -app-blue-50:  #F4F8FE;
+
+    /* Semânticas */
+    -app-red-700:    #A8303C;
+    -app-red-600:    #C83E4D;
+    -app-red-100:    #FDECEF;
+
+    -app-green-700:  #0F6949;
+    -app-green-600:  #16845B;
+    -app-green-100:  #E8F6EF;
+
+    -app-orange-600: #B7791F;
+    -app-orange-100: #FFF4DF;
+
+    -app-info-600:   #2874C8;
+    -app-info-100:   #EAF3FE;
+
+    /* Neutros */
+    -app-neutral-50:  #F8FAFC;
+    -app-neutral-100: #EDF1F5;
+    -app-neutral-200: #E1E7EF;
+    -app-neutral-300: #C8D2E0;
+
+    /* Superfícies */
+    -app-background:     #F5F7FA;
+    -app-surface:        #FFFFFF;
+    -app-border:         #E1E7EF;
+    -app-border-strong:  #C8D2E0;
+    -app-divider:        #E8EDF3;
+
+    /* Texto */
+    -app-text-primary:    #172334;
+    -app-text-secondary:  #68778B;
+    -app-text-disabled:   #98A2B3;
+    -app-text-on-primary: #FFFFFF;
+
+    /* Foco */
+    -app-focus-ring: rgba(50, 107, 197, 0.45);
+
+    /* Fonte */
+    -app-font-family: "Inter", "Segoe UI", sans-serif;
+    -app-font-mono: "JetBrains Mono", "Consolas", "Menlo", monospace;
+
+    /* Base */
+    -fx-background-color: -app-background;
+    -fx-font-family: -app-font-family;
 }
 
-.titulo {
+/* ============================================================
+   ROOT / CONTAINER
+   ============================================================ */
+
+.detalhes-root {
+    -fx-background-color: -app-background;
+}
+
+.detalhes-container {
+    -fx-background-color: -app-background;
+    -fx-spacing: 15px;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.detalhes-header {
+    -fx-padding: 0 0 4px 0;
+}
+
+.detalhes-title {
     -fx-font-size: 22px;
     -fx-font-weight: bold;
-    -fx-fill: #2c3e50;
+    -fx-fill: -app-text-primary;
 }
 
-.status-badge {
-    -fx-font-size: 13px;
+.detalhes-status-badge {
+    -fx-font-size: 12px;
     -fx-font-weight: bold;
-    -fx-padding: 4 12 4 12;
-    -fx-background-radius: 12px;
+    -fx-text-fill: -app-text-secondary;
+    -fx-padding: 6px 14px;
+    -fx-background-color: -app-neutral-100;
+    -fx-background-radius: 999px;
 }
 
-.status-badge.conectado {
-    -fx-background-color: #4CAF50;
-    -fx-text-fill: #ffffff;
+/* ============================================================
+   SEPARADOR
+   ============================================================ */
+
+.detalhes-separator {
+    -fx-background-color: -app-border;
 }
 
-.status-badge.falha {
-    -fx-background-color: #F44336;
-    -fx-text-fill: #ffffff;
+.detalhes-separator .line {
+    -fx-border-color: -app-border;
+    -fx-border-width: 1 0 0 0;
 }
 
-.status-badge.testando {
-    -fx-background-color: #FF9800;
-    -fx-text-fill: #ffffff;
-}
-
-.status-badge.nao-testado {
-    -fx-background-color: #9E9E9E;
-    -fx-text-fill: #ffffff;
-}
+/* ============================================================
+   GRID DE DADOS
+   ============================================================ */
 
 .detalhes-grid {
-    -fx-padding: 10 0 10 0;
+    -fx-padding: 8px 0;
 }
 
-.label-detalhe {
-    -fx-font-size: 14px;
-    -fx-font-weight: 600;
-    -fx-text-fill: #555555;
-    -fx-pref-width: 120px;
+.detalhes-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -app-text-secondary;
 }
 
-.valor-detalhe {
+.detalhes-value {
     -fx-font-size: 14px;
-    -fx-text-fill: #333333;
+    -fx-text-fill: -app-text-primary;
+}
+
+.detalhes-value-mono {
+    -fx-font-family: -app-font-mono;
+    -fx-font-size: 13px;
+    -fx-text-fill: -app-text-secondary;
+    -fx-background-color: -app-neutral-50;
+    -fx-background-radius: 6px;
+    -fx-padding: 6px 10px;
+}
+
+/* ============================================================
+   URL DE CONEXÃO
+   ============================================================ */
+
+.detalhes-url-box {
+    -fx-background-color: -app-neutral-50;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-color: -app-border;
+    -fx-border-width: 1px;
+    -fx-padding: 14px 16px;
+    -fx-spacing: 6px;
+}
+
+.detalhes-url-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -app-text-secondary;
+}
+
+.detalhes-url-value {
+    -fx-font-family: -app-font-mono;
+    -fx-font-size: 13px;
+    -fx-text-fill: -app-blue-700;
     -fx-wrap-text: true;
 }
 
-.valor-url {
+/* ============================================================
+   BOTÕES
+   ============================================================ */
+
+.clay-button {
+    -fx-font-family: -app-font-family;
     -fx-font-size: 13px;
-    -fx-text-fill: #1976D2;
-    -fx-font-family: "Monospaced", monospace;
-}
-
-.url-box {
-    -fx-padding: 10 0 10 0;
-    -fx-background-color: #f5f5f5;
-    -fx-background-radius: 4px;
-    -fx-padding: 10 15 10 15;
-}
-
-.button-bar {
-    -fx-padding: 15 0 0 0;
-    -fx-alignment: center-left;
-    -fx-spacing: 12;
-}
-
-.button-bar .button {
-    -fx-padding: 8 20 8 20;
-    -fx-font-size: 13px;
-    -fx-font-weight: 500;
-    -fx-background-radius: 4px;
+    -fx-font-weight: bold;
+    -fx-min-height: 38px;
+    -fx-padding: 0 18px;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-border-width: 1px;
+    -fx-border-color: transparent;
     -fx-cursor: hand;
+    -fx-graphic-text-gap: 8px;
 }
 
-.btn-testar {
-    -fx-background-color: #FF9800;
-    -fx-text-fill: #ffffff;
+.clay-button:focused {
+    -fx-effect: dropshadow(gaussian, -app-focus-ring, 4, 0, 0, 0);
 }
 
-.btn-testar:hover {
-    -fx-background-color: #F57C00;
+.clay-button:disabled {
+    -fx-opacity: 0.55;
+    -fx-cursor: default;
 }
 
-.btn-ativar {
-    -fx-background-color: #4CAF50;
-    -fx-text-fill: #ffffff;
+/* --- Primary (Editar) --- */
+.clay-button-primary {
+    -fx-background-color: -app-blue-700;
+    -fx-text-fill: -app-text-on-primary;
+    -fx-border-color: -app-blue-700;
 }
 
-.btn-ativar:hover {
-    -fx-background-color: #388E3C;
+.clay-button-primary:hover {
+    -fx-background-color: -app-blue-800;
+    -fx-border-color: -app-blue-800;
 }
 
-.btn-desativar {
-    -fx-background-color: #F44336;
-    -fx-text-fill: #ffffff;
+.clay-button-primary:pressed {
+    -fx-background-color: -app-blue-900;
+    -fx-border-color: -app-blue-900;
 }
 
-.btn-desativar:hover {
-    -fx-background-color: #D32F2F;
+/* --- Soft (Testar Conexão) --- */
+.clay-button-soft {
+    -fx-background-color: -app-blue-100;
+    -fx-text-fill: -app-blue-700;
+    -fx-border-color: transparent;
 }
 
-.btn-editar {
-    -fx-background-color: #2196F3;
-    -fx-text-fill: #ffffff;
+.clay-button-soft:hover {
+    -fx-background-color: #D6E4F8;
 }
 
-.btn-editar:hover {
-    -fx-background-color: #1976D2;
+.clay-button-soft:pressed {
+    -fx-background-color: #C3D6F0;
 }
 
-.btn-voltar {
-    -fx-background-color: #9E9E9E;
-    -fx-text-fill: #ffffff;
+/* --- Success (Ativar) --- */
+.clay-button-success {
+    -fx-background-color: -app-green-600;
+    -fx-text-fill: -app-text-on-primary;
+    -fx-border-color: -app-green-600;
 }
 
-.btn-voltar:hover {
-    -fx-background-color: #757575;
+.clay-button-success:hover {
+    -fx-background-color: -app-green-700;
+    -fx-border-color: -app-green-700;
+}
+
+/* --- Danger (Desativar) --- */
+.clay-button-danger {
+    -fx-background-color: -app-red-600;
+    -fx-text-fill: -app-text-on-primary;
+    -fx-border-color: -app-red-600;
+}
+
+.clay-button-danger:hover {
+    -fx-background-color: -app-red-700;
+    -fx-border-color: -app-red-700;
+}
+
+/* --- Ghost (Voltar) --- */
+.clay-button-ghost {
+    -fx-background-color: transparent;
+    -fx-text-fill: -app-text-secondary;
+    -fx-border-color: -app-border;
+}
+
+.clay-button-ghost:hover {
+    -fx-background-color: -app-neutral-50;
+    -fx-text-fill: -app-text-primary;
+    -fx-border-color: -app-border-strong;
+}
+
+.clay-button-ghost:pressed {
+    -fx-background-color: -app-neutral-100;
+}
+
+/* ============================================================
+   BARRA DE BOTÕES
+   ============================================================ */
+
+.detalhes-button-bar {
+    -fx-padding: 8px 0 0 0;
+    -fx-alignment: center-right;
 }

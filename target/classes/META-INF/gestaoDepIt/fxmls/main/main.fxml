@@ -1,213 +1,431 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.PieChart?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.shape.Rectangle?>
 
 <!--
     Main.fxml v2.0
-    Objetivo: shell principal (header, sidebar, content, footer, painel direito).
-    Regras visuais: surface #FEFEFE nas bordas, content #E8E5DE;
-    separação por elevação (.elevation-1..4) e bordas sutis #AFAAA4.
-    Estilização em Main.css.
+    Pergunta: Como é que a aplicação se organiza (shell global)?
+
+    Estrutura: BorderPane com header, sidebar, content, aside opcional, footer.
+    Classes: app-* (estrutura), ds-* (componentes), page-* (título de página),
+             dashboard-* (específico do ecrã dashboard).
 -->
-<BorderPane fx:id="borderpanel" styleClass="app-root"
-            stylesheets="@Main.css"
+
+<BorderPane fx:id="appShell"
+            styleClass="app-root"
             xmlns="http://javafx.com/javafx/21.0"
             xmlns:fx="http://javafx.com/fxml/1">
 
-    <!-- ========== HEADER ========== -->
+    <!-- ===================================================== -->
+    <!-- HEADER                                                 -->
+    <!-- ===================================================== -->
     <top>
-        <HBox alignment="CENTER_LEFT" styleClass="app-header elevation-1">
+        <HBox alignment="CENTER_LEFT"
+              styleClass="app-header"
+              spacing="16">
+
             <padding>
-                <Insets bottom="8" left="16" right="16" top="8" />
+                <Insets top="8" right="20" bottom="8" left="20"/>
             </padding>
 
-            <Button fx:id="toggleMenuBtn" styleClass="app-header-icon-btn">
-                <HBox.margin><Insets right="12" /></HBox.margin>
+            <!-- Toggle sidebar -->
+            <Button fx:id="toggleSidebarBtn"
+                    styleClass="ds-button, ds-button--icon, ds-button--ghost">
                 <graphic>
-                    <ImageView fx:id="menuIcon" fitHeight="20" fitWidth="20"
-                               preserveRatio="true" styleClass="app-header-icon" />
+                    <ImageView fx:id="menuIcon" fitHeight="20" fitWidth="20" preserveRatio="true"/>
                 </graphic>
             </Button>
 
-            <Label styleClass="app-header-title" text="Gestão de Equipamentos TI" />
+            <!-- Título da aplicação -->
+            <Label text="Gestão de Equipamentos TI"
+                   styleClass="app-header-title"/>
 
-            <Region HBox.hgrow="ALWAYS" />
+            <Region HBox.hgrow="ALWAYS"/>
 
-            <HBox alignment="CENTER_LEFT" spacing="8">
-                <ImageView fx:id="iconepage" fitHeight="22" fitWidth="22"
-                           preserveRatio="true" styleClass="app-page-icon" />
-                <Label fx:id="nomepage" styleClass="app-page-name" text="Dashboard" wrapText="true" />
+            <!-- Contexto da página (breadcrumb) -->
+            <HBox alignment="CENTER_LEFT" spacing="8" styleClass="app-breadcrumbs">
+                <ImageView fx:id="pageIcon" fitHeight="18" fitWidth="18" preserveRatio="true"/>
+                <Label fx:id="pageName" styleClass="app-breadcrumb-current" text="Dashboard"/>
             </HBox>
 
-            <Region HBox.hgrow="ALWAYS" />
+            <Region HBox.hgrow="ALWAYS"/>
 
-            <HBox alignment="CENTER_RIGHT" spacing="10">
-                <Button fx:id="btn_definicoes" text="Definições" styleClass="app-header-text-btn" />
+            <!-- Ações globais -->
+            <HBox alignment="CENTER_RIGHT" spacing="8">
 
-                <Button fx:id="btn_notificacao" styleClass="app-header-icon-btn">
+                <Button fx:id="btnSettings"
+                        styleClass="ds-button, ds-button--icon, ds-button--ghost">
                     <graphic>
-                        <ImageView fx:id="imageNotificatio" fitHeight="18" fitWidth="18"
-                                   preserveRatio="true" styleClass="app-header-icon" />
+                        <ImageView fx:id="settingsIcon" fitHeight="18" fitWidth="18" preserveRatio="true"/>
                     </graphic>
                 </Button>
 
-                <Separator orientation="VERTICAL" prefHeight="30" />
+                <Button fx:id="btnNotifications"
+                        styleClass="ds-button, ds-button--icon, ds-button--ghost">
+                    <graphic>
+                        <ImageView fx:id="notificationIcon" fitHeight="18" fitWidth="18" preserveRatio="true"/>
+                    </graphic>
+                </Button>
 
-                <HBox alignment="CENTER" spacing="8" styleClass="app-user-card">
-                    <VBox alignment="CENTER_RIGHT" spacing="2" styleClass="app-user-info">
-                        <HBox alignment="BASELINE_RIGHT" spacing="4">
-                            <Label fx:id="timeLabel" styleClass="app-time-display" text="14:30" />
-                            <Label fx:id="dateLabel" styleClass="app-date-display" text="15/12/24" />
+                <Separator orientation="VERTICAL" prefHeight="24"/>
+
+                <!-- Utilizador -->
+                <HBox alignment="CENTER" spacing="10" styleClass="app-user">
+                    <VBox alignment="CENTER_RIGHT" spacing="2">
+                        <HBox alignment="BASELINE_RIGHT" spacing="6">
+                            <Label fx:id="timeLabel" styleClass="app-user-time" text="14:30"/>
+                            <Label fx:id="dateLabel" styleClass="app-user-date" text="15/12/24"/>
                         </HBox>
-                        <HBox alignment="BASELINE_RIGHT" spacing="4">
-                            <Label fx:id="nameUser" styleClass="app-user-name" text="Administrador" wrapText="true" />
-                            <Label styleClass="app-user-status-dot" text="●" />
-                        </HBox>
+                        <Label fx:id="userName" styleClass="app-user-name" text="Administrador"/>
                     </VBox>
 
-                    <StackPane styleClass="app-avatar-container">
-                        <ImageView fx:id="imageUser" fitHeight="36" fitWidth="36"
-                                   preserveRatio="true" styleClass="app-avatar-image" />
-                        <Rectangle arcHeight="20" arcWidth="20" height="36" width="36"
-                                   styleClass="app-avatar-border" />
+                    <StackPane styleClass="app-avatar">
+                        <Label fx:id="userInitials" styleClass="app-avatar-initials" text="A"/>
+                        <ImageView fx:id="userImage" fitHeight="36" fitWidth="36"
+                                   preserveRatio="true" styleClass="app-avatar-image"/>
                     </StackPane>
                 </HBox>
             </HBox>
         </HBox>
     </top>
 
-    <!-- ========== SIDEBAR ========== -->
+    <!-- ===================================================== -->
+    <!-- SIDEBAR                                                -->
+    <!-- ===================================================== -->
     <left>
-        <VBox fx:id="sidebar" prefWidth="280" styleClass="app-sidebar">
+        <VBox fx:id="sidebar"
+              prefWidth="240"
+              styleClass="app-sidebar"
+              BorderPane.alignment="CENTER">
 
-            <HBox alignment="CENTER_LEFT" prefHeight="72" spacing="10" styleClass="app-sidebar-header">
-                <ImageView fitHeight="32" fitWidth="32" preserveRatio="true" styleClass="app-sidebar-logo" />
-                <Label styleClass="app-sidebar-title" text="TechManager Pro" wrapText="true" />
+            <!-- Marca -->
+            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="app-sidebar-brand">
+                <ImageView fitHeight="32" fitWidth="32" preserveRatio="true"/>
+                <Label styleClass="app-sidebar-brand-title" text="TechManager Pro"/>
             </HBox>
 
-            <ScrollPane fitToWidth="true" styleClass="app-sidebar-scroll" VBox.vgrow="ALWAYS">
+            <!-- Menu (scroll) -->
+            <ScrollPane fitToWidth="true"
+                        fitToHeight="true"
+                        hbarPolicy="NEVER"
+                        vbarPolicy="AS_NEEDED"
+                        styleClass="app-sidebar-scroll"
+                        VBox.vgrow="ALWAYS">
                 <content>
-                    <VBox fx:id="menuContainer" spacing="4" styleClass="app-menu-container">
+                    <VBox fx:id="menuContainer" spacing="2" styleClass="app-nav">
 
-                        <Label styleClass="app-menu-section" text="PRINCIPAL" />
-
-                        <Button fx:id="btn_dashboard" maxWidth="Infinity" mnemonicParsing="false" styleClass="app-menu-item">
-                            <graphic><ImageView fx:id="dashboardIcon" fitHeight="20" fitWidth="20" preserveRatio="true" styleClass="app-menu-icon" /></graphic>
+                        <Label styleClass="app-nav-section" text="PRINCIPAL"/>
+                        <Button fx:id="btnDashboard"
+                                maxWidth="Infinity"
+                                styleClass="app-nav-item">
+                            <graphic><ImageView fitHeight="18" fitWidth="18" preserveRatio="true"/></graphic>
                             <text>Dashboard</text>
                         </Button>
 
-                        <Separator styleClass="app-menu-separator" />
-
-                        <Label styleClass="app-menu-section" text="ESTOQUE" />
-
-                        <Button fx:id="btn_catalogo" maxWidth="Infinity" mnemonicParsing="false" styleClass="app-menu-item">
-                            <graphic><ImageView fx:id="catalogoIcon" fitHeight="20" fitWidth="20" preserveRatio="true" styleClass="app-menu-icon" /></graphic>
-                            <text>Catálogo Produtos</text>
+                        <Label styleClass="app-nav-section" text="ESTOQUE"/>
+                        <Button fx:id="btnCatalogo" maxWidth="Infinity" styleClass="app-nav-item">
+                            <graphic><ImageView fitHeight="18" fitWidth="18" preserveRatio="true"/></graphic>
+                            <text>Catálogo</text>
                         </Button>
-
-                        <Button fx:id="btn_estoque" maxWidth="Infinity" mnemonicParsing="false" styleClass="app-menu-item">
-                            <graphic><ImageView fx:id="estoqueIcon" fitHeight="20" fitWidth="20" preserveRatio="true" styleClass="app-menu-icon" /></graphic>
+                        <Button fx:id="btnEstoque" maxWidth="Infinity" styleClass="app-nav-item">
+                            <graphic><ImageView fitHeight="18" fitWidth="18" preserveRatio="true"/></graphic>
                             <text>Movimentações</text>
                         </Button>
-
-                        <Button fx:id="btn_produtoStock" maxWidth="Infinity" mnemonicParsing="false" styleClass="app-menu-item">
-                            <graphic><ImageView fx:id="produtoStockIcone" fitHeight="20" fitWidth="20" preserveRatio="true" styleClass="app-menu-icon" /></graphic>
-                            <text>Gestão De Produtos e Inventario</text>
+                        <Button fx:id="btnProdutoStock" maxWidth="Infinity" styleClass="app-nav-item">
+                            <graphic><ImageView fitHeight="18" fitWidth="18" preserveRatio="true"/></graphic>
+                            <text>Produtos E Inventário</text>
                         </Button>
 
-                        <Separator styleClass="app-menu-separator" />
-
-                        <Label styleClass="app-menu-section" text="EQUIPAMENTOS" />
-
-                        <Button fx:id="btn_inventario" maxWidth="Infinity" mnemonicParsing="false" styleClass="app-menu-item">
-                            <graphic><ImageView fx:id="inventarioIcon" fitHeight="20" fitWidth="20" preserveRatio="true" styleClass="app-menu-icon" /></graphic>
+                        <Label styleClass="app-nav-section" text="EQUIPAMENTOS"/>
+                        <Button fx:id="btnInventario" maxWidth="Infinity" styleClass="app-nav-item">
+                            <graphic><ImageView fitHeight="18" fitWidth="18" preserveRatio="true"/></graphic>
                             <text>Inventário</text>
                         </Button>
-
-                        <Button fx:id="btn_toners" maxWidth="Infinity" mnemonicParsing="false" styleClass="app-menu-item">
-                            <graphic><ImageView fx:id="tonersIcon" fitHeight="20" fitWidth="20" preserveRatio="true" styleClass="app-menu-icon" /></graphic>
-                            <text>Gestão de Toners</text>
+                        <Button fx:id="btnToners" maxWidth="Infinity" styleClass="app-nav-item">
+                            <graphic><ImageView fitHeight="18" fitWidth="18" preserveRatio="true"/></graphic>
+                            <text>Toners</text>
                         </Button>
 
-                        <Separator styleClass="app-menu-separator" />
-
-                        <Label styleClass="app-menu-section" text="PESSOAL" />
-
-                        <Button fx:id="btn_funcionarios" maxWidth="Infinity" mnemonicParsing="false" styleClass="app-menu-item">
-                            <graphic><ImageView fx:id="funcionariosIcon" fitHeight="20" fitWidth="20" preserveRatio="true" styleClass="app-menu-icon" /></graphic>
+                        <Label styleClass="app-nav-section" text="PESSOAL"/>
+                        <Button fx:id="btnFuncionarios" maxWidth="Infinity" styleClass="app-nav-item">
+                            <graphic><ImageView fitHeight="18" fitWidth="18" preserveRatio="true"/></graphic>
                             <text>Funcionários</text>
                         </Button>
-
-                        <Button fx:id="btn_usuarios" maxWidth="Infinity" mnemonicParsing="false" styleClass="app-menu-item">
-                            <graphic><ImageView fx:id="addItemIcon" fitHeight="20" fitWidth="20" preserveRatio="true" styleClass="app-menu-icon" /></graphic>
-                            <text>Usuarios</text>
+                        <Button fx:id="btnUsuarios" maxWidth="Infinity" styleClass="app-nav-item">
+                            <graphic><ImageView fitHeight="18" fitWidth="18" preserveRatio="true"/></graphic>
+                            <text>Usuários</text>
                         </Button>
 
-                        <Separator styleClass="app-menu-separator" />
-
-                        <Label styleClass="app-menu-section" text="RELATÓRIOS" />
-
-                        <Button fx:id="btn_relatorio" maxWidth="Infinity" mnemonicParsing="false" styleClass="app-menu-item">
-                            <graphic><ImageView fx:id="reportIcon" fitHeight="20" fitWidth="20" preserveRatio="true" styleClass="app-menu-icon" /></graphic>
+                        <Label styleClass="app-nav-section" text="RELATÓRIOS"/>
+                        <Button fx:id="btnRelatorio" maxWidth="Infinity" styleClass="app-nav-item">
+                            <graphic><ImageView fitHeight="18" fitWidth="18" preserveRatio="true"/></graphic>
                             <text>Relatórios</text>
                         </Button>
-
-                        <Button fx:id="btn_historico" maxWidth="Infinity" mnemonicParsing="false" styleClass="app-menu-item">
-                            <graphic><ImageView fx:id="historicoIcon" fitHeight="20" fitWidth="20" preserveRatio="true" styleClass="app-menu-icon" /></graphic>
+                        <Button fx:id="btnHistorico" maxWidth="Infinity" styleClass="app-nav-item">
+                            <graphic><ImageView fitHeight="18" fitWidth="18" preserveRatio="true"/></graphic>
                             <text>Histórico</text>
                         </Button>
                     </VBox>
                 </content>
             </ScrollPane>
 
+            <!-- Estado do sistema -->
             <VBox styleClass="app-sidebar-status" VBox.vgrow="NEVER">
-                <Label styleClass="app-status-title" text="STATUS DO SISTEMA" />
+                <Label styleClass="app-status-title" text="STATUS DO SISTEMA"/>
                 <HBox alignment="CENTER_LEFT" spacing="8">
                     <StackPane styleClass="app-status-indicator">
-                        <Rectangle arcHeight="4" arcWidth="4" height="8" width="8" styleClass="app-status-dot" />
+                        <Region styleClass="app-status-dot"/>
                     </StackPane>
-                    <Label styleClass="app-status-value" text="Operacional" />
+                    <Label styleClass="app-status-value" text="Operacional"/>
                 </HBox>
-                <Label styleClass="app-version-text" text="Versão 2.0.0" />
+                <Label styleClass="app-version-text" text="Versão 2.0.0"/>
             </VBox>
         </VBox>
     </left>
 
-    <!-- ========== CONTENT ========== -->
+    <!-- ===================================================== -->
+    <!-- CENTRO — conteúdo                                      -->
+    <!-- ===================================================== -->
     <center>
-        <StackPane fx:id="multiploPanel" styleClass="app-content-area">
-            <padding><Insets bottom="12.0" left="12.0" right="12.0" top="12.0" /></padding>
+        <StackPane fx:id="contentHost" styleClass="app-content-host">
+
+            <ScrollPane fitToWidth="true"
+                        hbarPolicy="NEVER"
+                        vbarPolicy="AS_NEEDED"
+                        styleClass="app-content-scroll">
+                <content>
+                    <VBox fx:id="dashboardContainer"
+                          spacing="24"
+                          styleClass="app-content, dashboard">
+
+                        <padding>
+                            <Insets top="24" right="24" bottom="24" left="24"/>
+                        </padding>
+
+                        <!-- Cabeçalho da página -->
+                        <VBox spacing="4" styleClass="page-header">
+                            <Label text="Dashboard de Gestão de TI"
+                                   styleClass="page-title"/>
+                            <Label text="Visão geral em tempo real do inventário e operações"
+                                   styleClass="page-description"/>
+                        </VBox>
+
+                        <!-- ============ KPIs ============ -->
+                        <VBox spacing="12" styleClass="page-section">
+                            <Label text="Indicadores Principais"
+                                   styleClass="page-section-title"/>
+
+                            <FlowPane hgap="16" vgap="16"
+                                      styleClass="dashboard-kpi-flow"
+                                      prefWrapLength="900">
+                                <VBox styleClass="ds-card, ds-stat-card" prefWidth="240">
+                                    <Label text="Total Produtos" styleClass="ds-stat-label"/>
+                                    <Label fx:id="lblTotalProdutos" text="0" styleClass="ds-stat-value"/>
+                                    <Label text="No catálogo" styleClass="ds-stat-description"/>
+                                </VBox>
+
+                                <VBox styleClass="ds-card, ds-stat-card" prefWidth="240">
+                                    <Label text="Equipamentos Ativos" styleClass="ds-stat-label"/>
+                                    <Label fx:id="lblTotalEquipamentos" text="0" styleClass="ds-stat-value"/>
+                                    <Label text="Em operação" styleClass="ds-stat-description"/>
+                                </VBox>
+
+                                <VBox styleClass="ds-card, ds-stat-card" prefWidth="240">
+                                    <Label text="Funcionários Ativos" styleClass="ds-stat-label"/>
+                                    <Label fx:id="lblTotalFuncionarios" text="0" styleClass="ds-stat-value"/>
+                                    <Label text="Com equipamentos" styleClass="ds-stat-description"/>
+                                </VBox>
+
+                                <VBox styleClass="ds-card, ds-stat-card, ds-stat-card--highlight"
+                                      prefWidth="240">
+                                    <Label text="Valor Total Estoque" styleClass="ds-stat-label"/>
+                                    <Label fx:id="lblValorTotalEstoque" text="0 €" styleClass="ds-stat-value"/>
+                                    <Label text="Inventário atual" styleClass="ds-stat-description"/>
+                                </VBox>
+                            </FlowPane>
+                        </VBox>
+
+                        <!-- ============ ALERTAS ============ -->
+                        <VBox spacing="12" styleClass="page-section">
+                            <Label text="Alertas e Indicadores Críticos"
+                                   styleClass="page-section-title"/>
+
+                            <FlowPane hgap="16" vgap="16"
+                                      styleClass="dashboard-alert-flow"
+                                      prefWrapLength="900">
+
+                                <VBox styleClass="ds-card, dashboard-alert-card, dashboard-alert-card--warning"
+                                      prefWidth="240">
+                                    <Label text="Produto Menor Stock" styleClass="ds-alert-label"/>
+                                    <Label fx:id="lblProdutoMenorStock" text="—" styleClass="ds-alert-value"/>
+                                    <Label text="Necessita atenção" styleClass="ds-alert-description"/>
+                                </VBox>
+
+                                <VBox styleClass="ds-card, dashboard-alert-card, dashboard-alert-card--danger"
+                                      prefWidth="240">
+                                    <Label text="Em Manutenção" styleClass="ds-alert-label"/>
+                                    <Label fx:id="lblEquipamentosManutencao" text="0" styleClass="ds-alert-value"/>
+                                    <Label text="Equipamentos parados" styleClass="ds-alert-description"/>
+                                </VBox>
+
+                                <VBox styleClass="ds-card, dashboard-alert-card, dashboard-alert-card--warning"
+                                      prefWidth="240">
+                                    <Label text="Toners Baixos" styleClass="ds-alert-label"/>
+                                    <Label fx:id="lblTonersBaixos" text="0" styleClass="ds-alert-value"/>
+                                    <Label text="Menos de 20% restante" styleClass="ds-alert-description"/>
+                                </VBox>
+
+                                <VBox styleClass="ds-card, dashboard-alert-card, dashboard-alert-card--info"
+                                      prefWidth="240">
+                                    <Label text="Movimentações Mês" styleClass="ds-alert-label"/>
+                                    <Label fx:id="lblMovimentacoesMes" text="0" styleClass="ds-alert-value"/>
+                                    <Label text="Atividade atual" styleClass="ds-alert-description"/>
+                                </VBox>
+                            </FlowPane>
+                        </VBox>
+
+                        <!-- ============ MÉTRICAS ============ -->
+                        <VBox spacing="12" styleClass="page-section">
+                            <Label text="Métricas Avançadas" styleClass="page-section-title"/>
+
+                            <HBox spacing="16">
+                                <VBox styleClass="ds-card, ds-stat-card"
+                                      HBox.hgrow="ALWAYS" maxWidth="Infinity">
+                                    <Label text="Departamento Líder" styleClass="ds-stat-label"/>
+                                    <Label fx:id="lblDepartamentoMaiorEquipamentos"
+                                           text="—" styleClass="ds-stat-value" wrapText="true"/>
+                                    <Label text="Mais equipamentos" styleClass="ds-stat-description"/>
+                                </VBox>
+
+                                <VBox styleClass="ds-card, ds-stat-card"
+                                      HBox.hgrow="ALWAYS" maxWidth="Infinity">
+                                    <Label text="Nível Stock Segurança" styleClass="ds-stat-label"/>
+                                    <ProgressBar fx:id="progressStockSeguranca"
+                                                 progress="0"
+                                                 maxWidth="Infinity"
+                                                 styleClass="ds-progress-bar"/>
+                                    <Label text="Produtos com stock disponível"
+                                           styleClass="ds-stat-description"/>
+                                </VBox>
+                            </HBox>
+                        </VBox>
+
+                        <!-- ============ GRÁFICOS ============ -->
+                        <VBox spacing="12" styleClass="page-section">
+                            <Label text="Visualizações e Análises" styleClass="page-section-title"/>
+
+                            <GridPane hgap="16" vgap="16" styleClass="dashboard-chart-grid">
+                                <columnConstraints>
+                                    <ColumnConstraints hgrow="ALWAYS" percentWidth="50" minWidth="320"/>
+                                    <ColumnConstraints hgrow="ALWAYS" percentWidth="50" minWidth="320"/>
+                                </columnConstraints>
+                                <rowConstraints>
+                                    <RowConstraints vgrow="ALWAYS" minHeight="300"/>
+                                    <RowConstraints vgrow="ALWAYS" minHeight="300"/>
+                                </rowConstraints>
+
+                                <VBox styleClass="ds-card, dashboard-chart-container"
+                                      GridPane.rowIndex="0" GridPane.columnIndex="0">
+                                    <Label text="Movimentações por Tipo" styleClass="ds-card-title"/>
+                                    <BarChart fx:id="chartMovimentacoes"
+                                              legendVisible="false"
+                                              styleClass="dashboard-chart"
+                                              VBox.vgrow="ALWAYS">
+                                        <xAxis><CategoryAxis label="Tipo"/></xAxis>
+                                        <yAxis><NumberAxis label="Quantidade"/></yAxis>
+                                    </BarChart>
+                                </VBox>
+
+                                <VBox styleClass="ds-card, dashboard-chart-container"
+                                      GridPane.rowIndex="0" GridPane.columnIndex="1">
+                                    <Label text="Distribuição por Tipo" styleClass="ds-card-title"/>
+                                    <PieChart fx:id="chartDistribuicaoTipos"
+                                              styleClass="dashboard-chart"
+                                              VBox.vgrow="ALWAYS"/>
+                                </VBox>
+
+                                <VBox styleClass="ds-card, dashboard-chart-container"
+                                      GridPane.rowIndex="1" GridPane.columnIndex="0">
+                                    <Label text="Tendência de Estoque" styleClass="ds-card-title"/>
+                                    <LineChart fx:id="chartTrendEstoque"
+                                               styleClass="dashboard-chart"
+                                               VBox.vgrow="ALWAYS">
+                                        <xAxis><CategoryAxis label="Mês"/></xAxis>
+                                        <yAxis><NumberAxis label="Movimentações"/></yAxis>
+                                    </LineChart>
+                                </VBox>
+
+                                <VBox styleClass="ds-card, dashboard-chart-container"
+                                      GridPane.rowIndex="1" GridPane.columnIndex="1">
+                                    <Label text="Equipamentos por Departamento" styleClass="ds-card-title"/>
+                                    <BarChart fx:id="chartEquipamentosDepartamento"
+                                              legendVisible="false"
+                                              styleClass="dashboard-chart"
+                                              VBox.vgrow="ALWAYS">
+                                        <xAxis><CategoryAxis label="Departamento"/></xAxis>
+                                        <yAxis><NumberAxis label="Equipamentos"/></yAxis>
+                                    </BarChart>
+                                </VBox>
+                            </GridPane>
+                        </VBox>
+
+                        <!-- ============ RODAPÉ ============ -->
+                        <HBox alignment="CENTER_RIGHT" spacing="6" styleClass="dashboard-footer">
+                            <Label text="Última atualização:" styleClass="ds-caption"/>
+                            <Label fx:id="lblUltimaAtualizacao" styleClass="ds-caption" text="—"/>
+                        </HBox>
+
+                    </VBox>
+                </content>
+            </ScrollPane>
+
+            <!-- Host para painéis dinâmicos (detalhes, formulários) -->
+            <StackPane fx:id="overlayHost" styleClass="app-overlay-host"/>
+
         </StackPane>
     </center>
 
-    <!-- ========== FOOTER ========== -->
-    <bottom>
-        <HBox alignment="CENTER" prefHeight="48" styleClass="app-footer">
-            <Label fx:id="lblFooter" styleClass="app-footer-text"
-                   text="© 2024 Gestão de Equipamentos de TI - Todos os direitos reservados"
-                   textAlignment="CENTER" wrapText="true" />
-        </HBox>
-    </bottom>
-
-    <!-- ========== PAINEL DIREITO ========== -->
+    <!-- ===================================================== -->
+    <!-- ASIDE (painel direito — opcional)                      -->
+    <!-- ===================================================== -->
     <right>
-        <StackPane fx:id="stack_sistema" prefWidth="380"
-                   styleClass="app-right-panel elevation-2">
-            <BorderPane.margin>
-                <Insets bottom="12.0" left="0.0" right="12.0" top="12.0" />
-            </BorderPane.margin>
-            <padding><Insets bottom="12.0" left="12.0" right="12.0" top="12.0" /></padding>
+        <StackPane fx:id="asideHost"
+                   prefWidth="0"
+                   minWidth="0"
+                   styleClass="app-aside"
+                   BorderPane.alignment="CENTER">
+            <!-- Preenchido em runtime pelo controller quando necessário -->
         </StackPane>
     </right>
+
+    <!-- ===================================================== -->
+    <!-- FOOTER (opcional)                                      -->
+    <!-- ===================================================== -->
+    <bottom>
+        <HBox alignment="CENTER" styleClass="app-footer">
+            <Label fx:id="lblFooter"
+                   styleClass="app-footer-text"
+                   text="© 2024 Gestão de Equipamentos de TI — Todos os direitos reservados"/>
+        </HBox>
+    </bottom>
 </BorderPane>
