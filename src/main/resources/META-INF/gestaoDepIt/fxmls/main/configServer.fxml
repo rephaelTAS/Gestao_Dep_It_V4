@@ -7,85 +7,116 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/21"
+<AnchorPane styleClass="config-root"
+            xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1">
 
-    <VBox spacing="20" AnchorPane.topAnchor="20" AnchorPane.leftAnchor="20"
+    <VBox spacing="20" styleClass="config-container"
+          AnchorPane.topAnchor="20" AnchorPane.leftAnchor="20"
           AnchorPane.rightAnchor="20" AnchorPane.bottomAnchor="20">
 
         <!-- TÍTULO -->
-        <HBox spacing="10">
-            <Text text="⚙️ Configuração de Servidor Remoto" styleClass="titulo-config" />
+        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="config-header">
+            <Text text="⚙️ Configuração de Servidor Remoto"
+                  styleClass="config-title"/>
         </HBox>
 
-        <Separator />
+        <Separator styleClass="config-separator"/>
 
         <!-- FORMULÁRIO -->
-        <GridPane hgap="15" vgap="12" styleClass="form-grid">
+        <GridPane hgap="15" vgap="12" styleClass="config-form">
 
-            <!-- Linha 1: Nome da Configuração -->
-            <Label text="Nome da Configuração:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="label-config" />
-            <TextField fx:id="txtNomeConfig" GridPane.rowIndex="0" GridPane.columnIndex="1"
-                       promptText="Ex: servidor_producao" styleClass="input-config" />
+            <columnConstraints>
+                <ColumnConstraints minWidth="180" prefWidth="180" hgrow="NEVER"/>
+                <ColumnConstraints minWidth="200" hgrow="ALWAYS"/>
+            </columnConstraints>
 
-            <!-- Linha 2: Tipo de Banco -->
-            <Label text="Tipo de Banco:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="label-config" />
-            <ComboBox fx:id="cmbTipoBanco" GridPane.rowIndex="1" GridPane.columnIndex="1"
-                      styleClass="input-config" />
+            <Label text="Nome da Configuração:" styleClass="config-label"
+                   GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtNomeConfig"
+                       promptText="Ex: servidor_producao"
+                       styleClass="clay-input"
+                       GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-            <!-- Linha 3: Host -->
-            <Label text="Host:" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="label-config" />
-            <TextField fx:id="txtHost" GridPane.rowIndex="2" GridPane.columnIndex="1"
-                       promptText="Ex: 192.168.20.10" styleClass="input-config" />
+            <Label text="Tipo de Banco:" styleClass="config-label"
+                   GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <ComboBox fx:id="cmbTipoBanco"
+                      styleClass="clay-input config-combo"
+                      maxWidth="Infinity"
+                      GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-            <!-- Linha 4: Porta -->
-            <Label text="Porta:" GridPane.rowIndex="3" GridPane.columnIndex="0" styleClass="label-config" />
-            <TextField fx:id="txtPorta" GridPane.rowIndex="3" GridPane.columnIndex="1"
-                       promptText="Ex: 3306" styleClass="input-config" />
+            <Label text="Host:" styleClass="config-label"
+                   GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtHost"
+                       promptText="Ex: 192.168.20.10"
+                       styleClass="clay-input"
+                       GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
-            <!-- Linha 5: Database -->
-            <Label text="Banco de Dados:" GridPane.rowIndex="4" GridPane.columnIndex="0" styleClass="label-config" />
-            <TextField fx:id="txtDatabase" GridPane.rowIndex="4" GridPane.columnIndex="1"
-                       promptText="Ex: gestao_dep_it" styleClass="input-config" />
+            <Label text="Porta:" styleClass="config-label"
+                   GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtPorta"
+                       promptText="Ex: 3306"
+                       styleClass="clay-input"
+                       GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
-            <!-- Linha 6: Usuário -->
-            <Label text="Usuário:" GridPane.rowIndex="5" GridPane.columnIndex="0" styleClass="label-config" />
-            <TextField fx:id="txtUsuario" GridPane.rowIndex="5" GridPane.columnIndex="1"
-                       promptText="Ex: rafael" styleClass="input-config" />
+            <Label text="Banco de Dados:" styleClass="config-label"
+                   GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtDatabase"
+                       promptText="Ex: gestao_dep_it"
+                       styleClass="clay-input"
+                       GridPane.rowIndex="4" GridPane.columnIndex="1"/>
 
-            <!-- Linha 7: Senha -->
-            <Label text="Senha:" GridPane.rowIndex="6" GridPane.columnIndex="0" styleClass="label-config" />
-            <PasswordField fx:id="txtSenha" GridPane.rowIndex="6" GridPane.columnIndex="1"
-                           promptText="Digite a senha" styleClass="input-config" />
+            <Label text="Usuário:" styleClass="config-label"
+                   GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtUsuario"
+                       promptText="Ex: rafael"
+                       styleClass="clay-input"
+                       GridPane.rowIndex="5" GridPane.columnIndex="1"/>
 
-            <!-- Linha 8: Parâmetros Extras -->
-            <Label text="Parâmetros Extras (JSON):" GridPane.rowIndex="7" GridPane.columnIndex="0" styleClass="label-config" />
-            <TextField fx:id="txtParametros" GridPane.rowIndex="7" GridPane.columnIndex="1"
-                       promptText='{"useSSL":false,"serverTimezone":"UTC"}' styleClass="input-config" />
+            <Label text="Senha:" styleClass="config-label"
+                   GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+            <PasswordField fx:id="txtSenha"
+                           promptText="Digite a senha"
+                           styleClass="clay-input"
+                           GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+
+            <Label text="Parâmetros Extras (JSON):" styleClass="config-label"
+                   GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtParametros"
+                       promptText='{"useSSL":false,"serverTimezone":"UTC"}'
+                       styleClass="clay-input"
+                       GridPane.rowIndex="7" GridPane.columnIndex="1"/>
 
         </GridPane>
 
-        <Separator />
+        <Separator styleClass="config-separator"/>
 
         <!-- BARRA DE STATUS -->
-        <HBox spacing="15" styleClass="status-bar">
-            <Label fx:id="lblStatus" text="Status: Não testado" styleClass="status-label" />
-            <Label fx:id="lblConexao" text="Última conexão: --" styleClass="status-label" />
+        <HBox spacing="15" alignment="CENTER_LEFT" styleClass="config-status-bar">
+            <Label fx:id="lblStatus" text="Status: Não testado"
+                   styleClass="config-status-label"/>
+            <Label fx:id="lblConexao" text="Última conexão: --"
+                   styleClass="config-status-label config-status-muted"/>
         </HBox>
 
         <!-- BOTÕES -->
-        <HBox spacing="15" styleClass="button-bar">
-            <Button fx:id="btnTestar" text="🔌 Testar Conexão" styleClass="btn-testar" />
-            <Button fx:id="btnSalvar" text="💾 Salvar" styleClass="btn-salvar" />
-            <Button fx:id="btnAtivar" text="✅ Ativar" styleClass="btn-ativar" />
-            <Button fx:id="btnFechar" text="✖️ Fechar" styleClass="btn-fechar" />
+        <HBox spacing="12" alignment="CENTER_RIGHT" styleClass="config-button-bar">
+            <Button fx:id="btnTestar" text="🔌 Testar Conexão"
+                    styleClass="clay-button clay-button-soft"/>
+            <Button fx:id="btnSalvar" text="💾 Salvar"
+                    styleClass="clay-button clay-button-primary"/>
+            <Button fx:id="btnAtivar" text="✅ Ativar"
+                    styleClass="clay-button clay-button-primary"/>
+            <Button fx:id="btnFechar" text="✖️ Fechar"
+                    styleClass="clay-button clay-button-ghost"/>
         </HBox>
 
     </VBox>
-
 </AnchorPane>

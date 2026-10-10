@@ -1,0 +1,294 @@
+/*
+ * JavaFX Design System
+ * File: layout.css
+ * Purpose: Application shell and page layouts
+ *
+ * REGRA: Este ficheiro SÓ contém estrutura (.app-*, .page-*, .sidebar-*).
+ * Pode usar tokens E compor componentes em contexto.
+ * NUNCA define componentes atómicos (.ds-*).
+ *
+ * Alinhado com: Catálogo Oficial §5 (Navigation) + §6 (Typography)
+ */
+
+/* ============================================================
+   §5 · SHELL
+   ============================================================ */
+
+.app-root {
+    -fx-background-color: -app-background;
+    -fx-font-family: -app-font-family;
+    -fx-font-size: -app-font-size-md;
+}
+
+/* ============================================================
+   §5 · HEADER
+   ============================================================ */
+
+.app-header {
+    -fx-background-color: -app-surface;
+    -fx-min-height: -app-topbar-height;
+    -fx-pref-height: -app-topbar-height;
+    -fx-padding: 0 -app-space-6;
+    -fx-border-color: transparent transparent -app-border transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.app-header-title {
+    -fx-font-size: -app-font-size-lg;
+    -fx-font-weight: -app-font-weight-semibold;
+    -fx-text-fill: -app-text-primary;
+}
+
+/* Breadcrumbs */
+.app-breadcrumbs       { -fx-alignment: center-left; -fx-spacing: -app-space-2; }
+.app-breadcrumb-current {
+    -fx-font-size: -app-font-size-sm;
+    -fx-font-weight: -app-font-weight-semibold;
+    -fx-text-fill: -app-text-primary;
+}
+
+/* Utilizador */
+.app-user          { -fx-padding: -app-space-1 0; }
+.app-user-time     { -fx-font-size: -app-font-size-sm; -fx-font-weight: -app-font-weight-semibold; -fx-text-fill: -app-text-primary; }
+.app-user-date     { -fx-font-size: -app-font-size-xs; -fx-text-fill: -app-text-secondary; }
+.app-user-name     { -fx-font-size: -app-font-size-sm; -fx-text-fill: -app-text-primary; }
+
+/* Avatar */
+.app-avatar {
+    -fx-min-width: 36px;
+    -fx-min-height: 36px;
+    -fx-pref-width: 36px;
+    -fx-pref-height: 36px;
+    -fx-background-color: -app-blue-700;
+    -fx-background-radius: 50%;
+    -fx-alignment: center;
+}
+
+.app-avatar-initials {
+    -fx-text-fill: white;
+    -fx-font-weight: -app-font-weight-bold;
+    -fx-font-size: -app-font-size-md;
+}
+
+/* ============================================================
+   §5 · SIDEBAR
+   ============================================================ */
+
+.app-sidebar {
+    -fx-background-color: -app-blue-900;
+    -fx-padding: -app-space-4 -app-space-2;
+    -fx-spacing: 0;
+    -fx-min-width: -app-sidebar-width;
+    -fx-pref-width: -app-sidebar-width;
+}
+
+.app-sidebar--compact {
+    -fx-min-width: -app-sidebar-compact-width;
+    -fx-pref-width: -app-sidebar-compact-width;
+}
+
+.app-sidebar-brand {
+    -fx-padding: -app-space-1 -app-space-2 -app-space-4 -app-space-2;
+    -fx-min-height: 48px;
+    -fx-alignment: center-left;
+}
+
+.app-sidebar-brand-title {
+    -fx-text-fill: white;
+    -fx-font-size: -app-font-size-lg;
+    -fx-font-weight: -app-font-weight-bold;
+}
+
+.app-sidebar-brand-subtitle {
+    -fx-text-fill: rgba(255,255,255,0.7);
+    -fx-font-size: -app-font-size-sm;
+}
+
+/* Scroll interno da sidebar */
+.app-sidebar-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-padding: 0;
+}
+.app-sidebar-scroll > .viewport { -fx-background-color: transparent; }
+.app-sidebar-scroll .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 6;
+}
+.app-sidebar-scroll .scroll-bar:vertical .thumb {
+    -fx-background-color: rgba(255,255,255,0.15);
+    -fx-background-radius: 3;
+}
+.app-sidebar-scroll .scroll-bar .increment-button,
+.app-sidebar-scroll .scroll-bar .decrement-button {
+    -fx-pref-height: 0;
+    -fx-opacity: 0;
+}
+
+/* ============================================================
+   §5 · NAVEGAÇÃO
+   ============================================================ */
+
+.app-nav {
+    -fx-spacing: -app-space-1;
+    -fx-padding: -app-space-1 0;
+}
+
+.app-nav-section {
+    -fx-text-fill: rgba(255,255,255,0.45);
+    -fx-font-size: 10px;
+    -fx-font-weight: -app-font-weight-bold;
+    -fx-padding: -app-space-3 -app-space-3 -app-space-1 -app-space-3;
+}
+
+.app-nav-item {
+    -fx-background-color: transparent;
+    -fx-background-radius: -app-radius-lg;
+    -fx-text-fill: rgba(255,255,255,0.85);
+    -fx-font-size: -app-font-size-sm;
+    -fx-padding: -app-space-3;
+    -fx-alignment: center-left;
+    -fx-graphic-text-gap: -app-space-3;
+    -fx-cursor: hand;
+    -fx-min-height: 40px;
+}
+
+.app-nav-item:hover {
+    -fx-background-color: rgba(255,255,255,0.06);
+    -fx-text-fill: white;
+}
+
+.app-nav-item:focused {
+    -fx-effect: dropshadow(gaussian, -app-focus-ring, 4, 0, 0, 0);
+}
+
+.app-nav-item--active {
+    -fx-background-color: -app-blue-700;
+    -fx-text-fill: white;
+    -fx-font-weight: -app-font-weight-semibold;
+}
+
+/* ============================================================
+   §5 · STATUS (sidebar footer)
+   ============================================================ */
+
+.app-sidebar-status {
+    -fx-padding: -app-space-3 -app-space-2 -app-space-1 -app-space-2;
+    -fx-spacing: -app-space-1;
+    -fx-border-color: rgba(255,255,255,0.08) transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+.app-status-title {
+    -fx-text-fill: rgba(255,255,255,0.45);
+    -fx-font-size: 10px;
+    -fx-font-weight: -app-font-weight-bold;
+}
+
+.app-status-indicator {
+    -fx-min-width: 10px;
+    -fx-min-height: 10px;
+}
+
+.app-status-dot {
+    -fx-background-color: -app-green-600;
+    -fx-background-radius: 50%;
+    -fx-min-width: 8px;
+    -fx-min-height: 8px;
+    -fx-max-width: 8px;
+    -fx-max-height: 8px;
+}
+
+.app-status-value  { -fx-text-fill: white; -fx-font-size: -app-font-size-xs; }
+.app-version-text  { -fx-text-fill: rgba(255,255,255,0.35); -fx-font-size: 11px; }
+
+/* ============================================================
+   §5 · CONTENT
+   ============================================================ */
+
+.app-content-host   { -fx-background-color: -app-background; }
+.app-content-scroll { -fx-background-color: transparent; -fx-background: transparent; }
+.app-content-scroll > .viewport { -fx-background-color: -app-background; }
+.app-content        { -fx-background-color: -app-background; }
+.app-overlay-host   { -fx-background-color: transparent; -fx-pick-on-bounds: false; }
+
+/* ============================================================
+   §5 · ASIDE / FOOTER
+   ============================================================ */
+
+.app-aside {
+    -fx-background-color: -app-surface;
+    -fx-border-color: -app-border transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+.app-footer {
+    -fx-background-color: -app-surface;
+    -fx-padding: -app-space-2 -app-space-5;
+    -fx-min-height: -app-footer-height;
+    -fx-border-color: -app-border transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+.app-footer-text {
+    -fx-font-size: -app-font-size-xs;
+    -fx-text-fill: -app-text-secondary;
+}
+
+/* ============================================================
+   §6 · PÁGINA
+   ============================================================ */
+
+.page-container {
+    -fx-background-color: -app-background;
+    -fx-padding: -app-space-6;
+}
+
+.page-header {
+    -fx-padding: 0 0 -app-space-4 0;
+    -fx-spacing: -app-space-1;
+}
+
+.page-title {
+    -fx-font-size: -app-font-size-4xl;
+    -fx-font-weight: -app-font-weight-semibold;
+    -fx-text-fill: -app-text-primary;
+}
+
+.page-description {
+    -fx-font-size: -app-font-size-md;
+    -fx-text-fill: -app-text-secondary;
+}
+
+.page-section {
+    -fx-padding: 0 0 -app-space-6 0;
+    -fx-spacing: -app-space-3;
+}
+
+.page-section-title {
+    -fx-font-size: -app-font-size-2xl;
+    -fx-font-weight: -app-font-weight-semibold;
+    -fx-text-fill: -app-text-primary;
+}
+
+/* Densidade de página */
+.layout-wide     .page-container { -fx-padding: -app-space-8; }
+.layout-standard .page-container { -fx-padding: -app-space-6; }
+.layout-compact  .page-container { -fx-padding: -app-space-4; }
+
+/* ============================================================
+   COMPOSIÇÃO — componentes em contexto
+   ============================================================ */
+
+/* Botão primário na sidebar tem cor adaptada ao fundo escuro */
+.app-sidebar .ds-button--primary {
+    -fx-background-color: -app-blue-600;
+}
+.app-sidebar .ds-button--primary:hover {
+    -fx-background-color: -app-blue-700;
+}
+
+/* Card dentro de content não tem sombra (o contexto já dá peso) */
+.app-content .ds-card {
+    -fx-effect: null;
+}

@@ -1,0 +1,551 @@
+/*
+ * JavaFX Design System
+ * File: component.css
+ * Purpose: Shared UI components (.ds-* only)
+ *
+ * REGRA: Este ficheiro SÓ contém componentes atómicos e reutilizáveis.
+ * Usa EXCLUSIVAMENTE variáveis de tokens.css.
+ * NUNCA contém layout (.app-*, .page-*, .sidebar-*).
+ *
+ * Alinhado com: Catálogo Oficial §2–§11
+ */
+
+/* ============================================================
+   §2 · BUTTONS
+   ============================================================ */
+
+.ds-button {
+    -fx-font-family: -app-font-family;
+    -fx-font-size: -app-font-size-md;
+    -fx-font-weight: -app-font-weight-semibold;
+    -fx-min-height: -app-control-height-lg;
+    -fx-pref-height: -app-control-height-lg;
+    -fx-padding: 0 -app-space-4;
+    -fx-background-radius: -app-radius-lg;
+    -fx-border-radius: -app-radius-lg;
+    -fx-border-width: 0;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+    -fx-graphic-text-gap: -app-space-2;
+    -fx-effect: -app-shadow-button;
+}
+
+.ds-button:hover {
+    -fx-effect: -app-shadow-button-hover;
+}
+
+.ds-button:pressed {
+    -fx-effect: -app-shadow-button-pressed;
+    -fx-translate-y: 1;
+}
+
+.ds-button:focused {
+    -fx-effect: -app-shadow-button,
+    dropshadow(gaussian, -app-focus-ring, 6, 0.4, 0, 0);
+}
+
+.ds-button:disabled {
+    -fx-opacity: 0.5;
+    -fx-cursor: default;
+    -fx-effect: null;
+}
+
+/* --- Tamanhos --- */
+
+.ds-button--compact {
+    -fx-min-height: -app-control-height-sm;
+    -fx-pref-height: -app-control-height-sm;
+    -fx-padding: 0 -app-space-3;
+    -fx-font-size: -app-font-size-sm;
+    -fx-graphic-text-gap: -app-space-1;
+}
+
+.ds-button--comfortable {
+    -fx-min-height: -app-control-height-xl;
+    -fx-pref-height: -app-control-height-xl;
+    -fx-padding: 0 -app-space-5;
+}
+
+/* --- Variantes semânticas --- */
+
+.ds-button--primary {
+    -fx-background-color: -app-blue-700;
+    -fx-text-fill: -app-text-on-primary;
+}
+.ds-button--primary:hover   { -fx-background-color: -app-blue-800; }
+.ds-button--primary:pressed { -fx-background-color: -app-blue-900; }
+
+.ds-button--secondary {
+    -fx-background-color: -app-surface;
+    -fx-text-fill: -app-text-primary;
+    -fx-border-width: 1px;
+    -fx-border-color: -app-border-strong;
+}
+.ds-button--secondary:hover {
+    -fx-background-color: -app-blue-50;
+    -fx-border-color: -app-blue-600;
+    -fx-text-fill: -app-blue-700;
+}
+.ds-button--secondary:pressed { -fx-background-color: -app-blue-100; }
+
+.ds-button--tonal {
+    -fx-background-color: -app-blue-100;
+    -fx-text-fill: -app-blue-700;
+}
+.ds-button--tonal:hover   { -fx-background-color: derive(-app-blue-100, -8%); }
+.ds-button--tonal:pressed { -fx-background-color: derive(-app-blue-100, -15%); }
+
+.ds-button--ghost {
+    -fx-background-color: transparent;
+    -fx-text-fill: -app-blue-700;
+    -fx-effect: null;
+}
+.ds-button--ghost:hover   { -fx-background-color: -app-blue-50; }
+.ds-button--ghost:pressed { -fx-background-color: -app-blue-100; }
+
+.ds-button--danger {
+    -fx-background-color: -app-red-600;
+    -fx-text-fill: -app-text-on-danger;
+}
+.ds-button--danger:hover   { -fx-background-color: -app-red-700; }
+.ds-button--danger:pressed { -fx-background-color: -app-red-900; }
+
+.ds-button--link {
+    -fx-background-color: transparent;
+    -fx-text-fill: -app-blue-700;
+    -fx-padding: 0 -app-space-1;
+    -fx-min-height: 0;
+    -fx-effect: null;
+}
+.ds-button--link:hover   { -fx-text-fill: -app-blue-800; }
+.ds-button--link:pressed { -fx-text-fill: -app-blue-900; }
+
+/* --- Estado de loading --- */
+.ds-button--loading {
+    -fx-opacity: 0.7;
+    -fx-cursor: wait;
+}
+
+/* ============================================================
+   §3 · FORM FIELDS
+   ============================================================ */
+
+.ds-input {
+    -fx-font-family: -app-font-family;
+    -fx-font-size: -app-font-size-md;
+    -fx-text-fill: -app-text-primary;
+    -fx-prompt-text-fill: -app-text-disabled;
+    -fx-background-color: -app-surface;
+    -fx-min-height: -app-control-height-lg;
+    -fx-pref-height: -app-control-height-lg;
+    -fx-padding: 0 -app-space-3;
+    -fx-background-radius: -app-radius-md;
+    -fx-border-radius: -app-radius-md;
+    -fx-border-color: -app-border;
+    -fx-border-width: 1px;
+}
+
+.ds-input:hover { -fx-border-color: -app-border-strong; }
+
+.ds-input:focused {
+    -fx-border-color: -app-blue-600;
+    -fx-border-width: 1.5px;
+    -fx-effect: dropshadow(gaussian, -app-focus-ring, 4, 0, 0, 0);
+}
+
+.ds-input:disabled {
+    -fx-opacity: 0.6;
+    -fx-background-color: -app-background;
+}
+
+.ds-input--error {
+    -fx-border-color: -app-red-600;
+    -fx-border-width: 1.5px;
+}
+.ds-input--error:focused {
+    -fx-border-color: -app-red-600;
+    -fx-effect: dropshadow(gaussian, -app-focus-ring-danger, 4, 0, 0, 0);
+}
+
+.ds-input--success {
+    -fx-border-color: -app-green-600;
+}
+
+.ds-input--readonly {
+    -fx-background-color: -app-neutral-50;
+    -fx-text-fill: -app-text-secondary;
+}
+
+/* Textarea */
+.ds-textarea {
+    -fx-font-family: -app-font-family;
+    -fx-font-size: -app-font-size-md;
+    -fx-text-fill: -app-text-primary;
+    -fx-background-color: -app-surface;
+    -fx-background-radius: -app-radius-md;
+    -fx-border-color: -app-border;
+    -fx-border-radius: -app-radius-md;
+    -fx-border-width: 1px;
+    -fx-padding: -app-space-2;
+}
+.ds-textarea:focused {
+    -fx-border-color: -app-blue-600;
+    -fx-effect: dropshadow(gaussian, -app-focus-ring, 4, 0, 0, 0);
+}
+
+/* --- Field (etiqueta + controlo + mensagem) --- */
+
+.ds-field {
+    -fx-spacing: -app-space-2;
+}
+
+.ds-field-label {
+    -fx-font-size: -app-font-size-sm;
+    -fx-font-weight: -app-font-weight-semibold;
+    -fx-text-fill: -app-text-primary;
+}
+
+.ds-field-hint {
+    -fx-font-size: -app-font-size-xs;
+    -fx-text-fill: -app-text-secondary;
+}
+
+.ds-field-error {
+    -fx-font-size: -app-font-size-xs;
+    -fx-text-fill: -app-danger;
+}
+
+.ds-field-required::after {
+    /* Marcador visual — implementado no FXML com "*" */
+}
+
+/* --- Checkbox / Radio --- */
+
+.ds-checkbox,
+.ds-radio {
+    -fx-font-size: -app-font-size-md;
+    -fx-text-fill: -app-text-primary;
+    -fx-cursor: hand;
+}
+
+.ds-checkbox .box,
+.ds-radio .radio {
+    -fx-background-color: -app-surface;
+    -fx-border-color: -app-border-strong;
+    -fx-border-radius: -app-radius-sm;
+    -fx-background-radius: -app-radius-sm;
+}
+
+.ds-checkbox:selected .box,
+.ds-radio:selected .radio {
+    -fx-background-color: -app-blue-700;
+    -fx-border-color: -app-blue-700;
+}
+
+.ds-checkbox:selected .mark { -fx-background-color: white; }
+
+.ds-checkbox:focused,
+.ds-radio:focused {
+    -fx-effect: dropshadow(gaussian, -app-focus-ring, 4, 0, 0, 0);
+}
+
+/* ============================================================
+   §4 · CARDS
+   ============================================================ */
+
+.ds-card {
+    -fx-background-color: -app-surface;
+    -fx-background-radius: -app-radius-xl;
+    -fx-border-radius: -app-radius-xl;
+    -fx-border-color: -app-border;
+    -fx-border-width: 1px;
+    -fx-padding: -app-card-padding-md;
+    -fx-spacing: -app-space-3;
+}
+
+.ds-card--compact  { -fx-padding: -app-card-padding-sm; }
+.ds-card--spacious { -fx-padding: -app-card-padding-lg; }
+
+.ds-card--elevated { -fx-effect: -app-shadow-sm; }
+
+.ds-card--interactive {
+    -fx-cursor: hand;
+}
+.ds-card--interactive:hover {
+    -fx-border-color: -app-blue-600;
+    -fx-effect: -app-shadow-md;
+}
+
+.ds-card-title {
+    -fx-font-size: -app-font-size-lg;
+    -fx-font-weight: -app-font-weight-semibold;
+    -fx-text-fill: -app-text-primary;
+}
+
+.ds-card-description {
+    -fx-font-size: -app-font-size-sm;
+    -fx-text-fill: -app-text-secondary;
+}
+
+/* --- Stat Card --- */
+
+.ds-stat-card {
+    -fx-padding: -app-card-padding-md;
+    -fx-spacing: -app-space-1;
+}
+
+.ds-stat-label {
+    -fx-font-size: -app-font-size-xs;
+    -fx-font-weight: -app-font-weight-semibold;
+    -fx-text-fill: -app-text-secondary;
+}
+
+.ds-stat-value {
+    -fx-font-size: -app-font-size-kpi;
+    -fx-font-weight: -app-font-weight-bold;
+    -fx-text-fill: -app-text-primary;
+}
+
+.ds-stat-description {
+    -fx-font-size: -app-font-size-xs;
+    -fx-text-fill: -app-text-disabled;
+}
+
+.ds-stat-card--highlight {
+    -fx-background-color: -app-blue-100;
+    -fx-border-color: -app-blue-600;
+}
+
+/* ============================================================
+   §7 · ICONS
+   ============================================================ */
+
+.ds-icon { -fx-font-size: -app-icon-size-md; -fx-text-fill: -app-text-secondary; }
+
+.ds-icon--sm { -fx-font-size: -app-icon-size-sm; }
+.ds-icon--lg { -fx-font-size: -app-icon-size-lg; }
+.ds-icon--xl { -fx-font-size: -app-icon-size-xl; }
+
+.ds-icon--primary { -fx-text-fill: -app-blue-600; }
+.ds-icon--success { -fx-text-fill: -app-success; }
+.ds-icon--warning { -fx-text-fill: -app-warning; }
+.ds-icon--danger  { -fx-text-fill: -app-danger; }
+.ds-icon--info    { -fx-text-fill: -app-info; }
+
+/* ============================================================
+   §8 · FEEDBACK
+   ============================================================ */
+
+/* --- Alert --- */
+.ds-alert {
+    -fx-padding: -app-space-3 -app-space-4;
+    -fx-background-radius: -app-radius-lg;
+    -fx-border-radius: -app-radius-lg;
+    -fx-border-width: 1px;
+    -fx-font-size: -app-font-size-sm;
+    -fx-graphic-text-gap: -app-space-3;
+}
+
+.ds-alert--info    { -fx-background-color: -app-info-bg;    -fx-border-color: -app-info;    -fx-text-fill: -app-info-fg; }
+.ds-alert--success { -fx-background-color: -app-success-bg; -fx-border-color: -app-success; -fx-text-fill: -app-success-fg; }
+.ds-alert--warning { -fx-background-color: -app-warning-bg; -fx-border-color: -app-warning; -fx-text-fill: -app-warning-fg; }
+.ds-alert--danger  { -fx-background-color: -app-danger-bg;  -fx-border-color: -app-danger;  -fx-text-fill: -app-danger-fg; }
+
+/* --- Toast --- */
+.ds-toast {
+    -fx-background-color: -app-neutral-900;
+    -fx-text-fill: white;
+    -fx-padding: -app-space-3 -app-space-4;
+    -fx-background-radius: -app-radius-lg;
+    -fx-font-size: -app-font-size-sm;
+    -fx-effect: -app-shadow-lg;
+    -fx-min-width: 320px;
+    -fx-max-width: 420px;
+    -fx-graphic-text-gap: -app-space-3;
+}
+
+.ds-toast--success { -fx-background-color: -app-success; }
+.ds-toast--warning { -fx-background-color: -app-warning; }
+.ds-toast--danger  { -fx-background-color: -app-danger; }
+
+/* --- Progress --- */
+.ds-progress {
+    -fx-min-height: 6px;
+    -fx-pref-height: 6px;
+}
+
+.ds-progress .track {
+    -fx-background-color: -app-neutral-100;
+    -fx-background-radius: -app-radius-pill;
+}
+
+.ds-progress .bar {
+    -fx-background-color: -app-blue-600;
+    -fx-background-radius: -app-radius-pill;
+}
+
+.ds-progress--sm { -fx-min-height: 4px; -fx-pref-height: 4px; }
+.ds-progress--lg { -fx-min-height: 8px; -fx-pref-height: 8px; }
+
+/* --- Empty State --- */
+.ds-empty {
+    -fx-padding: -app-space-10 -app-space-6;
+    -fx-spacing: -app-space-3;
+    -fx-alignment: center;
+}
+
+.ds-empty-icon {
+    -fx-font-size: -app-icon-size-xl;
+    -fx-text-fill: -app-text-disabled;
+}
+
+.ds-empty-title {
+    -fx-font-size: -app-font-size-xl;
+    -fx-font-weight: -app-font-weight-semibold;
+    -fx-text-fill: -app-text-primary;
+}
+
+.ds-empty-description {
+    -fx-font-size: -app-font-size-md;
+    -fx-text-fill: -app-text-secondary;
+    -fx-text-alignment: center;
+}
+
+/* ============================================================
+   §9 · BADGES
+   ============================================================ */
+
+.ds-badge {
+    -fx-padding: -app-space-1 -app-space-2;
+    -fx-background-radius: -app-radius-md;
+    -fx-font-size: -app-font-size-xs;
+    -fx-font-weight: -app-font-weight-medium;
+    -fx-min-height: 22px;
+    -fx-alignment: center;
+}
+
+.ds-badge--pill { -fx-background-radius: -app-radius-pill; }
+
+.ds-badge--success { -fx-background-color: -app-success-bg; -fx-text-fill: -app-success-fg; }
+.ds-badge--warning { -fx-background-color: -app-warning-bg; -fx-text-fill: -app-warning-fg; }
+.ds-badge--danger  { -fx-background-color: -app-danger-bg;  -fx-text-fill: -app-danger-fg; }
+.ds-badge--info    { -fx-background-color: -app-info-bg;    -fx-text-fill: -app-info-fg; }
+.ds-badge--neutral { -fx-background-color: -app-neutral-100; -fx-text-fill: -app-text-secondary; }
+
+/* ============================================================
+   §10 · DIALOGS
+   ============================================================ */
+
+.ds-dialog {
+    -fx-background-color: -app-surface;
+    -fx-background-radius: -app-radius-xl;
+    -fx-border-radius: -app-radius-xl;
+    -fx-border-color: -app-border;
+    -fx-border-width: 1px;
+    -fx-padding: -app-space-6;
+    -fx-spacing: -app-space-4;
+    -fx-effect: -app-shadow-lg;
+}
+
+.ds-dialog-title {
+    -fx-font-size: -app-font-size-2xl;
+    -fx-font-weight: -app-font-weight-semibold;
+    -fx-text-fill: -app-text-primary;
+}
+
+.ds-dialog-message {
+    -fx-font-size: -app-font-size-md;
+    -fx-text-fill: -app-text-secondary;
+}
+
+.ds-dialog-actions {
+    -fx-spacing: -app-space-2;
+    -fx-alignment: center-right;
+}
+
+/* ============================================================
+   §11 · TABLES
+   ============================================================ */
+
+.ds-table {
+    -fx-background-color: -app-surface;
+    -fx-border-color: -app-border;
+    -fx-border-radius: -app-radius-lg;
+    -fx-background-radius: -app-radius-lg;
+    -fx-table-cell-border-color: -app-divider;
+    -fx-padding: 0;
+}
+
+.ds-table .column-header-background {
+    -fx-background-color: -app-neutral-50;
+}
+
+.ds-table .column-header,
+.ds-table .filler {
+    -fx-size: 42px;
+    -fx-background-color: -app-neutral-50;
+    -fx-border-color: transparent transparent -app-border transparent;
+}
+
+.ds-table .column-header .label {
+    -fx-font-size: -app-font-size-xs;
+    -fx-font-weight: -app-font-weight-semibold;
+    -fx-text-fill: -app-text-secondary;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.ds-table .table-row-cell {
+    -fx-cell-size: 46px;
+    -fx-background-color: -app-surface;
+    -fx-border-color: transparent transparent -app-divider transparent;
+}
+
+.ds-table .table-row-cell:odd      { -fx-background-color: -app-neutral-50; }
+.ds-table .table-row-cell:hover    { -fx-background-color: -app-blue-50; }
+.ds-table .table-row-cell:selected { -fx-background-color: -app-blue-100; }
+
+.ds-table .table-cell {
+    -fx-padding: 0 -app-space-3;
+    -fx-font-size: -app-font-size-sm;
+    -fx-text-fill: -app-text-primary;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.ds-table .table-cell--numeric { -fx-alignment: CENTER_RIGHT; }
+.ds-table .table-cell--center  { -fx-alignment: CENTER; }
+
+/* Tabela compacta */
+.ds-table--compact .table-row-cell { -fx-cell-size: 38px; }
+.ds-table--compact .table-cell     { -fx-font-size: -app-font-size-xs; }
+
+/* ============================================================
+   §1 · CHIP
+   ============================================================ */
+
+.ds-chip {
+    -fx-background-color: -app-surface;
+    -fx-background-radius: -app-radius-lg;
+    -fx-border-color: -app-border;
+    -fx-border-radius: -app-radius-lg;
+    -fx-border-width: 1px;
+    -fx-padding: -app-space-2 -app-space-3;
+    -fx-font-size: -app-font-size-sm;
+    -fx-graphic-text-gap: -app-space-2;
+}
+
+/* ============================================================
+   UTILITÁRIOS — Elevação
+   ============================================================ */
+
+.ds-elevation-1 { -fx-effect: -app-shadow-sm; }
+.ds-elevation-2 { -fx-effect: -app-shadow-md; }
+.ds-elevation-4 { -fx-effect: -app-shadow-lg; }
+
+/* ============================================================
+   UTILITÁRIOS — Caption
+   ============================================================ */
+
+.ds-caption {
+    -fx-font-size: -app-font-size-xs;
+    -fx-text-fill: -app-text-secondary;
+}

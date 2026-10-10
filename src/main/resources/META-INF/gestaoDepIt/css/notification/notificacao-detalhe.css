@@ -1,6 +1,6 @@
 /*
- * Packt Inventário — Detalhes do Funcionário
- * File: funcionario.css
+ * Packt Inventário — Detalhes da Notificação
+ * File: notificacao-detalhe.css
  * JavaFX 21+
  *
  * AUTOSSUFICIENTE — não depende de outros CSS.
@@ -12,7 +12,7 @@
    ============================================================ */
 
 .root,
-.func-detail-root {
+.notificacao-detalhe-root {
     /* Azuis */
     -app-blue-900: #142B4A;
     -app-blue-800: #1E3A5F;
@@ -62,107 +62,69 @@
     -app-font-family: "Inter", "Segoe UI", sans-serif;
 
     /* Base */
-    -fx-background-color: -app-background;
+    -fx-background-color: -app-surface;
     -fx-font-family: -app-font-family;
 }
 
 /* ============================================================
-   ROOT / CONTAINER
+   ROOT
    ============================================================ */
 
-.func-detail-root {
-    -fx-background-color: -app-background;
-}
-
-/* ============================================================
-   HEADER
-   ============================================================ */
-
-.func-detail-title {
-    -fx-font-size: 22px;
-    -fx-font-weight: bold;
-    -fx-text-fill: -app-text-primary;
-}
-
-/* ============================================================
-   CARDS
-   ============================================================ */
-
-.detail-card {
+.notificacao-detalhe-root {
     -fx-background-color: -app-surface;
-    -fx-background-radius: 12px;
-    -fx-border-radius: 12px;
-    -fx-border-color: -app-border;
-    -fx-border-width: 1px;
-    -fx-padding: 15px;
+    -fx-padding: 20px;
     -fx-spacing: 10px;
 }
 
-.detail-card-header {
-    -fx-font-size: 14px;
+/* ============================================================
+   TÍTULO
+   ============================================================ */
+
+.detalhe-title {
+    -fx-font-size: 16px;
     -fx-font-weight: bold;
     -fx-text-fill: -app-text-primary;
-    -fx-padding: 0 0 8px 0;
-    -fx-border-color: transparent transparent -app-divider transparent;
-    -fx-border-width: 0 0 1 0;
+    -fx-padding: 0 0 6px 0;
 }
 
 /* ============================================================
-   IMAGEM DE PERFIL
+   SCROLL + CONTEÚDO
    ============================================================ */
 
-.func-detail-image {
-    -fx-background-color: -app-neutral-100;
+.detalhe-scroll {
+    -fx-background-color: -app-neutral-50;
+    -fx-background: -app-neutral-50;
     -fx-background-radius: 8px;
-    -fx-border-color: -app-border;
     -fx-border-radius: 8px;
+    -fx-border-color: -app-border;
     -fx-border-width: 1px;
+    -fx-padding: 4px;
 }
 
-.func-detail-image-info {
-    -fx-font-size: 11px;
-    -fx-text-fill: -app-text-secondary;
-    -fx-text-alignment: center;
+.detalhe-scroll > .viewport {
+    -fx-background-color: -app-neutral-50;
+    -fx-background-radius: 8px;
 }
 
-/* ============================================================
-   LABELS E VALORES
-   ============================================================ */
-
-.label-bold {
-    -fx-font-size: 13px;
-    -fx-font-weight: bold;
-    -fx-text-fill: -app-text-secondary;
-}
-
-.value-highlight {
-    -fx-font-family: "JetBrains Mono", "Consolas", "Menlo", monospace;
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-    -fx-text-fill: -app-blue-700;
-    -fx-background-color: -app-blue-50;
-    -fx-background-radius: 6px;
-    -fx-padding: 2px 8px;
-}
-
-/* Grid de labels — valores padrão */
-.grid-pane .label:not(.label-bold):not(.value-highlight) {
+.detalhe-conteudo {
     -fx-font-size: 13px;
     -fx-text-fill: -app-text-primary;
+    -fx-padding: 12px 16px;
+    -fx-line-spacing: 2px;
+    -fx-wrap-text: true;
 }
 
 /* ============================================================
    BOTÕES
    ============================================================ */
 
-.btn-primary,
 .btn-secondary,
-.btn-danger {
+.btn-success {
     -fx-font-family: -app-font-family;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
     -fx-min-height: 36px;
-    -fx-padding: 0 16px;
+    -fx-padding: 0 18px;
     -fx-background-radius: 6px;
     -fx-border-radius: 6px;
     -fx-border-width: 1px;
@@ -171,37 +133,18 @@
     -fx-graphic-text-gap: 8px;
 }
 
-.btn-primary:focused,
 .btn-secondary:focused,
-.btn-danger:focused {
+.btn-success:focused {
     -fx-effect: dropshadow(gaussian, -app-focus-ring, 4, 0, 0, 0);
 }
 
-.btn-primary:disabled,
 .btn-secondary:disabled,
-.btn-danger:disabled {
+.btn-success:disabled {
     -fx-opacity: 0.55;
     -fx-cursor: default;
 }
 
-/* --- Primary --- */
-.btn-primary {
-    -fx-background-color: -app-blue-700;
-    -fx-text-fill: -app-text-on-primary;
-    -fx-border-color: -app-blue-700;
-}
-
-.btn-primary:hover {
-    -fx-background-color: -app-blue-800;
-    -fx-border-color: -app-blue-800;
-}
-
-.btn-primary:pressed {
-    -fx-background-color: -app-blue-900;
-    -fx-border-color: -app-blue-900;
-}
-
-/* --- Secondary --- */
+/* --- Secondary (Fechar) --- */
 .btn-secondary {
     -fx-background-color: -app-surface;
     -fx-text-fill: -app-text-primary;
@@ -218,67 +161,24 @@
     -fx-background-color: -app-blue-100;
 }
 
-/* --- Danger --- */
-.btn-danger {
-    -fx-background-color: -app-red-600;
+/* --- Success (Resolvido) --- */
+.btn-success {
+    -fx-background-color: -app-green-600;
     -fx-text-fill: -app-text-on-primary;
-    -fx-border-color: -app-red-600;
-}
-
-.btn-danger:hover {
-    -fx-background-color: -app-red-700;
-    -fx-border-color: -app-red-700;
-}
-
-.btn-danger:pressed {
-    -fx-background-color: -app-red-700;
-}
-
-/* Botões dentro de cards (ações rápidas) — full width */
-.detail-card .btn-primary,
-.detail-card .btn-secondary,
-.detail-card .btn-danger {
-    -fx-max-width: Infinity;
-    -fx-alignment: center;
-}
-
-/* ============================================================
-   MENSAGEM DE STATUS
-   ============================================================ */
-
-.func-detail-status-message {
-    -fx-background-color: -app-green-100;
-    -fx-background-radius: 8px;
     -fx-border-color: -app-green-600;
-    -fx-border-radius: 8px;
-    -fx-border-width: 1px;
-    -fx-padding: 10px 16px;
-    -fx-font-size: 13px;
-    -fx-text-fill: -app-green-700;
-    -fx-font-weight: bold;
 }
 
-/* Variantes — o controller troca a classe */
-.func-detail-status-message.error {
-    -fx-background-color: -app-red-100;
-    -fx-border-color: -app-red-600;
-    -fx-text-fill: -app-red-700;
+.btn-success:hover {
+    -fx-background-color: -app-green-700;
+    -fx-border-color: -app-green-700;
 }
 
-.func-detail-status-message.warning {
-    -fx-background-color: -app-orange-100;
-    -fx-border-color: -app-orange-600;
-    -fx-text-fill: -app-orange-600;
-}
-
-.func-detail-status-message.info {
-    -fx-background-color: -app-info-100;
-    -fx-border-color: -app-info-600;
-    -fx-text-fill: -app-info-600;
+.btn-success:pressed {
+    -fx-background-color: -app-green-700;
 }
 
 /* ============================================================
-   SCROLLBAR GLOBAL
+   SCROLLBAR
    ============================================================ */
 
 .scroll-bar:vertical,

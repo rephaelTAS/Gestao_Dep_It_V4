@@ -9,18 +9,23 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 
 <!--
-    Dashboard.fxml v1.0
+    Dashboard.fxml v1.1
     Estrutura do dashboard principal com KPIs, alertas, métricas e gráficos.
-    Responsabilidades: Hierarquia de containers, dimensões base e constraints de layout.
-    Estilização visual delegada ao CSS externo via styleClass semânticas.
+    Estilização delegada ao dashboard.css.
 -->
-<ScrollPane fitToWidth="true" styleClass="dash-scroll"
+<ScrollPane fitToWidth="true" fitToHeight="true"
+            styleClass="dash-scroll"
             xmlns="http://javafx.com/javafx/21"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.ossobo.gestaoDepIt.controllers.main.DashboardController">
+            xmlns:fx="http://javafx.com/fxml/1">
 
     <content>
         <VBox fx:id="dashboardContainer" spacing="20"
@@ -35,7 +40,7 @@
                    styleClass="dash-title"/>
 
             <!-- ========== SEÇÃO 1: KPIs PRINCIPAIS ========== -->
-            <VBox spacing="15" styleClass="dash-kpi-section">
+            <VBox spacing="15" styleClass="dash-section">
                 <Label text="Indicadores Principais"
                        styleClass="dash-section-title"/>
 
@@ -46,34 +51,33 @@
                         <ColumnConstraints hgrow="ALWAYS" percentWidth="25" minWidth="200"/>
                         <ColumnConstraints hgrow="ALWAYS" percentWidth="25" minWidth="200"/>
                     </columnConstraints>
-
                     <rowConstraints>
                         <RowConstraints vgrow="ALWAYS" minHeight="140"/>
                     </rowConstraints>
 
-                    <!-- CARD 1: Total Produtos -->
-                    <VBox styleClass="dash-kpi-card" GridPane.hgrow="ALWAYS">
+                    <VBox styleClass="dash-kpi-card"
+                          GridPane.columnIndex="0" GridPane.rowIndex="0">
                         <Label text="Total Produtos" styleClass="dash-kpi-label"/>
                         <Label fx:id="lblTotalProdutos" text="0" styleClass="dash-kpi-value"/>
                         <Label text="No catálogo" styleClass="dash-kpi-description"/>
                     </VBox>
 
-                    <!-- CARD 2: Total Equipamentos -->
-                    <VBox styleClass="dash-kpi-card" GridPane.hgrow="ALWAYS" GridPane.columnIndex="1">
+                    <VBox styleClass="dash-kpi-card"
+                          GridPane.columnIndex="1" GridPane.rowIndex="0">
                         <Label text="Equipamentos Ativos" styleClass="dash-kpi-label"/>
                         <Label fx:id="lblTotalEquipamentos" text="0" styleClass="dash-kpi-value"/>
                         <Label text="Em operação" styleClass="dash-kpi-description"/>
                     </VBox>
 
-                    <!-- CARD 3: Total Funcionários -->
-                    <VBox styleClass="dash-kpi-card" GridPane.hgrow="ALWAYS" GridPane.columnIndex="2">
+                    <VBox styleClass="dash-kpi-card"
+                          GridPane.columnIndex="2" GridPane.rowIndex="0">
                         <Label text="Funcionários Ativos" styleClass="dash-kpi-label"/>
                         <Label fx:id="lblTotalFuncionarios" text="0" styleClass="dash-kpi-value"/>
                         <Label text="Com equipamentos" styleClass="dash-kpi-description"/>
                     </VBox>
 
-                    <!-- CARD 4: Valor Estoque -->
-                    <VBox styleClass="dash-kpi-card" GridPane.hgrow="ALWAYS" GridPane.columnIndex="3">
+                    <VBox styleClass="dash-kpi-card dash-kpi-card-highlight"
+                          GridPane.columnIndex="3" GridPane.rowIndex="0">
                         <Label text="Valor Total Estoque" styleClass="dash-kpi-label"/>
                         <Label fx:id="lblValorTotalEstoque" text="0 €" styleClass="dash-kpi-value"/>
                         <Label text="Inventário atual" styleClass="dash-kpi-description"/>
@@ -82,36 +86,37 @@
             </VBox>
 
             <!-- ========== SEÇÃO 2: ALERTAS ========== -->
-            <VBox spacing="15" styleClass="dash-alert-section">
+            <VBox spacing="15" styleClass="dash-section">
                 <Label text="Alertas e Indicadores Críticos"
                        styleClass="dash-section-title"/>
 
-                <FlowPane hgap="15" vgap="15" styleClass="dash-alert-flow"
-                          alignment="TOP_CENTER" prefWrapLength="1200">
+                <FlowPane hgap="15" vgap="15"
+                          styleClass="dash-alert-flow"
+                          alignment="TOP_LEFT">
 
-                    <!-- CARD 5: Produto Menor Stock -->
-                    <VBox styleClass="dash-alert-card" minWidth="250" prefWidth="280" maxWidth="300">
+                    <VBox styleClass="dash-alert-card dash-alert-warning"
+                          minWidth="250" prefWidth="280" maxWidth="320">
                         <Label text="Produto Menor Stock" styleClass="dash-alert-label"/>
                         <Label fx:id="lblProdutoMenorStock" text="N/A" styleClass="dash-alert-value"/>
                         <Label text="Necessita atenção" styleClass="dash-alert-description"/>
                     </VBox>
 
-                    <!-- CARD 6: Equipamentos Manutenção -->
-                    <VBox styleClass="dash-alert-card" minWidth="250" prefWidth="280" maxWidth="300">
+                    <VBox styleClass="dash-alert-card dash-alert-danger"
+                          minWidth="250" prefWidth="280" maxWidth="320">
                         <Label text="Em Manutenção" styleClass="dash-alert-label"/>
                         <Label fx:id="lblEquipamentosManutencao" text="0" styleClass="dash-alert-value"/>
                         <Label text="Equipamentos parados" styleClass="dash-alert-description"/>
                     </VBox>
 
-                    <!-- CARD 7: Toners Baixos -->
-                    <VBox styleClass="dash-alert-card" minWidth="250" prefWidth="280" maxWidth="300">
+                    <VBox styleClass="dash-alert-card dash-alert-warning"
+                          minWidth="250" prefWidth="280" maxWidth="320">
                         <Label text="Toners Baixos" styleClass="dash-alert-label"/>
                         <Label fx:id="lblTonersBaixos" text="0" styleClass="dash-alert-value"/>
                         <Label text="Menos de 20% restante" styleClass="dash-alert-description"/>
                     </VBox>
 
-                    <!-- CARD 8: Movimentações Mês -->
-                    <VBox styleClass="dash-alert-card" minWidth="250" prefWidth="280" maxWidth="300">
+                    <VBox styleClass="dash-alert-card dash-alert-info"
+                          minWidth="250" prefWidth="280" maxWidth="320">
                         <Label text="Movimentações Mês" styleClass="dash-alert-label"/>
                         <Label fx:id="lblMovimentacoesMes" text="0" styleClass="dash-alert-value"/>
                         <Label text="Atividade atual" styleClass="dash-alert-description"/>
@@ -120,22 +125,21 @@
             </VBox>
 
             <!-- ========== SEÇÃO 3: MÉTRICAS AVANÇADAS ========== -->
-            <VBox spacing="15" styleClass="dash-metric-section">
+            <VBox spacing="15" styleClass="dash-section">
                 <Label text="Métricas Avançadas" styleClass="dash-section-title"/>
 
                 <HBox spacing="15" styleClass="dash-metric-row">
-                    <!-- Departamento Maior Equipamentos -->
-                    <VBox styleClass="dash-metric-card" HBox.hgrow="ALWAYS">
+                    <VBox styleClass="dash-metric-card" HBox.hgrow="ALWAYS" maxWidth="Infinity">
                         <Label text="Departamento Líder" styleClass="dash-metric-label"/>
                         <Label fx:id="lblDepartamentoMaiorEquipamentos" text="N/A"
                                styleClass="dash-metric-value" wrapText="true"/>
                         <Label text="Mais equipamentos" styleClass="dash-metric-description"/>
                     </VBox>
 
-                    <!-- Nível Stock Segurança -->
-                    <VBox styleClass="dash-metric-card" HBox.hgrow="ALWAYS">
+                    <VBox styleClass="dash-metric-card" HBox.hgrow="ALWAYS" maxWidth="Infinity">
                         <Label text="Nível Stock Segurança" styleClass="dash-metric-label"/>
                         <ProgressBar fx:id="progressStockSeguranca" progress="0"
+                                     maxWidth="Infinity"
                                      styleClass="dash-security-progress"/>
                         <Label text="Produtos com stock disponível"
                                styleClass="dash-metric-description"/>
@@ -144,7 +148,7 @@
             </VBox>
 
             <!-- ========== SEÇÃO 4: GRÁFICOS ========== -->
-            <VBox spacing="15" styleClass="dash-chart-section">
+            <VBox spacing="15" styleClass="dash-section">
                 <Label text="Visualizações e Análises" styleClass="dash-section-title"/>
 
                 <GridPane hgap="15" vgap="15" styleClass="dash-chart-grid">
@@ -152,53 +156,56 @@
                         <ColumnConstraints hgrow="ALWAYS" percentWidth="50" minWidth="400"/>
                         <ColumnConstraints hgrow="ALWAYS" percentWidth="50" minWidth="400"/>
                     </columnConstraints>
-
                     <rowConstraints>
                         <RowConstraints vgrow="ALWAYS" minHeight="320"/>
                         <RowConstraints vgrow="ALWAYS" minHeight="320"/>
                     </rowConstraints>
 
-                    <!-- Gráfico de Movimentações -->
-                    <VBox styleClass="dash-chart-container" GridPane.hgrow="ALWAYS"
-                          GridPane.vgrow="ALWAYS" GridPane.rowIndex="0" GridPane.columnIndex="0">
-                        <BarChart fx:id="chartMovimentacoes" legendVisible="false">
+                    <VBox styleClass="dash-chart-container"
+                          GridPane.rowIndex="0" GridPane.columnIndex="0">
+                        <Label text="Movimentações por Tipo" styleClass="dash-chart-title"/>
+                        <BarChart fx:id="chartMovimentacoes" legendVisible="false"
+                                  styleClass="dash-chart" VBox.vgrow="ALWAYS">
                             <xAxis>
-                                <CategoryAxis label="Tipo de Movimentação" />
+                                <CategoryAxis label="Tipo"/>
                             </xAxis>
                             <yAxis>
-                                <NumberAxis label="Quantidade" />
+                                <NumberAxis label="Quantidade"/>
                             </yAxis>
                         </BarChart>
                     </VBox>
 
-                    <!-- Gráfico de Distribuição -->
-                    <VBox styleClass="dash-chart-container" GridPane.hgrow="ALWAYS"
-                          GridPane.vgrow="ALWAYS" GridPane.rowIndex="0" GridPane.columnIndex="1">
-                        <PieChart fx:id="chartDistribuicaoTipos" />
+                    <VBox styleClass="dash-chart-container"
+                          GridPane.rowIndex="0" GridPane.columnIndex="1">
+                        <Label text="Distribuição por Tipo" styleClass="dash-chart-title"/>
+                        <PieChart fx:id="chartDistribuicaoTipos"
+                                  styleClass="dash-chart" VBox.vgrow="ALWAYS"/>
                     </VBox>
 
-                    <!-- Gráfico de Tendência -->
-                    <VBox styleClass="dash-chart-container" GridPane.hgrow="ALWAYS"
-                          GridPane.vgrow="ALWAYS" GridPane.rowIndex="1" GridPane.columnIndex="0">
-                        <LineChart fx:id="chartTrendEstoque">
+                    <VBox styleClass="dash-chart-container"
+                          GridPane.rowIndex="1" GridPane.columnIndex="0">
+                        <Label text="Tendência de Estoque" styleClass="dash-chart-title"/>
+                        <LineChart fx:id="chartTrendEstoque"
+                                   styleClass="dash-chart" VBox.vgrow="ALWAYS">
                             <xAxis>
-                                <CategoryAxis label="Mês" />
+                                <CategoryAxis label="Mês"/>
                             </xAxis>
                             <yAxis>
-                                <NumberAxis label="Movimentações" />
+                                <NumberAxis label="Movimentações"/>
                             </yAxis>
                         </LineChart>
                     </VBox>
 
-                    <!-- Gráfico de Departamentos -->
-                    <VBox styleClass="dash-chart-container" GridPane.hgrow="ALWAYS"
-                          GridPane.vgrow="ALWAYS" GridPane.rowIndex="1" GridPane.columnIndex="1">
-                        <BarChart fx:id="chartEquipamentosDepartamento" legendVisible="false">
+                    <VBox styleClass="dash-chart-container"
+                          GridPane.rowIndex="1" GridPane.columnIndex="1">
+                        <Label text="Equipamentos por Departamento" styleClass="dash-chart-title"/>
+                        <BarChart fx:id="chartEquipamentosDepartamento" legendVisible="false"
+                                  styleClass="dash-chart" VBox.vgrow="ALWAYS">
                             <xAxis>
-                                <CategoryAxis label="Departamento" />
+                                <CategoryAxis label="Departamento"/>
                             </xAxis>
                             <yAxis>
-                                <NumberAxis label="Equipamentos" />
+                                <NumberAxis label="Equipamentos"/>
                             </yAxis>
                         </BarChart>
                     </VBox>
@@ -206,8 +213,8 @@
             </VBox>
 
             <!-- ========== RODAPÉ ========== -->
-            <HBox alignment="CENTER" styleClass="dash-footer">
-                <Label text="Última atualização: " styleClass="dash-footer-text"/>
+            <HBox alignment="CENTER" spacing="6" styleClass="dash-footer">
+                <Label text="Última atualização:" styleClass="dash-footer-text"/>
                 <Label fx:id="lblUltimaAtualizacao" styleClass="dash-footer-time"/>
             </HBox>
         </VBox>

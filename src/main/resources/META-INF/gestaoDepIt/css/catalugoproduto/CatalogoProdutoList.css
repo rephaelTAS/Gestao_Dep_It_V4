@@ -1,113 +1,505 @@
-/* Catalogo.css v1.0
-   Objetivo: tela de catálogo de produtos.
-   Usa primitivos (.clay-*, .elevation-1..4) do vocabulário global
-   e classes page-* específicas. Mantém apenas a paleta oficial.
-   Tokens: ver Login.css (mesma paleta).
-*/
+/*
+ * Packt Inventário — Catálogo
+ * File: catalogo.css
+ * JavaFX 21+
+ *
+ * AUTOSSUFICIENTE — não depende de outros CSS.
+ * Inclui a paleta oficial do catálogo §1.
+ *
+ * ATENÇÃO: paleta duplicada. Se mudares aqui, muda em TODOS os CSS de ecrã.
+ */
 
-/* ---------- Elevação (reutilizável) ---------- */
-.elevation-1 { -fx-effect: dropshadow(gaussian, rgba(175,170,164,0.55), 4,  0, 0, 1); }
-.elevation-2 { -fx-effect: dropshadow(gaussian, rgba(175,170,164,0.55), 8,  0, 2, 3); }
+/* ============================================================
+   PALETA OFICIAL — Catálogo §1
+   ============================================================ */
 
-/* ---------- Root ---------- */
-.page-root {
-    -fx-background-color: #E8E5DE;
-    -fx-font-family: "Segoe UI", "Roboto", "Helvetica Neue", sans-serif;
+.root {
+    /* Azuis */
+    -app-blue-900: #142B4A;
+    -app-blue-800: #1E3A5F;
+    -app-blue-700: #2457A7;
+    -app-blue-600: #326BC5;
+    -app-blue-100: #E8F0FC;
+    -app-blue-50:  #F4F8FE;
+
+    /* Semânticas */
+    -app-red-700:    #A8303C;
+    -app-red-600:    #C83E4D;
+    -app-red-100:    #FDECEF;
+
+    -app-green-700:  #0F6949;
+    -app-green-600:  #16845B;
+    -app-green-100:  #E8F6EF;
+
+    -app-orange-600: #B7791F;
+    -app-orange-100: #FFF4DF;
+
+    -app-info-600:   #2874C8;
+    -app-info-100:   #EAF3FE;
+
+    /* Neutros */
+    -app-neutral-50:  #F8FAFC;
+    -app-neutral-100: #EDF1F5;
+    -app-neutral-200: #E1E7EF;
+    -app-neutral-300: #C8D2E0;
+
+    /* Superfícies */
+    -app-background:     #F5F7FA;
+    -app-surface:        #FFFFFF;
+    -app-border:         #E1E7EF;
+    -app-border-strong:  #C8D2E0;
+    -app-divider:        #E8EDF3;
+
+    /* Texto */
+    -app-text-primary:    #172334;
+    -app-text-secondary:  #68778B;
+    -app-text-disabled:   #98A2B3;
+    -app-text-on-primary: #FFFFFF;
+
+    /* Foco */
+    -app-focus-ring: rgba(50, 107, 197, 0.45);
+
+    /* Fonte */
+    -app-font-family: "Inter", "Segoe UI", sans-serif;
 }
 
-/* ---------- Primitivos clay (duplicados aqui para autonomia do CSS) ---------- */
-.clay-card {
-    -fx-background-color: #FEFEFE;
-    -fx-background-radius: 20;
+/* ============================================================
+   ROOT / CONTAINER
+   ============================================================ */
+
+.app-root {
+    -fx-background-color: -app-background;
+    -fx-font-family: -app-font-family;
 }
 
-.clay-button {
-    -fx-background-radius: 999;
+.catalogo-root {
+    -fx-background-color: -app-background;
+}
+
+.catalogo-container {
+    -fx-background-color: -app-background;
+    -fx-padding: 24px;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.catalogo-header {
+    -fx-padding: 0 0 16px 0;
+}
+
+.catalogo-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -app-text-primary;
+}
+
+/* ============================================================
+   CARD DE FILTROS
+   ============================================================ */
+
+.ds-card {
+    -fx-background-color: -app-surface;
+    -fx-background-radius: 12px;
+    -fx-border-radius: 12px;
+    -fx-border-color: -app-border;
+    -fx-border-width: 1px;
+    -fx-padding: 20px;
+}
+
+.catalogo-card {
+    -fx-padding: 20px;
+    -fx-spacing: 12px;
+}
+
+.catalogo-card-header {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -app-text-primary;
+}
+
+.catalogo-filters-grid {
+    -fx-padding: 8px 0 0 0;
+}
+
+.catalogo-filters-actions {
+    -fx-padding: 8px 0 0 0;
+}
+
+/* ============================================================
+   FIELD LABELS
+   ============================================================ */
+
+.ds-field-label {
     -fx-font-size: 13px;
     -fx-font-weight: bold;
+    -fx-text-fill: -app-text-primary;
+}
+
+/* ============================================================
+   INPUTS
+   ============================================================ */
+
+.ds-input {
+    -fx-min-height: 40px;
+    -fx-pref-height: 40px;
+    -fx-padding: 0 12px;
+    -fx-background-color: -app-surface;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-border-color: -app-border;
+    -fx-border-width: 1px;
+    -fx-font-family: -app-font-family;
+    -fx-font-size: 14px;
+    -fx-text-fill: -app-text-primary;
+    -fx-prompt-text-fill: -app-text-disabled;
+}
+
+.ds-input:hover {
+    -fx-border-color: -app-border-strong;
+}
+
+.ds-input:focused {
+    -fx-border-color: -app-blue-600;
+    -fx-border-width: 1.5px;
+    -fx-effect: dropshadow(gaussian, rgba(50, 107, 197, 0.15), 5, 0, 0, 0);
+}
+
+/* Especifico para ComboBox (a seta) */
+.ds-input .arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 8px;
+}
+
+.ds-input .arrow {
+    -fx-background-color: -app-text-secondary;
+    -fx-padding: 3px;
+}
+
+.ds-input:hover .arrow {
+    -fx-background-color: -app-blue-700;
+}
+
+.ds-input .list-cell {
+    -fx-padding: 0;
+    -fx-text-fill: -app-text-primary;
+    -fx-background-color: transparent;
+}
+
+.ds-input .list-view {
+    -fx-background-color: -app-surface;
+    -fx-border-color: -app-border;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.10), 8, 0, 0, 2);
+}
+
+.ds-input .list-view .list-cell {
+    -fx-padding: 8px 12px;
+    -fx-text-fill: -app-text-primary;
+    -fx-background-color: transparent;
+}
+
+.ds-input .list-view .list-cell:hover {
+    -fx-background-color: -app-blue-50;
+}
+
+.ds-input .list-view .list-cell:selected {
+    -fx-background-color: -app-blue-100;
+    -fx-text-fill: -app-blue-700;
+}
+
+/* ============================================================
+   BOTÕES
+   ============================================================ */
+
+.ds-button {
+    -fx-font-family: -app-font-family;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-min-height: 40px;
+    -fx-padding: 0 16px;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-border-color: transparent;
     -fx-cursor: hand;
-    -fx-border-color: transparent;
-    -fx-border-radius: 999;
-    -fx-border-width: 1.5;
+    -fx-graphic-text-gap: 8px;
 }
 
-.clay-button-primary {
-    -fx-background-color: #9EBCEE;
-    -fx-text-fill: #222222;
-    -fx-padding: 10 22 10 22;
-}
-.clay-button-primary:hover   { -fx-background-color: #B8CEF2; }
-.clay-button-primary:pressed { -fx-background-color: #8EB0E5;
-    -fx-effect: innershadow(gaussian, rgba(34,34,34,0.22), 6, 0, 0, 1); }
-.clay-button-primary:focused { -fx-border-color: #00CFCC; }
-.clay-button-primary:disabled {
-    -fx-background-color: #AFAAA4; -fx-text-fill: #FEFEFE;
-    -fx-opacity: 1; -fx-effect: none;
+.ds-button:focused {
+    -fx-effect: dropshadow(gaussian, -app-focus-ring, 4, 0, 0, 0);
 }
 
-.clay-button-ghost {
-    -fx-background-color: #FEFEFE;
-    -fx-text-fill: #222222;
-    -fx-border-color: #AFAAA4;
-    -fx-padding: 8 18 8 18;
+.ds-button:disabled {
+    -fx-opacity: 0.55;
+    -fx-cursor: default;
 }
-.clay-button-ghost:hover   { -fx-background-color: #C2DFCD; -fx-border-color: #AFD9C3; }
-.clay-button-ghost:pressed { -fx-background-color: #B6D7C4;
-    -fx-effect: innershadow(gaussian, rgba(34,34,34,0.18), 4, 0, 0, 1); }
-.clay-button-ghost:focused { -fx-border-color: #00CFCC; }
 
-/* Input/Combo compacto (afundado, pílula menor) */
-.clay-input-compact {
-    -fx-background-color: #E8E5DE;
-    -fx-background-radius: 10;
-    -fx-padding: 8 12 8 12;
-    -fx-text-fill: #222222;
-    -fx-prompt-text-fill: #AFAAA4;
+/* --- Compacto (paginação) --- */
+.ds-button--compact {
+    -fx-min-height: 32px;
+    -fx-pref-height: 32px;
+    -fx-padding: 0 12px;
     -fx-font-size: 13px;
-    -fx-effect: innershadow(gaussian, rgba(175,170,164,0.55), 4, 0, 0, 1);
+}
+
+/* --- Primary --- */
+.ds-button--primary {
+    -fx-background-color: -app-blue-700;
+    -fx-text-fill: -app-text-on-primary;
+    -fx-border-color: -app-blue-700;
+}
+
+.ds-button--primary:hover {
+    -fx-background-color: -app-blue-800;
+    -fx-border-color: -app-blue-800;
+}
+
+.ds-button--primary:pressed {
+    -fx-background-color: -app-blue-900;
+    -fx-border-color: -app-blue-900;
+}
+
+/* --- Secondary (paginação) --- */
+.ds-button--secondary {
+    -fx-background-color: -app-surface;
+    -fx-text-fill: -app-text-primary;
+    -fx-border-color: -app-border;
+}
+
+.ds-button--secondary:hover {
+    -fx-background-color: -app-blue-50;
+    -fx-border-color: -app-blue-600;
+    -fx-text-fill: -app-blue-700;
+}
+
+.ds-button--secondary:pressed {
+    -fx-background-color: -app-blue-100;
+}
+
+.ds-button--secondary:disabled {
+    -fx-opacity: 0.40;
+    -fx-cursor: default;
+}
+
+/* --- Ghost --- */
+.ds-button--ghost {
+    -fx-background-color: transparent;
+    -fx-text-fill: -app-blue-700;
     -fx-border-color: transparent;
-    -fx-border-radius: 10;
-    -fx-border-width: 1.5;
-}
-.clay-input-compact:focused {
-    -fx-border-color: #00CFCC;
-    -fx-background-color: #FEFEFE;
-    -fx-effect: dropshadow(gaussian, rgba(0,207,204,0.35), 5, 0, 0, 0);
 }
 
-/* ---------- Header / Título ---------- */
-.page-header { -fx-padding: 4 4 4 4; }
-
-.page-title {
-    -fx-text-fill: #222222;
-    -fx-font-size: 24px;
-    -fx-font-weight: bold;
+.ds-button--ghost:hover {
+    -fx-background-color: -app-blue-50;
 }
 
-/* ---------- Cards ---------- */
-.page-card { -fx-background-radius: 20; }
-
-.page-card-header {
-    -fx-text-fill: #AFAAA4;
-    -fx-font-size: 11px;
-    -fx-font-weight: bold;
+.ds-button--ghost:pressed {
+    -fx-background-color: -app-blue-100;
 }
 
-.page-field-label {
-    -fx-text-fill: #222222;
+/* ============================================================
+   ESTATÍSTICAS
+   ============================================================ */
+
+.catalogo-stats-row {
+    -fx-padding: 4px 0;
+}
+
+.catalogo-statistics {
+    -fx-font-size: 13px;
+    -fx-text-fill: -app-text-secondary;
+}
+
+.catalogo-active-filters {
     -fx-font-size: 12px;
     -fx-font-weight: bold;
+    -fx-text-fill: -app-blue-700;
+    -fx-padding: 4px 8px;
+    -fx-background-color: -app-blue-100;
+    -fx-background-radius: 6px;
+}
+
+/* ============================================================
+   TABELA
+   ============================================================ */
+
+.ds-table {
+    -fx-background-color: -app-surface;
+    -fx-border-color: -app-border;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-table-cell-border-color: -app-divider;
+    -fx-padding: 0;
+}
+
+.catalogo-table {
+    -fx-min-height: 200px;
+}
+
+.ds-table .column-header-background {
+    -fx-background-color: -app-neutral-50;
+}
+
+.ds-table .column-header,
+.ds-table .filler {
+    -fx-size: 42px;
+    -fx-background-color: -app-neutral-50;
+    -fx-border-color: transparent transparent -app-border transparent;
+}
+
+.ds-table .column-header .label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -app-text-secondary;
     -fx-alignment: CENTER_LEFT;
 }
 
-/* ---------- Estatísticas ---------- */
-.page-stats-row { -fx-padding: 0 4 0 4; }
+.ds-table .table-row-cell {
+    -fx-cell-size: 46px;
+    -fx-background-color: -app-surface;
+    -fx-border-color: transparent transparent -app-divider transparent;
+    -fx-cursor: hand;
+}
 
-.page-statistics {
-    -fx-text-fill: #222222;
+.ds-table .table-row-cell:odd {
+    -fx-background-color: -app-neutral-50;
+}
+
+.ds-table .table-row-cell:hover {
+    -fx-background-color: -app-blue-50;
+}
+
+.ds-table .table-row-cell:selected {
+    -fx-background-color: -app-blue-100;
+}
+
+.ds-table .table-row-cell:selected .table-cell {
+    -fx-text-fill: -app-blue-700;
+}
+
+.ds-table .table-cell {
+    -fx-padding: 0 12px;
     -fx-font-size: 13px;
+    -fx-text-fill: -app-text-primary;
+    -fx-alignment: CENTER_LEFT;
+    -fx-border-color: transparent;
+}
+
+/* Placeholder / estado vazio */
+.catalogo-empty {
+    -fx-font-size: 14px;
+    -fx-text-fill: -app-text-secondary;
+    -fx-padding: 32px;
+    -fx-text-alignment: center;
+}
+
+/* ============================================================
+   PAGINAÇÃO
+   ============================================================ */
+
+.catalogo-pagination-bar {
+    -fx-padding: 8px 0 0 0;
+}
+
+.catalogo-page-btn {
+    -fx-min-width: 32px;
+    -fx-pref-width: 32px;
+    -fx-padding: 0;
+    -fx-font-size: 16px;
+    -fx-font-weight: normal;
+}
+
+.catalogo-pagination-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: -app-text-secondary;
+    -fx-padding: 0 4px;
+}
+
+/* ============================================================
+   STATUS BAR
+   ============================================================ */
+
+.catalogo-status-bar {
+    -fx-padding: 8px 0 0 0;
+    -fx-border-color: -app-border transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+.catalogo-status-text {
+    -fx-font-size: 12px;
+    -fx-text-fill: -app-text-secondary;
+}
+
+/* Progress Indicator */
+.catalogo-progress {
+    -fx-progress-color: -app-blue-600;
+}
+
+.catalogo-progress .spinner {
+    -fx-background-color: transparent;
+}
+
+.catalogo-progress .percentage {
+    -fx-fill: transparent;
+}
+
+/* ============================================================
+   SCROLLBAR GLOBAL
+   ============================================================ */
+
+.scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 10;
+}
+
+.scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar:vertical .thumb {
+    -fx-background-color: -app-border-strong;
+    -fx-background-radius: 5;
+}
+
+.scroll-bar:vertical .thumb:hover {
+    -fx-background-color: -app-text-disabled;
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-pref-height: 0;
+    -fx-opacity: 0;
+}
+
+/* ============================================================
+   COMBOBOX — Dropdown popup
+   ============================================================ */
+
+.combo-box-popup .list-view {
+    -fx-background-color: -app-surface;
+    -fx-border-color: -app-border;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.12), 10, 0, 0, 3);
+    -fx-padding: 4px;
+}
+
+.combo-box-popup .list-view .list-cell {
+    -fx-padding: 8px 12px;
+    -fx-text-fill: -app-text-primary;
+    -fx-background-color: transparent;
+    -fx-background-radius: 4px;
+    -fx-font-size: 13px;
+}
+
+.combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: -app-blue-50;
+}
+
+.combo-box-popup .list-view .list-cell:filled:selected {
+    -fx-background-color: -app-blue-100;
+    -fx-text-fill: -app-blue-700;
     -fx-font-weight: bold;
-    -fx-background-color: #FEFEFE;
-    -fx-background-radius: 999;
-    -fx-padding: 6 14 6 14;
-    -fx-effect: dropshadow(gaussian, rgba(175,170,164,0
+}

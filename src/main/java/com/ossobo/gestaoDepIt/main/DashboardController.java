@@ -54,7 +54,11 @@ import java.util.stream.Collectors;
         width = 1200,
         height = 800,
         centered = true,
-        primaryCss = "/META-INF/gestaoDepIt/css/main/dashboard.css"
+        primaryCss = "/META-INF/gestaoDepIt/css/main/dashboard.css",
+        additionalCss = {
+                "/META-INF/gestaoDepIt/css/global/tokens.css",
+                "/META-INF/gestaoDepIt/css/global/components.css"
+        }
 )
 public class DashboardController implements Initializable, WinterFXController {
     private static final Logger LOGGER = System.getLogger(DashboardController.class.getName());

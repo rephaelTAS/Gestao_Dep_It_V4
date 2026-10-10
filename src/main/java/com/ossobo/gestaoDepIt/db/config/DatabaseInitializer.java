@@ -17,26 +17,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.HashSet;
 import java.util.Set;
+
 /**
- * DatabaseInitializer v2.2
+ * DatabaseInitializer v2.3
  *
  * Inicialização do banco SQLite local: PRAGMAs, schema (idempotente)
- * e seed do par guest. Roda uma única vez via @PostConstruct.
+ * e seeds (guest + admin). Roda uma única vez via @PostConstruct.
  *
- * v2.1 — Correções estruturais no executor de DDL:
- *   1. Splitter de statements que respeita comentários (-- e /* *​/) e
- *      strings ('...' e "...") — antes split(";") quebrava em qualquer ';'
- *      dentro de comentário ou literal.
- *   2. Marcação incremental de user_version.
- *   3. Log individual por statement.
- *   4. Leitura de recurso com remoção de BOM UTF-8.
+ * v2.3 — Seed dividido em seedGuest() + seedAdmin(), ambos idempotentes.
+ *        AdminConstants centraliza IDs fixos do administrador padrão.
+ *        seedInitialData() passa a orquestrar os dois seeds em sequência.
  *
- * v2.2 — Transação dos scripts de bootstrap controlada via JDBC:
- *   - O executarScriptSePendente agora abre/fecha a transação ele mesmo,
- *     ignorando os BEGIN TRANSACTION/COMMIT internos dos scripts SQL.
- *   - Rollback explícito em caso de falha — nunca deixa transação aberta,
- *     evitando o bug de "script reporta sucesso mas não commita".
- *   - Autocommit resetado antes de cada script (imune a estado residual).
+ * v2.2 — Transação dos scripts de bootstrap controlada via JDBC.
+ * v2.1 — Splitter de SQL que respeita comentários e strings.
  */
 @Component
 public final class DatabaseInitializer {
@@ -47,18 +40,11 @@ public final class DatabaseInitializer {
     private static final int SCHEMA_VERSION_TARGET = 2;
 
     // =========================================================================
-// BOOTSTRAP DE SCRIPTS SQL — controle de idempotência
-// =========================================================================
+    // BOOTSTRAP DE SCRIPTS SQL — controle de idempotência
+    // =========================================================================
 
-    /** Tabela de controle: 1 linha por script já aplicado. */
     private static final String BOOTSTRAP_TABLE = "_bootstrap_scripts";
 
-    /**
-     * Scripts de bootstrap, NA ORDEM de execução.
-     * Cada um é aplicado UMA ÚNICA VEZ (registrado em _bootstrap_scripts).
-     * Para re-importar: DELETE FROM _bootstrap_scripts WHERE nome = '...';
-     * ou apague a tabela inteira (ver resetBootstrap()).
-     */
     private static final List<String> SCRIPTS_BOOTSTRAP = List.of(
             "/db/insert_catalogo.sql",
             "/db/insert_funcionarios.sql",
@@ -165,13 +151,6 @@ public final class DatabaseInitializer {
     // SPLITTER DE SQL — respeita comentários e strings
     // =========================================================================
 
-    /**
-     * Divide o script SQL em statements, respeitando:
-     *   - Comentários de linha:      -- até fim de linha
-     *   - Comentários de bloco:      /* ... *​/
-     *   - Strings com aspas simples: '...'  (com escape '' dentro)
-     *   - Strings com aspas duplas:  "..."  (com escape "" dentro)
-     */
     static List<String> splitSqlStatements(String script) {
         List<String> out = new ArrayList<>();
         if (script == null) return out;
@@ -184,21 +163,16 @@ public final class DatabaseInitializer {
             char c = script.charAt(i);
             char next = (i + 1 < n) ? script.charAt(i + 1) : '\0';
 
-            // Comentário de linha
             if (c == '-' && next == '-') {
                 int fim = script.indexOf('\n', i);
                 i = (fim < 0) ? n : fim + 1;
                 continue;
             }
-
-            // Comentário de bloco
             if (c == '/' && next == '*') {
                 int fim = script.indexOf("*/", i + 2);
                 i = (fim < 0) ? n : fim + 2;
                 continue;
             }
-
-            // String com aspas simples
             if (c == '\'') {
                 atual.append(c);
                 i++;
@@ -218,8 +192,6 @@ public final class DatabaseInitializer {
                 i++;
                 continue;
             }
-
-            // String com aspas duplas
             if (c == '"') {
                 atual.append(c);
                 i++;
@@ -239,8 +211,6 @@ public final class DatabaseInitializer {
                 i++;
                 continue;
             }
-
-            // Fim de statement
             if (c == ';') {
                 String stmt = atual.toString().trim();
                 if (!stmt.isEmpty()) {
@@ -250,7 +220,6 @@ public final class DatabaseInitializer {
                 i++;
                 continue;
             }
-
             atual.append(c);
             i++;
         }
@@ -259,11 +228,9 @@ public final class DatabaseInitializer {
         if (!ultimo.isEmpty()) {
             out.add(ultimo);
         }
-
         return out;
     }
 
-    /** Rótulo humano-legível do statement (nome da tabela/índice) para log. */
     private String rotuloDoStatement(String sql) {
         String head = sql.trim().toUpperCase();
         if (head.startsWith("CREATE TABLE")) {
@@ -301,10 +268,23 @@ public final class DatabaseInitializer {
     }
 
     // =========================================================================
+    // SEEDS — orquestra guest + admin
+    // =========================================================================
+
+    /**
+     * Semeia contas padrão idempotentemente. Cada seed checa existência
+     * antes de inserir — rodar de novo é no-op.
+     */
+    private void seedInitialData(Connection conn) throws SQLException {
+        seedGuest(conn);
+        seedAdmin(conn);
+    }
+
+    // =========================================================================
     // SEED GUEST
     // =========================================================================
 
-    private void seedInitialData(Connection conn) throws SQLException {
+    private void seedGuest(Connection conn) throws SQLException {
         try (PreparedStatement ps = conn.prepareStatement(
                 "SELECT 1 FROM usuarios WHERE id = ? LIMIT 1")) {
             ps.setString(1, GuestConstants.GUEST_ID);
@@ -357,12 +337,87 @@ public final class DatabaseInitializer {
     }
 
     // =========================================================================
-    // LEITURA DE RECURSO
+    // SEED ADMIN
     // =========================================================================
 
     /**
-     * Lê o recurso como UTF-8 e remove BOM se presente.
+     * Cria o par funcionário + usuário ADMIN padrão.
+     * Idempotente: se o usuário ADMIN já existir, não faz nada.
+     * A senha é hasheada aqui (BCrypt); nunca gravada em texto puro.
      */
+    private void seedAdmin(Connection conn) throws SQLException {
+        // 1) Já existe?
+        try (PreparedStatement ps = conn.prepareStatement(
+                "SELECT 1 FROM usuarios WHERE id = ? LIMIT 1")) {
+            ps.setString(1, AdminConstants.ADMIN_ID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    LOGGER.log(Level.INFO, "✅ Usuário ADMIN já existe");
+                    return;
+                }
+            }
+        }
+
+        String hash = BCrypt.hashpw(
+                AdminConstants.DEFAULT_PASSWORD, BCrypt.gensalt());
+
+        conn.setAutoCommit(false);
+        try {
+            // 2) Funcionário ADMIN (se ainda não existir)
+            boolean funcionarioExiste;
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "SELECT 1 FROM funcionarios WHERE cod_dep = ? LIMIT 1")) {
+                ps.setString(1, AdminConstants.ADMIN_FUNC_ID);
+                try (ResultSet rs = ps.executeQuery()) {
+                    funcionarioExiste = rs.next();
+                }
+            }
+
+            if (!funcionarioExiste) {
+                try (PreparedStatement ps = conn.prepareStatement(
+                        "INSERT INTO funcionarios (cod_dep, nome, departamento, funcao, ativo) " +
+                                "VALUES (?, ?, ?, ?, ?)")) {
+                    ps.setString(1, AdminConstants.ADMIN_FUNC_ID);
+                    ps.setString(2, AdminConstants.ADMIN_FUNC_NAME);
+                    ps.setString(3, AdminConstants.ADMIN_DEPARTMENT);
+                    ps.setString(4, AdminConstants.ADMIN_ROLE);
+                    ps.setInt(5, 1);
+                    ps.executeUpdate();
+                }
+                LOGGER.log(Level.INFO, "✅ Funcionário ADMIN criado");
+            }
+
+            // 3) Usuário ADMIN
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "INSERT INTO usuarios (id, funcionario_id, nome, email, senha_hash, nivel_acesso, ativo) " +
+                            "VALUES (?, ?, ?, ?, ?, ?, ?)")) {
+                ps.setString(1, AdminConstants.ADMIN_ID);
+                ps.setString(2, AdminConstants.ADMIN_FUNC_ID);
+                ps.setString(3, AdminConstants.ADMIN_NAME);
+                ps.setString(4, AdminConstants.ADMIN_EMAIL);
+                ps.setString(5, hash);
+                ps.setString(6, AdminConstants.ADMIN_NIVEL);
+                ps.setInt(7, 1);
+                ps.executeUpdate();
+            }
+
+            conn.commit();
+            LOGGER.log(Level.INFO,
+                    "✅ Usuário ADMIN criado (login: {0} | senha: {1}) — ALTERAR EM PRODUÇÃO",
+                    AdminConstants.ADMIN_FUNC_ID, AdminConstants.DEFAULT_PASSWORD);
+
+        } catch (SQLException e) {
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(true);
+        }
+    }
+
+    // =========================================================================
+    // LEITURA DE RECURSO
+    // =========================================================================
+
     private String readClasspathResource(String path) {
         try (var is = getClass().getResourceAsStream(path)) {
             if (is == null) {
@@ -372,7 +427,6 @@ public final class DatabaseInitializer {
             }
             byte[] bytes = is.readAllBytes();
 
-            // Remove BOM UTF-8 se presente
             if (bytes.length >= 3
                     && (bytes[0] & 0xFF) == 0xEF
                     && (bytes[1] & 0xFF) == 0xBB
@@ -389,28 +443,12 @@ public final class DatabaseInitializer {
         }
     }
 
-
     // =========================================================================
-// BOOTSTRAP DE SCRIPTS SQL
-// =========================================================================
+    // BOOTSTRAP DE SCRIPTS SQL
+    // =========================================================================
 
-    /**
-     * Executa os scripts de bootstrap pendentes, na ordem de SCRIPTS_BOOTSTRAP.
-     *
-     * - Idempotente: cada script é aplicado 1x (controle em _bootstrap_scripts).
-     * - Transação controlada via JDBC (ignora BEGIN/COMMIT internos do script).
-     * - Rollback automático em caso de falha — nunca deixa transação aberta.
-     * - Autocommit resetado antes de cada script.
-     *
-     * Para re-importar um script específico:
-     *   DELETE FROM _bootstrap_scripts WHERE nome = '/db/insert_catalogo.sql';
-     *
-     * Para re-importar TODOS (apaga tudo):
-     *   ver método estático resetBootstrap(Connection).
-     */
     private void executarBootstrapScripts(Connection conn) throws SQLException {
         garantirTabelaBootstrap(conn);
-
         Set<String> aplicados = lerScriptsAplicados(conn);
 
         List<String> pendentes = SCRIPTS_BOOTSTRAP.stream()
@@ -431,22 +469,15 @@ public final class DatabaseInitializer {
         }
     }
 
-    /**
-     * Executa um único script, registrando-o em _bootstrap_scripts ao final.
-     * Tudo dentro de UMA transação JDBC — se falhar, rollback completo.
-     */
     private void executarScriptSePendente(Connection conn, String recurso) throws SQLException {
         String sql = readClasspathResource(recurso);
         List<String> statements = splitSqlStatements(sql);
 
         LOGGER.log(Level.INFO, "📜 [{0}] {1} statement(s)", recurso, statements.size());
 
-        // Estado limpo: nunca herda autocommit de outro trecho
         conn.setAutoCommit(true);
-
         try {
             conn.setAutoCommit(false);
-
             int executados = 0;
             for (int i = 0; i < statements.size(); i++) {
                 String stmt = statements.get(i);
@@ -461,9 +492,7 @@ public final class DatabaseInitializer {
                 }
             }
 
-            // Registra como aplicado (mesma transação → atômico)
             registrarScriptAplicado(conn, recurso);
-
             conn.commit();
             LOGGER.log(Level.INFO, "✅ [{0}] {1} statement(s) executado(s) e registrado(s)",
                     recurso, executados);
@@ -482,9 +511,9 @@ public final class DatabaseInitializer {
         }
     }
 
-// =========================================================================
-// TABELA DE CONTROLE
-// =========================================================================
+    // =========================================================================
+    // TABELA DE CONTROLE
+    // =========================================================================
 
     private void garantirTabelaBootstrap(Connection conn) throws SQLException {
         try (Statement st = conn.createStatement()) {
@@ -516,21 +545,10 @@ public final class DatabaseInitializer {
         }
     }
 
-// =========================================================================
-// RESET — apaga o controle de bootstrap
-// =========================================================================
+    // =========================================================================
+    // RESET — apaga o controle de bootstrap
+    // =========================================================================
 
-    /**
-     * Remove o controle de bootstrap (opcionalmente de UM script específico).
-     *
-     * Uso típico:
-     *   - resetBootstrap(conn, null)            → todos os scripts rodarão de novo
-     *   - resetBootstrap(conn, "/db/insert_inventario.sql") → só esse rodará
-     *
-     * IMPORTANTE: os dados em si NÃO são apagados — apenas o registro de "já apliquei".
-     * Como os scripts usam INSERT OR IGNORE, rodar de novo NÃO duplica.
-     * Se quiser apagar os dados também, faça DELETE das tabelas antes.
-     */
     public static void resetBootstrap(Connection conn, String nomeScript) throws SQLException {
         try (Statement st = conn.createStatement()) {
             if (nomeScript == null) {

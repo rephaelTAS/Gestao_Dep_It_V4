@@ -1,6 +1,6 @@
 /*
- * Packt Inventário — Detalhes do Usuário
- * File: usuario-detalhe.css
+ * Packt Inventário — Dashboard de Gestão de Toners
+ * File: toner-dashboard.css
  * JavaFX 21+
  *
  * AUTOSSUFICIENTE — não depende de outros CSS.
@@ -12,7 +12,7 @@
    ============================================================ */
 
 .root,
-.usuario-detail-root {
+.toner-dashboard-root {
     /* Azuis */
     -app-blue-900: #142B4A;
     -app-blue-800: #1E3A5F;
@@ -65,7 +65,6 @@
 
     /* Fonte */
     -app-font-family: "Inter", "Segoe UI", sans-serif;
-    -app-font-mono: "JetBrains Mono", "Consolas", monospace;
 
     /* Base */
     -fx-background-color: -app-background;
@@ -76,31 +75,93 @@
    ROOT / CONTAINER
    ============================================================ */
 
-.usuario-detail-root {
+.toner-dashboard-root {
     -fx-background-color: -app-background;
 }
 
 /* ============================================================
-   HEADER
+   TÍTULO
    ============================================================ */
 
-.page-title {
-    -fx-font-size: 20px;
+.dashboard-title {
+    -fx-font-size: 22px;
     -fx-font-weight: bold;
     -fx-text-fill: -app-text-primary;
 }
 
-.page-subtitle {
-    -fx-font-size: 12px;
-    -fx-text-fill: -app-text-secondary;
-    -fx-font-family: -app-font-mono;
+.dashboard-section-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -app-text-primary;
+    -fx-padding: 4px 0;
+}
+
+/* Utilitário para emojis grandes */
+.emoji-lg {
+    -fx-font-size: 24px;
 }
 
 /* ============================================================
-   CARDS
+   CARDS DE KPI
    ============================================================ */
 
-.detail-card {
+.dashboard-card-green,
+.dashboard-card-red,
+.dashboard-card-blue,
+.dashboard-card-purple {
+    -fx-background-color: -app-surface;
+    -fx-background-radius: 12px;
+    -fx-border-radius: 12px;
+    -fx-border-width: 1px;
+    -fx-padding: 16px 20px;
+    -fx-spacing: 8px;
+    -fx-min-width: 180px;
+    -fx-pref-width: 220px;
+    -fx-alignment: center-left;
+}
+
+/* --- Verde (Ativos) --- */
+.dashboard-card-green {
+    -fx-border-color: -app-green-600;
+    -fx-background-color: -app-green-100;
+}
+
+/* --- Vermelho (Alerta) --- */
+.dashboard-card-red {
+    -fx-border-color: -app-red-600;
+    -fx-background-color: -app-red-100;
+}
+
+/* --- Azul (Média de uso) --- */
+.dashboard-card-blue {
+    -fx-border-color: -app-blue-600;
+    -fx-background-color: -app-blue-50;
+}
+
+/* --- Roxo (Ciclos médios) --- */
+.dashboard-card-purple {
+    -fx-border-color: -app-purple-600;
+    -fx-background-color: -app-purple-100;
+}
+
+/* Valores */
+.dashboard-card-value {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -app-text-primary;
+}
+
+.dashboard-card-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -app-text-secondary;
+}
+
+/* ============================================================
+   CARDS GENÉRICOS
+   ============================================================ */
+
+.dashboard-card {
     -fx-background-color: -app-surface;
     -fx-background-radius: 12px;
     -fx-border-radius: 12px;
@@ -110,7 +171,7 @@
     -fx-spacing: 10px;
 }
 
-.detail-card-header {
+.dashboard-card-title {
     -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-text-fill: -app-text-primary;
@@ -120,117 +181,140 @@
 }
 
 /* ============================================================
-   LABELS E VALORES
+   GRÁFICO (PieChart)
    ============================================================ */
 
-.label-bold {
-    -fx-font-size: 12px;
-    -fx-font-weight: bold;
-    -fx-text-fill: -app-text-secondary;
+.pie-chart {
+    -fx-background-color: transparent;
+    -fx-padding: 8px 0;
 }
 
-/* Valores default do GridPane (sem classe específica) */
-.grid-pane > .label:not(.label-bold):not(.value-highlight) {
-    -fx-font-size: 13px;
-    -fx-text-fill: -app-text-primary;
+.pie-chart .chart-pie {
+    -fx-border-color: -app-surface;
+    -fx-border-width: 1.5;
 }
 
-.value-highlight {
-    -fx-font-family: -app-font-mono;
-    -fx-font-size: 12px;
-    -fx-font-weight: bold;
-    -fx-text-fill: -app-blue-700;
-    -fx-background-color: -app-blue-50;
-    -fx-background-radius: 4px;
-    -fx-padding: 2px 8px;
-}
-
-.hint-label {
+.pie-chart .chart-pie-label {
+    -fx-fill: -app-text-primary;
     -fx-font-size: 11px;
-    -fx-text-fill: -app-text-secondary;
-    -fx-font-style: italic;
 }
 
-/* ============================================================
-   INPUTS (PasswordField, TextField)
-   ============================================================ */
+.pie-chart .chart-pie-label-line {
+    -fx-stroke: -app-border;
+}
 
-.text-field,
-.password-field {
-    -fx-min-height: 36px;
-    -fx-pref-height: 36px;
-    -fx-padding: 0 12px;
-    -fx-background-color: -app-surface;
-    -fx-background-radius: 6px;
-    -fx-border-radius: 6px;
-    -fx-border-color: -app-border;
-    -fx-border-width: 1px;
-    -fx-font-family: -app-font-family;
-    -fx-font-size: 13px;
+.pie-chart .chart-legend {
+    -fx-background-color: transparent;
+}
+
+.pie-chart .chart-legend-item {
     -fx-text-fill: -app-text-primary;
-    -fx-prompt-text-fill: -app-text-disabled;
+    -fx-font-size: 11px;
 }
 
-.text-field:hover,
-.password-field:hover {
-    -fx-border-color: -app-border-strong;
-}
-
-.text-field:focused,
-.password-field:focused {
-    -fx-border-color: -app-blue-600;
-    -fx-border-width: 1.5px;
-    -fx-effect: dropshadow(gaussian, rgba(50, 107, 197, 0.15), 5, 0, 0, 0);
-}
+/* Cores de série — verde, amarelo, vermelho, cinza */
+.pie-chart .default-color0.chart-pie { -fx-pie-color: -app-green-600; }
+.pie-chart .default-color1.chart-pie { -fx-pie-color: -app-orange-600; }
+.pie-chart .default-color2.chart-pie { -fx-pie-color: -app-red-600; }
+.pie-chart .default-color3.chart-pie { -fx-pie-color: -app-neutral-300; }
 
 /* ============================================================
-   MENSAGEM DE ERRO (dentro dos painéis)
+   LISTVIEW DE ALERTAS
    ============================================================ */
 
-.form-message-error {
-    -fx-background-color: -app-red-100;
-    -fx-background-radius: 8px;
-    -fx-border-color: -app-red-600;
-    -fx-border-radius: 8px;
-    -fx-border-width: 1px;
-    -fx-padding: 8px 12px;
+.alert-list {
+    -fx-background-color: -app-neutral-50;
+    -fx-border-color: -app-border;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 4px;
+}
+
+.alert-list .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: -app-text-primary;
     -fx-font-size: 12px;
+    -fx-padding: 8px 12px;
+    -fx-background-radius: 4px;
+}
+
+.alert-list .list-cell:odd {
+    -fx-background-color: transparent;
+}
+
+.alert-list .list-cell:hover {
+    -fx-background-color: -app-blue-50;
+}
+
+.alert-list .list-cell:selected {
+    -fx-background-color: -app-red-100;
     -fx-text-fill: -app-red-700;
     -fx-font-weight: bold;
 }
 
 /* ============================================================
-   STATUS MESSAGE (global)
+   TABELA
    ============================================================ */
 
-.status-message {
-    -fx-background-color: -app-green-100;
-    -fx-background-radius: 8px;
-    -fx-border-color: -app-green-600;
+.table-view {
+    -fx-background-color: -app-surface;
+    -fx-border-color: -app-border;
     -fx-border-radius: 8px;
-    -fx-border-width: 1px;
-    -fx-padding: 10px 16px;
-    -fx-font-size: 13px;
-    -fx-text-fill: -app-green-700;
+    -fx-background-radius: 8px;
+    -fx-table-cell-border-color: -app-divider;
+    -fx-padding: 0;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: -app-neutral-50;
+}
+
+.table-view .column-header,
+.table-view .filler {
+    -fx-size: 38px;
+    -fx-background-color: -app-neutral-50;
+    -fx-border-color: transparent transparent -app-border transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.table-view .column-header .label {
+    -fx-font-size: 12px;
     -fx-font-weight: bold;
+    -fx-text-fill: -app-text-secondary;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 0 8px;
 }
 
-.status-message.error {
-    -fx-background-color: -app-red-100;
-    -fx-border-color: -app-red-600;
-    -fx-text-fill: -app-red-700;
+.table-row-cell {
+    -fx-cell-size: 40px;
+    -fx-background-color: -app-surface;
+    -fx-border-color: transparent transparent -app-divider transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-cursor: hand;
 }
 
-.status-message.warning {
-    -fx-background-color: -app-orange-100;
-    -fx-border-color: -app-orange-600;
-    -fx-text-fill: -app-orange-600;
+.table-row-cell:odd {
+    -fx-background-color: -app-neutral-50;
 }
 
-.status-message.info {
-    -fx-background-color: -app-info-100;
-    -fx-border-color: -app-info-600;
-    -fx-text-fill: -app-info-600;
+.table-row-cell:hover {
+    -fx-background-color: -app-blue-50;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: -app-blue-100;
+}
+
+.table-row-cell:selected .table-cell {
+    -fx-text-fill: -app-blue-700;
+}
+
+.table-cell {
+    -fx-padding: 0 8px;
+    -fx-font-size: 12px;
+    -fx-text-fill: -app-text-primary;
+    -fx-alignment: CENTER_LEFT;
+    -fx-border-color: transparent;
 }
 
 /* ============================================================
@@ -241,9 +325,7 @@
 .btn-secondary,
 .btn-success,
 .btn-warning,
-.btn-danger,
-.btn-dark,
-.btn-purple {
+.btn-dark {
     -fx-font-family: -app-font-family;
     -fx-font-size: 12px;
     -fx-font-weight: bold;
@@ -261,9 +343,7 @@
 .btn-secondary:focused,
 .btn-success:focused,
 .btn-warning:focused,
-.btn-danger:focused,
-.btn-dark:focused,
-.btn-purple:focused {
+.btn-dark:focused {
     -fx-effect: dropshadow(gaussian, -app-focus-ring, 4, 0, 0, 0);
 }
 
@@ -271,101 +351,94 @@
 .btn-secondary:disabled,
 .btn-success:disabled,
 .btn-warning:disabled,
-.btn-danger:disabled,
-.btn-dark:disabled,
-.btn-purple:disabled {
+.btn-dark:disabled {
     -fx-opacity: 0.55;
     -fx-cursor: default;
 }
 
-/* --- Primary (Alterar Senha) --- */
+/* --- Primary --- */
 .btn-primary {
     -fx-background-color: -app-blue-700;
     -fx-text-fill: -app-text-on-primary;
     -fx-border-color: -app-blue-700;
 }
+
 .btn-primary:hover {
     -fx-background-color: -app-blue-800;
     -fx-border-color: -app-blue-800;
 }
+
 .btn-primary:pressed {
     -fx-background-color: -app-blue-900;
+    -fx-border-color: -app-blue-900;
 }
 
-/* --- Secondary (Voltar, Cancelar) --- */
+/* --- Secondary --- */
 .btn-secondary {
     -fx-background-color: -app-surface;
     -fx-text-fill: -app-text-primary;
     -fx-border-color: -app-border;
 }
+
 .btn-secondary:hover {
     -fx-background-color: -app-blue-50;
     -fx-border-color: -app-blue-600;
     -fx-text-fill: -app-blue-700;
 }
 
-/* --- Success (Salvar) --- */
+.btn-secondary:pressed {
+    -fx-background-color: -app-blue-100;
+}
+
+/* --- Success --- */
 .btn-success {
     -fx-background-color: -app-green-600;
     -fx-text-fill: -app-text-on-primary;
     -fx-border-color: -app-green-600;
 }
+
 .btn-success:hover {
     -fx-background-color: -app-green-700;
     -fx-border-color: -app-green-700;
 }
 
-/* --- Warning (Redefinir Senha) --- */
+/* --- Warning --- */
 .btn-warning {
     -fx-background-color: -app-orange-100;
     -fx-text-fill: -app-orange-600;
     -fx-border-color: -app-orange-600;
 }
+
 .btn-warning:hover {
     -fx-background-color: #F0D9A9;
 }
+
 .btn-warning:pressed {
     -fx-background-color: #E5C88A;
 }
 
-/* --- Danger (Desativar, Forçar Logout) --- */
-.btn-danger {
-    -fx-background-color: -app-red-600;
-    -fx-text-fill: -app-text-on-primary;
-    -fx-border-color: -app-red-600;
-}
-.btn-danger:hover {
-    -fx-background-color: -app-red-700;
-    -fx-border-color: -app-red-700;
-}
-
-/* --- Dark (Auditar Atividade) --- */
+/* --- Dark (nova variante — azul escuro sólido) --- */
 .btn-dark {
     -fx-background-color: -app-blue-800;
     -fx-text-fill: -app-text-on-primary;
     -fx-border-color: -app-blue-800;
 }
+
 .btn-dark:hover {
     -fx-background-color: -app-blue-900;
     -fx-border-color: -app-blue-900;
 }
 
-/* --- Purple (Alterar Nível Acesso) --- */
-.btn-purple {
-    -fx-background-color: -app-purple-600;
-    -fx-text-fill: -app-text-on-primary;
-    -fx-border-color: -app-purple-600;
-}
-.btn-purple:hover {
-    -fx-background-color: -app-purple-700;
-    -fx-border-color: -app-purple-700;
+.btn-dark:pressed {
+    -fx-background-color: #0F1F35;
 }
 
-/* Botões do bloco de ações — full width */
-.detail-card .btn-primary,
-.detail-card .btn-danger,
-.detail-card .btn-dark,
-.detail-card .btn-purple {
+/* Botões do bloco de ações rápidas — full width */
+.dashboard-card .btn-primary,
+.dashboard-card .btn-secondary,
+.dashboard-card .btn-success,
+.dashboard-card .btn-warning,
+.dashboard-card .btn-dark {
     -fx-max-width: Infinity;
     -fx-alignment: center;
 }

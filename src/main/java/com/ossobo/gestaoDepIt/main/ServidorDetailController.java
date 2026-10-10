@@ -40,7 +40,11 @@ import java.util.ResourceBundle;
         id = ViewConstant.Server.DETAIL,
         fxml = "/META-INF/gestaoDepIt/fxmls/main/servidor_detail.fxml",
         title = "Detalhes do Servidor",
-        primaryCss = "/com/ossobo/gestaoDepIt/css/config/servidor_detail.css"
+        primaryCss = "/com/ossobo/gestaoDepIt/css/config/servidor_detail.css",
+        additionalCss   = {
+                "/META-INF/gestaoDepIt/css/global/tokens.css",
+                "/META-INF/gestaoDepIt/css/global/components.css"
+        }
 )
 public class ServidorDetailController implements Initializable, WinterFXController {
 

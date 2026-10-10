@@ -1,105 +1,308 @@
+/*
+ * Packt Inventário — Configuração de Servidor Remoto
+ * File: configuracao.css
+ * JavaFX 21+
+ *
+ * AUTOSSUFICIENTE — não depende de outros CSS.
+ * Inclui a paleta oficial do catálogo §1.
+ *
+ * ATENÇÃO: paleta duplicada. Se mudares aqui, muda em TODOS os CSS de ecrã.
+ */
+
 /* ============================================================
-   CONFIG_SERVIDOR.CSS - Estilos para Configuração de Servidor
-   v1.0
+   PALETA OFICIAL — Catálogo §1
    ============================================================ */
 
-.titulo-config {
-    -fx-font-size: 20px;
+.root,
+.config-root {
+    /* Azuis */
+    -app-blue-900: #142B4A;
+    -app-blue-800: #1E3A5F;
+    -app-blue-700: #2457A7;
+    -app-blue-600: #326BC5;
+    -app-blue-100: #E8F0FC;
+    -app-blue-50:  #F4F8FE;
+
+    /* Semânticas */
+    -app-red-700:    #A8303C;
+    -app-red-600:    #C83E4D;
+    -app-red-100:    #FDECEF;
+
+    -app-green-700:  #0F6949;
+    -app-green-600:  #16845B;
+    -app-green-100:  #E8F6EF;
+
+    -app-orange-600: #B7791F;
+    -app-orange-100: #FFF4DF;
+
+    -app-info-600:   #2874C8;
+    -app-info-100:   #EAF3FE;
+
+    /* Neutros */
+    -app-neutral-50:  #F8FAFC;
+    -app-neutral-100: #EDF1F5;
+    -app-neutral-200: #E1E7EF;
+    -app-neutral-300: #C8D2E0;
+
+    /* Superfícies */
+    -app-background:     #F5F7FA;
+    -app-surface:        #FFFFFF;
+    -app-border:         #E1E7EF;
+    -app-border-strong:  #C8D2E0;
+    -app-divider:        #E8EDF3;
+
+    /* Texto */
+    -app-text-primary:    #172334;
+    -app-text-secondary:  #68778B;
+    -app-text-disabled:   #98A2B3;
+    -app-text-on-primary: #FFFFFF;
+
+    /* Foco */
+    -app-focus-ring: rgba(50, 107, 197, 0.45);
+
+    /* Fonte */
+    -app-font-family: "Inter", "Segoe UI", sans-serif;
+
+    /* Base */
+    -fx-background-color: -app-background;
+    -fx-font-family: -app-font-family;
+}
+
+/* ============================================================
+   CONTAINER
+   ============================================================ */
+
+.config-root {
+    -fx-background-color: -app-background;
+}
+
+.config-container {
+    -fx-background-color: -app-background;
+    -fx-spacing: 20px;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.config-header {
+    -fx-padding: 0 0 4px 0;
+}
+
+.config-title {
+    -fx-font-size: 24px;
     -fx-font-weight: bold;
-    -fx-fill: #2c3e50;
+    -fx-fill: -app-text-primary;
 }
 
-.form-grid {
-    -fx-padding: 10 0 10 0;
+.config-separator {
+    -fx-background-color: -app-border;
+    -fx-padding: 0.5px 0;
 }
 
-.label-config {
-    -fx-font-size: 14px;
-    -fx-text-fill: #333333;
-    -fx-font-weight: 500;
+/* ============================================================
+   FORMULÁRIO
+   ============================================================ */
+
+.config-form {
+    -fx-padding: 8px 0;
 }
 
-.input-config {
-    -fx-pref-width: 350px;
-    -fx-padding: 6 10 6 10;
-    -fx-background-radius: 4px;
-    -fx-border-radius: 4px;
-    -fx-border-color: #d0d0d0;
+.config-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -app-text-primary;
+}
+
+/* ============================================================
+   INPUTS (TextField, PasswordField, ComboBox)
+   ============================================================ */
+
+.clay-input,
+.text-field,
+.password-field,
+.combo-box {
+    -fx-min-height: 40px;
+    -fx-pref-height: 40px;
+    -fx-padding: 0 12px;
+    -fx-background-color: -app-surface;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-border-color: -app-border;
     -fx-border-width: 1px;
-    -fx-background-color: #ffffff;
+    -fx-font-family: -app-font-family;
+    -fx-font-size: 14px;
+    -fx-text-fill: -app-text-primary;
+    -fx-prompt-text-fill: -app-text-disabled;
 }
 
-.input-config:focused {
-    -fx-border-color: #3498db;
-    -fx-border-width: 2px;
+.clay-input:hover,
+.text-field:hover,
+.password-field:hover,
+.combo-box:hover {
+    -fx-border-color: -app-border-strong;
 }
 
-.input-config .text {
+.clay-input:focused,
+.text-field:focused,
+.password-field:focused,
+.combo-box:focused {
+    -fx-border-color: -app-blue-600;
+    -fx-border-width: 1.5px;
+    -fx-effect: dropshadow(gaussian, rgba(50, 107, 197, 0.15), 5, 0, 0, 0);
+}
+
+.clay-input:disabled,
+.text-field:disabled,
+.password-field:disabled,
+.combo-box:disabled {
+    -fx-opacity: 0.6;
+    -fx-background-color: -app-neutral-100;
+}
+
+/* ComboBox — seta */
+.config-combo .arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 6px;
+}
+
+.config-combo .arrow {
+    -fx-background-color: -app-text-secondary;
+    -fx-padding: 3px;
+}
+
+.config-combo:hover .arrow {
+    -fx-background-color: -app-blue-700;
+}
+
+/* ComboBox popup (dropdown) */
+.combo-box-popup .list-view {
+    -fx-background-color: -app-surface;
+    -fx-border-color: -app-border;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.12), 10, 0, 0, 3);
+    -fx-padding: 4px;
+}
+
+.combo-box-popup .list-view .list-cell {
+    -fx-padding: 8px 12px;
+    -fx-text-fill: -app-text-primary;
+    -fx-background-color: transparent;
+    -fx-background-radius: 4px;
     -fx-font-size: 13px;
 }
 
-/* Status Bar */
-.status-bar {
-    -fx-padding: 10 0 10 0;
-    -fx-background-color: #f8f9fa;
-    -fx-background-radius: 4px;
-    -fx-border-radius: 4px;
-    -fx-border-color: #e0e0e0;
-    -fx-border-width: 1px;
-    -fx-padding: 10 15 10 15;
+.combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: -app-blue-50;
 }
 
-.status-label {
-    -fx-font-size: 13px;
-    -fx-text-fill: #555555;
+.combo-box-popup .list-view .list-cell:filled:selected {
+    -fx-background-color: -app-blue-100;
+    -fx-text-fill: -app-blue-700;
+    -fx-font-weight: bold;
 }
 
-/* Button Bar */
-.button-bar {
-    -fx-padding: 10 0 0 0;
-    -fx-alignment: center-right;
-}
+/* ============================================================
+   BOTÕES
+   ============================================================ */
 
-.button-bar .button {
-    -fx-padding: 8 20 8 20;
+.clay-button {
+    -fx-font-family: -app-font-family;
     -fx-font-size: 14px;
-    -fx-font-weight: 500;
-    -fx-background-radius: 4px;
+    -fx-font-weight: bold;
+    -fx-min-height: 40px;
+    -fx-padding: 0 18px;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-border-width: 1px;
+    -fx-border-color: transparent;
     -fx-cursor: hand;
+    -fx-graphic-text-gap: 8px;
 }
 
-.btn-testar {
-    -fx-background-color: #FF9800;
-    -fx-text-fill: #ffffff;
+.clay-button:focused {
+    -fx-effect: dropshadow(gaussian, -app-focus-ring, 4, 0, 0, 0);
 }
 
-.btn-testar:hover {
-    -fx-background-color: #F57C00;
+.clay-button:disabled {
+    -fx-opacity: 0.55;
+    -fx-cursor: default;
 }
 
-.btn-salvar {
-    -fx-background-color: #2196F3;
-    -fx-text-fill: #ffffff;
+/* --- Primary --- */
+.clay-button-primary {
+    -fx-background-color: -app-blue-700;
+    -fx-text-fill: -app-text-on-primary;
+    -fx-border-color: -app-blue-700;
 }
 
-.btn-salvar:hover {
-    -fx-background-color: #1976D2;
+.clay-button-primary:hover {
+    -fx-background-color: -app-blue-800;
+    -fx-border-color: -app-blue-800;
 }
 
-.btn-ativar {
-    -fx-background-color: #4CAF50;
-    -fx-text-fill: #ffffff;
+.clay-button-primary:pressed {
+    -fx-background-color: -app-blue-900;
+    -fx-border-color: -app-blue-900;
 }
 
-.btn-ativar:hover {
-    -fx-background-color: #388E3C;
+/* --- Soft (testar conexão) --- */
+.clay-button-soft {
+    -fx-background-color: -app-blue-100;
+    -fx-text-fill: -app-blue-700;
+    -fx-border-color: transparent;
 }
 
-.btn-fechar {
-    -fx-background-color: #9E9E9E;
-    -fx-text-fill: #ffffff;
+.clay-button-soft:hover {
+    -fx-background-color: #D6E4F8;
 }
 
-.btn-fechar:hover {
-    -fx-background-color: #757575;
+.clay-button-soft:pressed {
+    -fx-background-color: #C3D6F0;
+}
+
+/* --- Ghost (fechar) --- */
+.clay-button-ghost {
+    -fx-background-color: transparent;
+    -fx-text-fill: -app-text-secondary;
+    -fx-border-color: -app-border;
+}
+
+.clay-button-ghost:hover {
+    -fx-background-color: -app-neutral-50;
+    -fx-text-fill: -app-text-primary;
+    -fx-border-color: -app-border-strong;
+}
+
+.clay-button-ghost:pressed {
+    -fx-background-color: -app-neutral-100;
+}
+
+/* ============================================================
+   BARRA DE STATUS
+   ============================================================ */
+
+.config-status-bar {
+    -fx-padding: 4px 0;
+}
+
+.config-status-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -app-text-primary;
+}
+
+.config-status-muted {
+    -fx-font-weight: normal;
+    -fx-text-fill: -app-text-secondary;
+}
+
+/* ============================================================
+   BARRA DE BOTÕES
+   ============================================================ */
+
+.config-button-bar {
+    -fx-padding: 8px 0 0 0;
+    -fx-alignment: center-right;
 }

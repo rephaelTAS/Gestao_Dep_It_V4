@@ -1,174 +1,253 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/21"
-            xmlns:fx="http://javafx.com/fxml/1"
-            prefHeight="750.0" prefWidth="800.0">
+<!--
+    FormProduto.fxml v1.1
+    Formulário de cadastro/edição de produto.
+    Estilização em formproduto.css.
+-->
+<AnchorPane prefHeight="750.0" prefWidth="800.0"
+            styleClass="formproduto-root"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1">
 
     <ScrollPane fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER"
+                styleClass="formproduto-scroll"
                 AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
                 AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 
-        <VBox spacing="20" styleClass="form-root">
+        <VBox spacing="24" styleClass="formproduto-container">
 
-            <!-- ========== HEADER ========== -->
+            <padding>
+                <Insets top="20" right="24" bottom="20" left="24"/>
+            </padding>
+
+            <!-- ==================== HEADER ==================== -->
             <Label fx:id="tituloLabel" text="Novo Produto no Catálogo"
-                   styleClass="form-title">
-                <padding>
-                    <Insets bottom="10" left="20" right="20" top="20" />
-                </padding>
-            </Label>
+                   styleClass="formproduto-title"/>
 
-            <!-- ========== SKU GERADO ========== -->
-            <VBox fx:id="idGeradoContainer" spacing="5"
-                  visible="false" managed="false">
-                <padding>
-                    <Insets bottom="10" left="20" right="20" top="10" />
-                </padding>
-                <Label fx:id="idGeradoLabel" text="SKU gerado: " styleClass="form-sku-label" />
+            <!-- ==================== SKU GERADO ==================== -->
+            <VBox fx:id="idGeradoContainer" spacing="4"
+                  visible="false" managed="false"
+                  styleClass="formproduto-sku-box">
+                <Label fx:id="idGeradoLabel" text="SKU gerado: "
+                       styleClass="formproduto-sku-value"/>
                 <Label text="SKU gerado automaticamente baseado em Tipo, Marca e Modelo"
-                       styleClass="form-hint" />
+                       styleClass="formproduto-hint"/>
             </VBox>
 
-            <!-- ========== FORMULÁRIO ========== -->
-            <GridPane hgap="15" vgap="15">
-                <padding>
-                    <Insets bottom="20" left="20" right="20" top="20" />
-                </padding>
+            <!-- ==================== FORMULÁRIO ==================== -->
+            <VBox spacing="6" styleClass="formproduto-section">
+                <Label text="Informações do Produto"
+                       styleClass="formproduto-section-title"/>
 
-                <columnConstraints>
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="150" prefWidth="150" />
-                    <ColumnConstraints hgrow="ALWAYS" minWidth="250" prefWidth="250" />
-                </columnConstraints>
+                <GridPane hgap="15" vgap="14" styleClass="formproduto-grid">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="NEVER" minWidth="160" prefWidth="170"/>
+                        <ColumnConstraints hgrow="ALWAYS" minWidth="250"/>
+                    </columnConstraints>
 
-                <!-- SKU (Readonly) -->
-                <Label text="SKU *" styleClass="form-label" GridPane.rowIndex="0" GridPane.columnIndex="0" />
-                <TextField fx:id="skuField" promptText="Será gerado automaticamente"
-                           editable="false" styleClass="form-field-readonly"
-                           GridPane.rowIndex="0" GridPane.columnIndex="1" />
+                    <!-- SKU (readonly) -->
+                    <Label text="SKU *" styleClass="formproduto-label"
+                           GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <TextField fx:id="skuField"
+                               promptText="Será gerado automaticamente"
+                               editable="false"
+                               styleClass="clay-input formproduto-readonly"
+                               GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-                <!-- Tipo de Produto -->
-                <Label text="Tipo de Produto *" styleClass="form-label" GridPane.rowIndex="1" GridPane.columnIndex="0" />
-                <ComboBox fx:id="tipoProduto" promptText="Selecione o tipo"
-                          GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                    <!-- Tipo -->
+                    <Label text="Tipo de Produto *" styleClass="formproduto-label"
+                           GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                    <ComboBox fx:id="tipoProduto" promptText="Selecione o tipo"
+                              maxWidth="Infinity"
+                              styleClass="clay-input"
+                              GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-                <!-- Categoria -->
-                <Label text="Categoria *" styleClass="form-label" GridPane.rowIndex="2" GridPane.columnIndex="0" />
-                <TextField fx:id="categoriaField" promptText="Ex: Impressora, Toner, Monitor"
-                           GridPane.rowIndex="2" GridPane.columnIndex="1" />
+                    <!-- Categoria -->
+                    <Label text="Categoria *" styleClass="formproduto-label"
+                           GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                    <TextField fx:id="categoriaField"
+                               promptText="Ex: Impressora, Toner, Monitor"
+                               styleClass="clay-input"
+                               GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
-                <!-- Marca -->
-                <Label text="Marca *" styleClass="form-label" GridPane.rowIndex="3" GridPane.columnIndex="0" />
-                <TextField fx:id="marcaField" promptText="Fabricante do produto"
-                           GridPane.rowIndex="3" GridPane.columnIndex="1" />
+                    <!-- Marca -->
+                    <Label text="Marca *" styleClass="formproduto-label"
+                           GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                    <TextField fx:id="marcaField"
+                               promptText="Fabricante do produto"
+                               styleClass="clay-input"
+                               GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
-                <!-- Modelo -->
-                <Label text="Modelo *" styleClass="form-label" GridPane.rowIndex="4" GridPane.columnIndex="0" />
-                <TextField fx:id="modeloField" promptText="Modelo específico"
-                           GridPane.rowIndex="4" GridPane.columnIndex="1" />
+                    <!-- Modelo -->
+                    <Label text="Modelo *" styleClass="formproduto-label"
+                           GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                    <TextField fx:id="modeloField"
+                               promptText="Modelo específico"
+                               styleClass="clay-input"
+                               GridPane.rowIndex="4" GridPane.columnIndex="1"/>
 
-                <!-- Cor -->
-                <Label text="Cor" styleClass="form-label" GridPane.rowIndex="5" GridPane.columnIndex="0" />
-                <TextField fx:id="corField" promptText="Cor do produto (opcional)"
-                           GridPane.rowIndex="5" GridPane.columnIndex="1" />
+                    <!-- Cor -->
+                    <Label text="Cor" styleClass="formproduto-label"
+                           GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                    <TextField fx:id="corField"
+                               promptText="Cor do produto (opcional)"
+                               styleClass="clay-input"
+                               GridPane.rowIndex="5" GridPane.columnIndex="1"/>
 
-                <!-- Fornecedor -->
-                <Label text="Fornecedor" styleClass="form-label" GridPane.rowIndex="6" GridPane.columnIndex="0" />
-                <TextField fx:id="fornecedorField" promptText="Fornecedor do produto"
-                           GridPane.rowIndex="6" GridPane.columnIndex="1" />
+                    <!-- Fornecedor -->
+                    <Label text="Fornecedor" styleClass="formproduto-label"
+                           GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+                    <TextField fx:id="fornecedorField"
+                               promptText="Fornecedor do produto"
+                               styleClass="clay-input"
+                               GridPane.rowIndex="6" GridPane.columnIndex="1"/>
 
-                <!-- Número da Fatura -->
-                <Label text="Nº Fatura" styleClass="form-label" GridPane.rowIndex="7" GridPane.columnIndex="0" />
-                <TextField fx:id="numeroFaturaField" promptText="Número da fatura"
-                           GridPane.rowIndex="7" GridPane.columnIndex="1" />
+                    <!-- Nº Fatura -->
+                    <Label text="Nº Fatura" styleClass="formproduto-label"
+                           GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+                    <TextField fx:id="numeroFaturaField"
+                               promptText="Número da fatura"
+                               styleClass="clay-input"
+                               GridPane.rowIndex="7" GridPane.columnIndex="1"/>
 
-                <!-- Anexo da Fatura (arquivo) -->
-                <Label text="Anexo da Fatura" styleClass="form-label"
-                       GridPane.rowIndex="8" GridPane.columnIndex="0" />
-                <VBox spacing="5" GridPane.rowIndex="8" GridPane.columnIndex="1">
-                    <HBox spacing="10" alignment="CENTER_LEFT">
-                        <Button fx:id="btn_anexarFatura" text="📎 Anexar PDF/Imagem"
-                                styleClass="btn-secondary" />
-                        <Button fx:id="btn_removerFatura" text="🗑 Remover"
-                                styleClass="btn-outline-danger" />
-                        <Label fx:id="lblFaturaSelecionada"
-                               text="Nenhum arquivo anexado"
-                               styleClass="form-hint" />
+                    <!-- Anexo Fatura -->
+                    <Label text="Anexo da Fatura" styleClass="formproduto-label"
+                           GridPane.rowIndex="8" GridPane.columnIndex="0"/>
+                    <VBox spacing="6" GridPane.rowIndex="8" GridPane.columnIndex="1">
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Button fx:id="btn_anexarFatura" text="📎 Anexar PDF/Imagem"
+                                    styleClass="clay-button clay-button-soft"/>
+                            <Button fx:id="btn_removerFatura" text="🗑 Remover"
+                                    styleClass="clay-button clay-button-danger-outline"/>
+                            <Label fx:id="lblFaturaSelecionada"
+                                   text="Nenhum arquivo anexado"
+                                   styleClass="formproduto-hint"/>
+                        </HBox>
+                        <Label text="PDF ou imagem até 2MB (opcional)"
+                               styleClass="formproduto-hint"/>
+                    </VBox>
+                </GridPane>
+            </VBox>
+
+            <!-- ==================== VALORES ==================== -->
+            <VBox spacing="6" styleClass="formproduto-section">
+                <Label text="Preços e Estoque"
+                       styleClass="formproduto-section-title"/>
+
+                <GridPane hgap="15" vgap="14" styleClass="formproduto-grid">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="NEVER" minWidth="160" prefWidth="170"/>
+                        <ColumnConstraints hgrow="ALWAYS" minWidth="250"/>
+                    </columnConstraints>
+
+                    <!-- Preço -->
+                    <Label text="Preço Unitário *" styleClass="formproduto-label"
+                           GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <HBox spacing="8" alignment="CENTER_LEFT"
+                          GridPane.rowIndex="0" GridPane.columnIndex="1">
+                        <TextField fx:id="precoUnitarioField" promptText="0.00"
+                                   styleClass="clay-input"
+                                   HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                        <Label text="€" styleClass="formproduto-symbol"/>
                     </HBox>
-                    <Label text="PDF ou imagem até 2MB (opcional)"
-                           styleClass="form-hint" />
-                </VBox>
 
-                <!-- Preço Unitário -->
-                <Label text="Preço Unitário (€)" styleClass="form-label" GridPane.rowIndex="9" GridPane.columnIndex="0" />
-                <HBox spacing="10" alignment="CENTER_LEFT" GridPane.rowIndex="9" GridPane.columnIndex="1">
-                    <TextField fx:id="precoUnitarioField" promptText="0.00" HBox.hgrow="ALWAYS" />
-                    <Label text="€" styleClass="form-currency-symbol" />
-                </HBox>
+                    <!-- IVA -->
+                    <Label text="IVA (%)" styleClass="formproduto-label"
+                           GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                    <HBox spacing="8" alignment="CENTER_LEFT"
+                          GridPane.rowIndex="1" GridPane.columnIndex="1">
+                        <TextField fx:id="ivaField" promptText="23"
+                                   styleClass="clay-input"
+                                   HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                        <Label text="%" styleClass="formproduto-symbol"/>
+                    </HBox>
 
-                <!-- IVA -->
-                <Label text="IVA" styleClass="form-label" GridPane.rowIndex="10" GridPane.columnIndex="0" />
-                <HBox spacing="10" alignment="CENTER_LEFT" GridPane.rowIndex="10" GridPane.columnIndex="1">
-                    <TextField fx:id="ivaField" promptText="23" HBox.hgrow="ALWAYS" />
-                    <Label text="" styleClass="form-currency-symbol" />
-                </HBox>
+                    <!-- Estoque -->
+                    <Label text="Estoque Inicial" styleClass="formproduto-label"
+                           GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                    <TextField fx:id="totalRecebidoField" promptText="0"
+                               styleClass="clay-input"
+                               GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                </GridPane>
+            </VBox>
 
-                <!-- Estoque Inicial -->
-                <Label text="Estoque Inicial" styleClass="form-label" GridPane.rowIndex="11" GridPane.columnIndex="0" />
-                <TextField fx:id="totalRecebidoField" promptText="0"
-                           GridPane.rowIndex="11" GridPane.columnIndex="1" />
+            <!-- ==================== DESCRIÇÃO ==================== -->
+            <VBox spacing="6" styleClass="formproduto-section">
+                <Label text="Descrição e Características"
+                       styleClass="formproduto-section-title"/>
 
-                <!-- Descrição -->
-                <Label text="Descrição" styleClass="form-label" GridPane.rowIndex="12" GridPane.columnIndex="0" />
-                <TextArea fx:id="descricaoField" promptText="Descrição detalhada do produto"
-                          wrapText="true" prefRowCount="3"
-                          GridPane.rowIndex="12" GridPane.columnIndex="1" />
+                <GridPane hgap="15" vgap="14" styleClass="formproduto-grid">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="NEVER" minWidth="160" prefWidth="170"/>
+                        <ColumnConstraints hgrow="ALWAYS" minWidth="250"/>
+                    </columnConstraints>
 
-                <!-- Características Técnicas -->
-                <Label text="Características Técnicas" styleClass="form-label" GridPane.rowIndex="13" GridPane.columnIndex="0" />
-                <VBox spacing="5" GridPane.rowIndex="13" GridPane.columnIndex="1">
-                    <TextArea fx:id="caracteristicasField"
-                              promptText='JSON com características técnicas&#10;Ex: {"peso": "2.5kg", "dimensoes": "30x20x15cm"}'
-                              wrapText="true" prefRowCount="4" />
-                    <Label text='Formato JSON: {"chave": "valor"}' styleClass="form-hint" />
-                </VBox>
+                    <Label text="Descrição" styleClass="formproduto-label"
+                           GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <TextArea fx:id="descricaoField"
+                              promptText="Descrição detalhada do produto"
+                              wrapText="true" prefRowCount="3"
+                              styleClass="clay-textarea"
+                              GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-                <!-- Status -->
-                <Label text="Status" styleClass="form-label" GridPane.rowIndex="14" GridPane.columnIndex="0" />
-                <CheckBox fx:id="ativoCheckBox" text="Produto Ativo" selected="true"
-                          GridPane.rowIndex="14" GridPane.columnIndex="1" />
-            </GridPane>
+                    <Label text="Características Técnicas" styleClass="formproduto-label"
+                           GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                    <VBox spacing="6" GridPane.rowIndex="1" GridPane.columnIndex="1">
+                        <TextArea fx:id="caracteristicasField"
+                                  promptText='JSON com características técnicas&#10;Ex: {"peso": "2.5kg", "dimensoes": "30x20x15cm"}'
+                                  wrapText="true" prefRowCount="4"
+                                  styleClass="clay-textarea"/>
+                        <Label text='Formato JSON: {"chave": "valor"}'
+                               styleClass="formproduto-hint"/>
+                    </VBox>
 
-            <!-- ========== PREVIEW ========== -->
-            <VBox spacing="10" styleClass="form-preview-box">
-                <padding>
-                    <Insets bottom="15" left="20" right="20" top="15" />
-                </padding>
-                <Label text="Preview do Produto" styleClass="form-preview-title" />
+                    <Label text="Status" styleClass="formproduto-label"
+                           GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                    <CheckBox fx:id="ativoCheckBox" text="Produto Ativo" selected="true"
+                              styleClass="clay-checkbox"
+                              GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                </GridPane>
+            </VBox>
+
+            <!-- ==================== PREVIEW ==================== -->
+            <VBox spacing="8" styleClass="formproduto-preview-box">
+                <Label text="Preview do Produto"
+                       styleClass="formproduto-preview-title"/>
                 <Label fx:id="previewLabel"
                        text="SKU: - | Tipo: - | Marca: - | Modelo: - | Preço: - | Estoque: -"
-                       styleClass="form-preview-text" />
+                       styleClass="formproduto-preview-text"
+                       wrapText="true"/>
             </VBox>
 
-            <!-- ========== MENSAGEM DE ERRO ========== -->
+            <!-- ==================== ERRO ==================== -->
             <Label fx:id="mensagemErroLabel" visible="false" managed="false"
-                   maxWidth="Infinity" styleClass="form-message-error">
-                <padding>
-                    <Insets left="20" right="20" />
-                </padding>
-            </Label>
+                   maxWidth="Infinity"
+                   styleClass="formproduto-error"
+                   wrapText="true"/>
 
-            <!-- ========== BOTÕES DE AÇÃO ========== -->
-            <HBox spacing="15" alignment="CENTER_RIGHT">
-                <padding>
-                    <Insets bottom="20" left="20" right="20" top="10" />
-                </padding>
-                <Button fx:id="btn_cancelar" text="Cancelar" styleClass="btn-secondary" />
-                <Button fx:id="btn_salvar" text="Salvar Produto" styleClass="btn-primary" />
+            <!-- ==================== BOTÕES ==================== -->
+            <HBox spacing="12" alignment="CENTER_RIGHT" styleClass="formproduto-button-bar">
+                <Button fx:id="btn_cancelar" text="Cancelar"
+                        styleClass="clay-button clay-button-ghost"/>
+                <Button fx:id="btn_salvar" text="💾 Salvar Produto"
+                        styleClass="clay-button clay-button-primary elevation-2"/>
             </HBox>
+
         </VBox>
     </ScrollPane>
 </AnchorPane>

@@ -9,7 +9,6 @@ import com.ossobo.gestaoDepIt.events.LogoutEvent;
 import com.ossobo.winterfx.anotations.Controller;
 import com.ossobo.winterfx.anotations.EventListener;
 import com.ossobo.winterfx.anotations.Inject;
-import com.ossobo.winterfx.anotations.PostConstruct;
 import com.ossobo.winterfx.event.EventBus;
 import com.ossobo.winterfx.imagemanager.anotations.InjectImage;
 import com.ossobo.winterfx.imagemanager.anotations.SwapImage;
@@ -37,26 +36,30 @@ import java.lang.System.Logger.Level;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
- * 🎯 MainController - Dashboard Principal com WinterFX
+ * MainController v5.0
  *
- * ✅ Gerenciado pelo WinterFX (@Controller)
- * ✅ Registro automático via @RegisterView
- * ✅ Injeção de imagens com @InjectImage
- * ✅ Navegação com @SwapFxml
- * ✅ Troca de imagens com @SwapImage
- * ✅ Eventos com @EventListener
- * ✅ Binding automático via FXML (fx:id)
+ * Alinhado ao main.fxml v2.0 (nomes finais):
+ *   appShell           — BorderPane raiz
+ *   toggleSidebarBtn   — alterna o menu lateral
+ *   menuIcon           — ícone do toggle (ImageView, @InjectImage)
+ *   pageIcon/pageName  — contexto da página (breadcrumb)
+ *   btnSettings        — definições (ImageView settingsIcon dentro)
+ *   btnNotifications   — notificações
+ *   userName/userImage — dados do usuário logado
+ *   sidebar            — VBox do menu
+ *   btnDashboard … btnHistorico — itens de navegação
+ *   contentHost        — StackPane do conteúdo central (alvo de @SwapFxml)
+ *   asideHost          — StackPane do painel direito
+ *   lblFooter          — rodapé
  *
- * ⚠️ NOTA: Não é necessário configurar setOnAction() manualmente.
- * O WinterFX faz o binding automático através do FXML.
- *
- * @version 4.0 (WinterFX)
- * @since 2026-08-19
+ * v5.0 — Renomeações do FXML v2.0. Ícones individuais do menu removidos do
+ *        FXML: o controller passa a operar apenas sobre pageIcon via @SwapImage.
+ *        Handlers órfãos (btn_timeReport, btn_visualizar, btn_notificacao)
+ *        removidos. stack_sistema → asideHost. multiploPanel → contentHost.
  */
 @Controller(proxy = false)
 @RegisterView(
@@ -69,13 +72,10 @@ import java.util.ResourceBundle;
         primaryCss = "/META-INF/gestaoDepIt/css/main/main.css"
 )
 public class MainController implements Initializable, WinterFXController {
+
     private static final Logger LOGGER = System.getLogger(MainController.class.getName());
 
-    // ============================================================
-    // CONSTANTES
-    // ============================================================
-
-    private static final double EXPANDED_WIDTH = 280;
+    private static final double EXPANDED_WIDTH = 240;
     private static final double COLLAPSED_WIDTH = 70;
     private static final String USER_DEFAULT = "Convidado";
 
@@ -83,97 +83,64 @@ public class MainController implements Initializable, WinterFXController {
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     // ============================================================
-    // FXML INJECTION - O WinterFX injeta automaticamente
+    // FXML — containers principais
     // ============================================================
 
-    // Container principal
-    @FXML public StackPane stack_sistema;
-    @FXML public StackPane multiploPanel;
+    @FXML private StackPane contentHost;
+    @FXML private StackPane asideHost;
     @FXML private VBox sidebar;
 
+    // ============================================================
     // Header
-    @FXML private Button toggleMenuBtn;
+    // ============================================================
+
+    @FXML private Button toggleSidebarBtn;
     @FXML @InjectImage(AppImageConfig.System.SETTING)
     private ImageView menuIcon;
 
     @FXML @InjectImage(AppImageConfig.System.NOTIFICATIONS)
-    private ImageView imageNotificatio;
+    private ImageView notificationIcon;
 
-    @FXML private ImageView iconepage;
-    @FXML private Label nomepage;
-    @FXML private Button btn_notificacao;
+    @FXML private ImageView settingsIcon;
+    @FXML private ImageView pageIcon;
+    @FXML private Label pageName;
+    @FXML private Button btnNotifications;
 
+    // ============================================================
     // User info
-    @FXML @InjectImage(AppImageConfig.System.DEFAULT_USER)
-    private ImageView imageUser;
+    // ============================================================
 
-    @FXML private Label nameUser;
+    @FXML @InjectImage(AppImageConfig.System.DEFAULT_USER)
+    private ImageView userImage;
+
+    @FXML private Label userName;
+    @FXML private Label userInitials;
     @FXML private Label timeLabel;
     @FXML private Label dateLabel;
 
+    // ============================================================
     // Footer
+    // ============================================================
+
     @FXML private Label lblFooter;
 
     // ============================================================
-    // BOTÕES DO MENU SIDEBAR
+    // Itens de navegação do menu
     // ============================================================
 
-    // Seção PRINCIPAL
-    @FXML private Button btn_dashboard;
-    @FXML @InjectImage(AppImageConfig.System.DASHBOARD)
-    private ImageView dashboardIcon;
-
-    // Seção ESTOQUE
-    @FXML private Button btn_catalogo;
-    @FXML @InjectImage(AppImageConfig.System.MENU)
-    private ImageView catalogoIcon;
-
-    @FXML private Button btn_estoque;
-    @FXML @InjectImage(AppImageConfig.System.STOCK)
-    private ImageView estoqueIcon;
-
-    @FXML private Button btn_produtoStock;
-    @FXML @InjectImage(AppImageConfig.System.IN_STOCK)
-    private ImageView produtoStockIcone;
-
-    // Seção EQUIPAMENTOS
-    @FXML private Button btn_inventario;
-    @FXML @InjectImage(AppImageConfig.System.MENU)
-    private ImageView inventarioIcon;
-
-    @FXML private Button btn_toners;
-    @FXML @InjectImage(AppImageConfig.System.BALLOT)
-    private ImageView tonersIcon;
-
-    // Seção PESSOAL
-    @FXML private Button btn_funcionarios;
-    @FXML @InjectImage(AppImageConfig.System.USER)
-    private ImageView funcionariosIcon;
-
-    @FXML private Button btn_usuarios;
-    @FXML @InjectImage(AppImageConfig.System.USER)
-    private ImageView addItemIcon;
-
-    // Seção RELATÓRIOS
-    @FXML private Button btn_relatorio;
-    @FXML @InjectImage(AppImageConfig.System.REPORT)
-    private ImageView reportIcon;
-
-    @FXML private Button btn_timeReport;
-    @FXML @InjectImage(AppImageConfig.System.CLOCK)
-    private ImageView timeReportIcon;
-
-    @FXML private Button btn_historico;
-    @FXML @InjectImage(AppImageConfig.System.USER)
-    private ImageView historicoIcon;
-
-    // Seção VISUALIZAÇÃO
-    @FXML private Button btn_visualizar;
-    @FXML @InjectImage(AppImageConfig.System.VIEW)
-    private ImageView viewIcon;
+    @FXML private Button btnDashboard;
+    @FXML private Button btnCatalogo;
+    @FXML private Button btnEstoque;
+    @FXML private Button btnProdutoStock;
+    @FXML private Button btnInventario;
+    @FXML private Button btnToners;
+    @FXML private Button btnFuncionarios;
+    @FXML private Button btnUsuarios;
+    @FXML private Button btnRelatorio;
+    @FXML private Button btnHistorico;
 
     // ============================================================
-    // DEPENDÊNCIAS INJETADAS
+    // Dependências
     // ============================================================
 
     @Inject
@@ -183,101 +150,49 @@ public class MainController implements Initializable, WinterFXController {
     private EventBus eventBus;
 
     // ============================================================
-    // ESTADO
+    // Estado
     // ============================================================
 
     private boolean isMenuCollapsed = false;
-    private String currentSystemView = "";
-    private boolean isSystemCollapsed = false;
     private Usuario usuarioLogado;
     private String loggedInUserName;
 
     // ============================================================
-    // CICLO DE VIDA - @PostConstruct
+    // Ciclo de vida
     // ============================================================
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         LOGGER.log(Level.INFO, "🏔️ MainController inicializando com WinterFX...");
-
         try {
-            // Configurar menu
             setupMenu();
-
-            // Configurar data/hora
             setupDateTime();
-
-            // Usuário padrão
             updateUserDisplay(USER_DEFAULT);
-
-            // Carregar view padrão - Dashboard
             loadDashboard();
-
-            // Mostrar painel de notificações inicialmente
-            showNotificationsInitially();
-
             LOGGER.log(Level.INFO, "✅ MainController inicializado com sucesso");
-
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, "❌ Erro durante a inicialização do MainController", e);
         }
     }
 
     // ============================================================
-    // CONFIGURAÇÃO DO MENU
+    // Menu lateral
     // ============================================================
 
     private void setupMenu() {
-        sidebar.getStyleClass().remove("collapsed");
+        if (sidebar == null) {
+            LOGGER.log(Level.WARNING, "⚠️ sidebar não injetado");
+            return;
+        }
+        sidebar.getStyleClass().remove("menu-collapsed");
         sidebar.getStyleClass().add("menu-expanded");
         sidebar.setPrefWidth(EXPANDED_WIDTH);
         isMenuCollapsed = false;
-        LOGGER.log(Level.DEBUG, "Menu configurado no modo expandido");
     }
 
-    // ============================================================
-    // CONFIGURAÇÃO DATA/HORA
-    // ============================================================
-
-    private void setupDateTime() {
-        Timeline clock = new Timeline(
-                new KeyFrame(Duration.ZERO, e -> updateDateTime()),
-                new KeyFrame(Duration.seconds(1))
-        );
-        clock.setCycleCount(Animation.INDEFINITE);
-        clock.play();
-        LOGGER.log(Level.DEBUG, "Relógio configurado");
-    }
-
-    private void updateDateTime() {
-        try {
-            LocalDateTime now = LocalDateTime.now();
-            if (timeLabel != null) {
-                timeLabel.setText(now.format(timeFormatter));
-            }
-            if (dateLabel != null) {
-                dateLabel.setText(now.format(dateFormatter));
-            }
-            if (lblFooter != null) {
-                lblFooter.setText(String.format(
-                        "© %d Gestão de TI - Todos os direitos reservados",
-                        now.getYear()
-                ));
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.ERROR, "❌ Erro ao atualizar data/hora", e);
-        }
-    }
-
-    // ============================================================
-    // TOGGLE DO MENU
-    // ============================================================
-
-    /**
-     * Alterna o menu lateral entre expandido e recolhido.
-     * O binding é feito automaticamente via FXML (fx:id="toggleMenuBtn").
-     */
     @FXML
-    public void toggleMenuBtn(ActionEvent event) {
+    public void toggleSidebarBtn(ActionEvent event) {
+        if (sidebar == null) return;
         isMenuCollapsed = !isMenuCollapsed;
 
         if (isMenuCollapsed) {
@@ -294,390 +209,158 @@ public class MainController implements Initializable, WinterFXController {
     }
 
     // ============================================================
-    // HANDLERS DOS BOTÕES - COM @SwapFxml E @SwapImage
-    // O WinterFX faz o binding automático via FXML (fx:id)
+    // Data/hora
     // ============================================================
 
-    // -------------------------------------------------------------
-    // SEÇÃO PRINCIPAL
-    // -------------------------------------------------------------
+    private void setupDateTime() {
+        Timeline clock = new Timeline(
+                new KeyFrame(Duration.ZERO, e -> updateDateTime()),
+                new KeyFrame(Duration.seconds(1))
+        );
+        clock.setCycleCount(Animation.INDEFINITE);
+        clock.play();
+    }
 
-    /**
-     * Dashboard - View principal
-     * Binding via FXML: btn_dashboard → handleDashboard
-     */
+    private void updateDateTime() {
+        try {
+            LocalDateTime now = LocalDateTime.now();
+            if (timeLabel != null) timeLabel.setText(now.format(timeFormatter));
+            if (dateLabel != null) dateLabel.setText(now.format(dateFormatter));
+            if (lblFooter != null) {
+                lblFooter.setText(String.format(
+                        "© %d Gestão de Equipamentos de TI — Todos os direitos reservados",
+                        now.getYear()));
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, "❌ Erro ao atualizar data/hora", e);
+        }
+    }
+
+    // ============================================================
+    // Navegação — handlers dos itens do menu
+    // ============================================================
+
     @FXML
-    @SwapFxml(
-            container = "multiploPanel",
-            viewId = ViewConstant.Main.DASHBOARD,
-            before = false
-    )
-    @SwapImage(
-            imageView = "iconepage",
-            imageId = AppImageConfig.System.DASHBOARD
-    )
-    public void btn_dashboard(ActionEvent event) {
-        LOGGER.log(Level.INFO, "📊 Navegando para Dashboard");
+    @SwapFxml(container = "contentHost", viewId = ViewConstant.Main.DASHBOARD, before = false)
+    @SwapImage(imageView = "pageIcon", imageId = AppImageConfig.System.DASHBOARD)
+    public void btnDashboard(ActionEvent event) {
         updatePageTitle("Dashboard");
     }
 
-    // -------------------------------------------------------------
-    // SEÇÃO ESTOQUE
-    // -------------------------------------------------------------
-
-    /**
-     * Catálogo de Produtos
-     * Binding via FXML: btn_catalogo → handleCatalogo
-     */
     @FXML
-    @SwapFxml(
-            container = "multiploPanel",
-            viewId = ViewConstant.Catalogo.LIST,
-            before = false
-    )
-    @SwapImage(
-            imageView = "iconepage",
-            imageId = AppImageConfig.System.IN_STOCK
-    )
-    public void btn_catalogo(ActionEvent event) {
-        LOGGER.log(Level.INFO, "📦 Navegando para Catálogo de Produtos");
-        updatePageTitle("Catálogo de Produtos");
+    @SwapFxml(container = "contentHost", viewId = ViewConstant.Catalogo.LIST, before = false)
+    @SwapImage(imageView = "pageIcon", imageId = AppImageConfig.System.IN_STOCK)
+    public void btnCatalogo(ActionEvent event) {
+        updatePageTitle("Catálogo");
     }
 
-    /**
-     * Movimentações de Estoque
-     * Binding via FXML: btn_estoque → handleMovimentacoes
-     */
     @FXML
-    @SwapFxml(
-            container = "multiploPanel",
-            viewId = ViewConstant.Estoque.MOVIMENTACOES_LIST,
-            before = false
-    )
-    @SwapImage(
-            imageView = "iconepage",
-            imageId = AppImageConfig.System.IN_STOCK
-    )
-    public void btn_estoque(ActionEvent event) {
-        LOGGER.log(Level.INFO, "📋 Navegando para Movimentações de Estoque");
-        updatePageTitle("Movimentações de Estoque");
+    @SwapFxml(container = "contentHost", viewId = ViewConstant.Estoque.MOVIMENTACOES_LIST, before = false)
+    @SwapImage(imageView = "pageIcon", imageId = AppImageConfig.System.IN_STOCK)
+    public void btnEstoque(ActionEvent event) {
+        updatePageTitle("Movimentações");
     }
 
-    /**
-     * Gestão de Stock
-     * Binding via FXML: btn_produtoStock → handleEstoque
-     */
     @FXML
-    @SwapFxml(
-            container = "multiploPanel",
-            viewId = ViewConstant.Estoque.PRODUTO_STOCK,
-            before = false
-    )
-    @SwapImage(
-            imageView = "iconepage",
-            imageId = AppImageConfig.System.PRODUTO
-    )
-    public void btn_produtoStock(ActionEvent event) {
-        LOGGER.log(Level.INFO, "📊 Navegando para Gestão de Stock");
-        updatePageTitle("Gestão de Stock");
+    @SwapFxml(container = "contentHost", viewId = ViewConstant.Estoque.PRODUTO_STOCK, before = false)
+    @SwapImage(imageView = "pageIcon", imageId = AppImageConfig.System.PRODUTO)
+    public void btnProdutoStock(ActionEvent event) {
+        updatePageTitle("Produtos E Inventário");
     }
 
-    // -------------------------------------------------------------
-    // SEÇÃO EQUIPAMENTOS
-    // -------------------------------------------------------------
-
-    /**
-     * Inventário de Equipamentos
-     * Binding via FXML: btn_inventario → handleInventario
-     */
     @FXML
-    @SwapFxml(
-            container = "multiploPanel",
-            viewId = ViewConstant.Inventario.LIST,
-            before = false
-    )
-    @SwapImage(
-            imageView = "iconepage",
-            imageId = AppImageConfig.System.LIST
-    )
-    public void btn_inventario(ActionEvent event) {
-        LOGGER.log(Level.INFO, "🔧 Navegando para Inventário de Equipamentos");
-        updatePageTitle("Inventário de Equipamentos");
+    @SwapFxml(container = "contentHost", viewId = ViewConstant.Inventario.LIST, before = false)
+    @SwapImage(imageView = "pageIcon", imageId = AppImageConfig.System.LIST)
+    public void btnInventario(ActionEvent event) {
+        updatePageTitle("Inventário");
     }
 
-    /**
-     * Gestão de Toners
-     * Binding via FXML: btn_toners → handleToners
-     */
     @FXML
-    @SwapFxml(
-            container = "multiploPanel",
-            viewId = ViewConstant.Toner.LIST,
-            before = false
-    )
-    @SwapImage(
-            imageView = "iconepage",
-            imageId = AppImageConfig.System.BALLOT
-    )
-    public void tonersIcon(ActionEvent event) {
-        LOGGER.log(Level.INFO, "🖨️ Navegando para Gestão de Toners");
-        updatePageTitle("Gestão de Toners");
+    @SwapFxml(container = "contentHost", viewId = ViewConstant.Toner.LIST, before = false)
+    @SwapImage(imageView = "pageIcon", imageId = AppImageConfig.System.BALLOT)
+    public void btnToners(ActionEvent event) {
+        updatePageTitle("Toners");
     }
 
-    // -------------------------------------------------------------
-    // SEÇÃO PESSOAL
-    // -------------------------------------------------------------
-
-    /**
-     * Gestão de Funcionários
-     * Binding via FXML: btn_funcionarios → handleFuncionarios
-     */
     @FXML
-    @SwapFxml(
-            container = "multiploPanel",
-            viewId = ViewConstant.Funcionario.LIST,
-            before = false
-    )
-    @SwapImage(
-            imageView = "iconepage",
-            imageId = AppImageConfig.System.USER
-    )
-    public void btn_funcionarios(ActionEvent event) {
-        LOGGER.log(Level.INFO, "👤 Navegando para Gestão de Funcionários");
-        updatePageTitle("Gestão de Funcionários");
+    @SwapFxml(container = "contentHost", viewId = ViewConstant.Funcionario.LIST, before = false)
+    @SwapImage(imageView = "pageIcon", imageId = AppImageConfig.System.USER)
+    public void btnFuncionarios(ActionEvent event) {
+        updatePageTitle("Funcionários");
     }
 
-    /**
-     * Gestão de Usuários
-     * Binding via FXML: btn_usuarios → handleUsuarios
-     */
     @FXML
-    @SwapFxml(
-            container = "multiploPanel",
-            viewId = ViewConstant.Usuario.LIST,
-            before = false
-    )
-    @SwapImage(
-            imageView = "iconepage",
-            imageId = AppImageConfig.System.USER
-    )
-    public void btn_usuarios(ActionEvent event) {
-        LOGGER.log(Level.INFO, "🔐 Navegando para Gestão de Usuários");
-        updatePageTitle("Gestão de Usuários");
+    @SwapFxml(container = "contentHost", viewId = ViewConstant.Usuario.LIST, before = false)
+    @SwapImage(imageView = "pageIcon", imageId = AppImageConfig.System.USER)
+    public void btnUsuarios(ActionEvent event) {
+        updatePageTitle("Usuários");
     }
 
-    // -------------------------------------------------------------
-    // SEÇÃO RELATÓRIOS
-    // -------------------------------------------------------------
-
-    /**
-     * Relatórios
-     * Binding via FXML: btn_relatorio → handleRelatorios
-     */
     @FXML
-    @SwapFxml(
-            container = "multiploPanel",
-            viewId = ViewConstant.Relatorio.DASHBOARD,
-            before = false
-    )
-    @SwapImage(
-            imageView = "iconepage",
-            imageId = AppImageConfig.System.REPORT
-    )
-    public void btn_relatorio(ActionEvent event) {
-        LOGGER.log(Level.INFO, "📈 Navegando para Relatórios");
+    @SwapFxml(container = "contentHost", viewId = ViewConstant.Relatorio.DASHBOARD, before = false)
+    @SwapImage(imageView = "pageIcon", imageId = AppImageConfig.System.REPORT)
+    public void btnRelatorio(ActionEvent event) {
         updatePageTitle("Relatórios");
     }
 
-    /**
-     * Relatório de Tempo
-     * Binding via FXML: btn_timeReport → handleTimeReport
-     */
     @FXML
-    @SwapFxml(
-            container = "multiploPanel",
-            viewId = ViewConstant.Main.TIME_REPORT,
-            before = false
-    )
-    @SwapImage(
-            imageView = "iconepage",
-            imageId = AppImageConfig.System.CLOCK
-    )
-    public void handleTimeReport(ActionEvent event) {
-        LOGGER.log(Level.INFO, "⏰ Navegando para Relatório de Tempo");
-        updatePageTitle("Relatório de Tempo");
+    @SwapFxml(container = "contentHost", viewId = ViewConstant.HistoricoEvento.LIST, before = false)
+    @SwapImage(imageView = "pageIcon", imageId = AppImageConfig.System.VIEW)
+    public void btnHistorico(ActionEvent event) {
+        updatePageTitle("Histórico");
     }
 
-    /**
-     * Histórico de Eventos
-     * Binding via FXML: btn_historico → handleHistorico
-     */
-    @FXML
-    @SwapFxml(
-            container = "multiploPanel",
-            viewId = ViewConstant.HistoricoEvento.LIST,
-            before = false
-    )
-    @SwapImage(
-            imageView = "iconepage",
-            imageId = AppImageConfig.System.VIEW
-    )
-    public void handleHistorico(ActionEvent event) {
-        LOGGER.log(Level.INFO, "📜 Navegando para Histórico de Eventos");
-        updatePageTitle("Histórico de Eventos");
-    }
+    // ============================================================
+    // Carga inicial
+    // ============================================================
 
-    // -------------------------------------------------------------
-    // SEÇÃO VISUALIZAÇÃO
-    // -------------------------------------------------------------
-
-    /**
-     * Visualizar
-     * Binding via FXML: btn_visualizar → handleVisualizar
-     */
-    @FXML
-    @SwapFxml(
-            container = "multiploPanel",
-            viewId = ViewConstant.Main.VISUALIZAR,
-            before = false
-    )
-    @SwapImage(
-            imageView = "iconepage",
-            imageId = AppImageConfig.System.VIEW
-    )
-    public void handleVisualizar(ActionEvent event) {
-        LOGGER.log(Level.INFO, "👁️ Navegando para Visualizar");
-        updatePageTitle("Visualizar");
-    }
-
-    // -------------------------------------------------------------
-    // CARREGAMENTO INICIAL (Sem evento)
-    // -------------------------------------------------------------
-
-    /**
-     * Carrega o Dashboard na inicialização
-     * Chamado diretamente pelo @PostConstruct
-     */
-    @SwapFxml(
-            container = "multiploPanel",
-            viewId = ViewConstant.Main.DASHBOARD,
-            before = false
-    )
-    @SwapImage(
-            imageView = "iconepage",
-            imageId = AppImageConfig.System.DASHBOARD
-    )
+    @SwapFxml(container = "contentHost", viewId = ViewConstant.Main.DASHBOARD, before = false)
+    @SwapImage(imageView = "pageIcon", imageId = AppImageConfig.System.DASHBOARD)
     private void loadDashboard() {
-        LOGGER.log(Level.INFO, "📊 Carregando Dashboard inicial");
         updatePageTitle("Dashboard");
     }
 
     // ============================================================
-    // SISTEMA DE NOTIFICAÇÕES
+    // Painel de sistema (notificações / definições)
     // ============================================================
 
-    private void showNotificationsInitially() {
-        currentSystemView = ViewConstant.Main.NOTIFICATION;
-        loadSystemContentView(ViewConstant.Main.NOTIFICATION);
-        expandPanel();
-        LOGGER.log(Level.INFO, "Painel de notificações aberto na inicialização");
-    }
-
-    /**
-     * Notificações
-     * Binding via FXML: btn_notificacao → handleNotificacoes
-     */
     @FXML
-    @SwapFxml(
-            container = "stack_sistema",
-            viewId = ViewConstant.Main.NOTIFICATION,
-            before = false
-    )
-    public void handleNotificacoes(ActionEvent event) {
-        toggleSystemView(ViewConstant.Main.NOTIFICATION);
+    @SwapFxml(container = "asideHost", viewId = ViewConstant.Main.NOTIFICATION, before = false)
+    public void btnNotifications(ActionEvent event) {
+        expandAside();
     }
 
-    /**
-     * Definições
-     * Binding via clique na imagem do usuário
-     */
     @FXML
-    @SwapFxml(
-            container = "multiploPanel",
-            viewId = ViewConstant.Main.DEFINICOES,
-            before = false
-    )
-    public void btn_definicoes(ActionEvent event) {
-
-        LOGGER.log(Level.INFO, "📊 Carregando Definiçoes");
+    @SwapFxml(container = "contentHost", viewId = ViewConstant.Main.DEFINICOES, before = false)
+    public void btnSettings(ActionEvent event) {
+        updatePageTitle("Definições");
     }
 
-    private void toggleSystemView(String targetViewId) {
-        if (!currentSystemView.equals(targetViewId)) {
-            loadSystemContentView(targetViewId);
-            currentSystemView = targetViewId;
-            expandPanel();
-        } else {
-            if (isSystemCollapsed) {
-                expandPanel();
-            } else {
-                collapsePanel();
-            }
-        }
-    }
-
-    private void expandPanel() {
-        isSystemCollapsed = false;
-        stack_sistema.setPrefWidth(400);
-        stack_sistema.setVisible(true);
-        stack_sistema.getStyleClass().remove("collapsed");
-        stack_sistema.getStyleClass().add("expanded");
-    }
-
-    private void collapsePanel() {
-        isSystemCollapsed = true;
-        stack_sistema.setPrefWidth(0);
-        stack_sistema.setVisible(false);
-        stack_sistema.getStyleClass().remove("expanded");
-        stack_sistema.getStyleClass().add("collapsed");
-    }
-
-    @SwapFxml(
-            container = "stack_sistema",
-            viewId = "#{viewId}",
-            before = false
-    )
-    private void loadSystemContentView(String viewId) {
-        LOGGER.log(Level.DEBUG, "🔄 Carregando view do sistema: {0}", viewId);
+    private void expandAside() {
+        if (asideHost == null) return;
+        asideHost.setPrefWidth(400);
+        asideHost.setVisible(true);
+        asideHost.getStyleClass().remove("collapsed");
+        asideHost.getStyleClass().add("expanded");
     }
 
     // ============================================================
-    // UTILITÁRIOS
+    // Utilitários
     // ============================================================
 
-    /**
-     * Atualiza o título da página
-     */
     private void updatePageTitle(String title) {
-        if (nomepage != null) {
-            nomepage.setText(title);
-        }
+        if (pageName != null) pageName.setText(title);
     }
 
     // ============================================================
-    // GERENCIAMENTO DE USUÁRIO
+    // Usuário
     // ============================================================
 
-    /**
-     * Define o usuário logado após autenticação
-     */
     public void setLoggedInUser(Usuario usuario) {
         try {
-            LOGGER.log(Level.INFO, "👤 Recebendo usuário logado: {0}", usuario.nome());
             this.usuarioLogado = usuario;
             this.loggedInUserName = usuario.nome();
             updateUserDisplay(usuario.nome());
-
             if (funcionariosService != null) {
                 buscarDadosFuncionario(usuario.funcionarioId());
             }
@@ -687,30 +370,23 @@ public class MainController implements Initializable, WinterFXController {
         }
     }
 
-    /**
-     * Define o usuário logado (fallback com nome)
-     */
-    public void setLoggedInUser(String userName) {
+    public void setLoggedInUser(String nomeUsuario) {
         try {
-            LOGGER.log(Level.INFO, "👤 Recebendo usuário logado: {0}", userName);
-            this.loggedInUserName = userName;
-            updateUserDisplay(userName);
-
-            if (funcionariosService != null) {
-                // buscarDadosFuncionarioPorNome(userName);
-            }
+            this.loggedInUserName = nomeUsuario;
+            updateUserDisplay(nomeUsuario);
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, "❌ Erro ao definir usuário logado", e);
-            updateUserDisplay(userName);
+            updateUserDisplay(nomeUsuario);
         }
     }
 
-    private void updateUserDisplay(String userName) {
+    private void updateUserDisplay(String nomeUsuario) {
         try {
-            if (nameUser != null) {
-                nameUser.setText(userName);
+            if (userName != null) userName.setText(nomeUsuario);
+            if (userInitials != null && nomeUsuario != null && !nomeUsuario.isBlank()) {
+                userInitials.setText(String.valueOf(nomeUsuario.charAt(0)).toUpperCase());
             }
-            updateWindowTitle(userName);
+            updateWindowTitle(nomeUsuario);
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, "❌ Erro ao atualizar display do usuário", e);
         }
@@ -718,31 +394,20 @@ public class MainController implements Initializable, WinterFXController {
 
     private void buscarDadosFuncionario(String funcionarioId) {
         try {
-            if (funcionarioId == null || funcionarioId.isBlank()) {
-                return;
-            }
-            Optional<Funcionarios> funcionarioOpt = funcionariosService.buscarPorCodDep(funcionarioId);
-            funcionarioOpt.ifPresent(this::updateUserDisplayWithFullData);
+            if (funcionarioId == null || funcionarioId.isBlank()) return;
+            Optional<Funcionarios> opt = funcionariosService.buscarPorCodDep(funcionarioId);
+            opt.ifPresent(this::updateUserDisplayWithFullData);
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, "❌ Erro ao buscar dados do funcionário: {0}", e.getMessage());
         }
     }
-/**
-    private void buscarDadosFuncionarioPorNome(String nome) {
-        try {
-            List<Funcionarios> funcionarios = funcionariosService.buscarPorNome(nome);
-            if (funcionarios != null && !funcionarios.isEmpty()) {
-                updateUserDisplayWithFullData(funcionarios.get(0));
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.ERROR, "❌ Erro ao buscar dados do funcionário: {0}", e.getMessage());
-        }
-    }
-*/
+
     private void updateUserDisplayWithFullData(Funcionarios funcionario) {
         try {
-            if (nameUser != null) {
-                nameUser.setText(funcionario.nome());
+            if (userName != null) userName.setText(funcionario.nome());
+            if (userInitials != null && funcionario.nome() != null && !funcionario.nome().isBlank()) {
+                userInitials.setText(
+                        String.valueOf(funcionario.nome().charAt(0)).toUpperCase());
             }
             loadUserImage(funcionario);
         } catch (Exception e) {
@@ -751,12 +416,12 @@ public class MainController implements Initializable, WinterFXController {
         }
     }
 
-    private void updateWindowTitle(String userName) {
+    private void updateWindowTitle(String nomeUsuario) {
         try {
-            if (nameUser != null && nameUser.getScene() != null) {
-                var stage = (javafx.stage.Stage) nameUser.getScene().getWindow();
+            if (userName != null && userName.getScene() != null) {
+                var stage = (javafx.stage.Stage) userName.getScene().getWindow();
                 if (stage != null) {
-                    stage.setTitle(String.format("Gestão de TI - Usuário: %s", userName));
+                    stage.setTitle(String.format("Gestão de TI - Usuário: %s", nomeUsuario));
                 }
             }
         } catch (Exception e) {
@@ -764,15 +429,11 @@ public class MainController implements Initializable, WinterFXController {
         }
     }
 
-    /**
-     * Carrega a imagem do funcionário (sobrescreve a imagem injetada via @InjectImage)
-     */
     private void loadUserImage(Funcionarios funcionario) {
         try {
-            if (funcionario != null && funcionario.temImagemPerfil() && imageUser != null) {
+            if (funcionario != null && funcionario.temImagemPerfil() && userImage != null) {
                 Image image = new Image(new ByteArrayInputStream(funcionario.imagemPerfil()));
-                imageUser.setImage(image);
-                LOGGER.log(Level.DEBUG, "✅ Imagem do funcionário carregada: {0}", funcionario.nome());
+                userImage.setImage(image);
             }
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "⚠️ Erro ao carregar imagem do funcionário", e);
@@ -780,58 +441,35 @@ public class MainController implements Initializable, WinterFXController {
     }
 
     // ============================================================
-    // EVENTOS
+    // Eventos
     // ============================================================
 
-    /**
-     * Escuta evento de logout para limpar estado
-     */
     @EventListener
     public void onLogoutEvent(LogoutEvent event) {
-        LOGGER.log(Level.INFO, "📢 Logout recebido no MainController: {0}", event.getUsername());
-
         this.usuarioLogado = null;
         this.loggedInUserName = null;
         updateUserDisplay(USER_DEFAULT);
 
         Platform.runLater(() -> {
-            if (nameUser != null && nameUser.getScene() != null) {
-                var stage = (javafx.stage.Stage) nameUser.getScene().getWindow();
-                if (stage != null) {
-                    stage.close();
-                }
+            if (userName != null && userName.getScene() != null) {
+                var stage = (javafx.stage.Stage) userName.getScene().getWindow();
+                if (stage != null) stage.close();
             }
         });
     }
 
-    // ============================================================
-    // SHUTDOWN
-    // ============================================================
-
-    /**
-     * Método chamado quando a janela é fechada
-     */
     @FXML
     private void handleWindowClose() {
-        LOGGER.log(Level.INFO, "🔌 Fechando MainController...");
         if (eventBus != null && usuarioLogado != null) {
             eventBus.publish(new LogoutEvent(usuarioLogado.nome()));
         }
     }
 
     // ============================================================
-    // GETTERS
+    // Getters
     // ============================================================
 
-    public Usuario getUsuarioLogado() {
-        return usuarioLogado;
-    }
-
-    public String getLoggedInUser() {
-        return loggedInUserName;
-    }
-
-    public boolean isAuthenticated() {
-        return usuarioLogado != null;
-    }
+    public Usuario getUsuarioLogado() { return usuarioLogado; }
+    public String getLoggedInUser() { return loggedInUserName; }
+    public boolean isAuthenticated() { return usuarioLogado != null; }
 }

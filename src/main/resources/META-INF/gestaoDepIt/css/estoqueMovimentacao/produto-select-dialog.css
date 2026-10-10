@@ -1,174 +1,328 @@
-/* produto-select-dialog.css v1.0 — Diálogo de Seleção de Produto */
+/*
+ * Packt Inventário — Diálogo: Selecionar Produto
+ * File: dialog-produto.css
+ * JavaFX 21+
+ *
+ * AUTOSSUFICIENTE — não depende de outros CSS.
+ * Inclui a paleta oficial do catálogo §1.
+ */
 
 /* ============================================================
-   RAIZ
+   PALETA OFICIAL — Catálogo §1
    ============================================================ */
+
+.root,
 .dialog-root {
-    -fx-background-color: #FFFFFF;
-    -fx-font-family: "Segoe UI", "Inter", "Roboto", sans-serif;
-    -fx-font-size: 13px;
+    /* Azuis */
+    -app-blue-900: #142B4A;
+    -app-blue-800: #1E3A5F;
+    -app-blue-700: #2457A7;
+    -app-blue-600: #326BC5;
+    -app-blue-100: #E8F0FC;
+    -app-blue-50:  #F4F8FE;
+
+    /* Semânticas */
+    -app-red-700:    #A8303C;
+    -app-red-600:    #C83E4D;
+    -app-red-100:    #FDECEF;
+
+    -app-green-700:  #0F6949;
+    -app-green-600:  #16845B;
+    -app-green-100:  #E8F6EF;
+
+    -app-orange-600: #B7791F;
+    -app-orange-100: #FFF4DF;
+
+    -app-info-600:   #2874C8;
+    -app-info-100:   #EAF3FE;
+
+    /* Neutros */
+    -app-neutral-50:  #F8FAFC;
+    -app-neutral-100: #EDF1F5;
+    -app-neutral-200: #E1E7EF;
+    -app-neutral-300: #C8D2E0;
+
+    /* Superfícies */
+    -app-background:     #F5F7FA;
+    -app-surface:        #FFFFFF;
+    -app-border:         #E1E7EF;
+    -app-border-strong:  #C8D2E0;
+    -app-divider:        #E8EDF3;
+
+    /* Texto */
+    -app-text-primary:    #172334;
+    -app-text-secondary:  #68778B;
+    -app-text-disabled:   #98A2B3;
+    -app-text-on-primary: #FFFFFF;
+
+    /* Foco */
+    -app-focus-ring: rgba(50, 107, 197, 0.45);
+
+    /* Fonte */
+    -app-font-family: "Inter", "Segoe UI", sans-serif;
+
+    /* Base */
+    -fx-background-color: -app-surface;
+    -fx-font-family: -app-font-family;
 }
 
 /* ============================================================
-   CABEÇALHO — título, busca e contador
+   ROOT / CONTAINER
    ============================================================ */
+
+.dialog-root {
+    -fx-background-color: -app-surface;
+}
+
+/* ============================================================
+   HEADER (top)
+   ============================================================ */
+
 .dialog-header {
-    -fx-background-color: #F8FAFC;
-    -fx-border-color: transparent transparent #E2E8F0 transparent;
+    -fx-background-color: -app-surface;
+    -fx-border-color: transparent transparent -app-border transparent;
     -fx-border-width: 0 0 1 0;
+    -fx-padding: 15px 20px;
+    -fx-spacing: 10px;
 }
 
 .dialog-title {
-    -fx-font-size: 17px;
+    -fx-font-size: 18px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1E293B;
-}
-
-.dialog-search {
-    -fx-background-color: #FFFFFF;
-    -fx-border-color: #CBD5E1;
-    -fx-border-radius: 8;
-    -fx-background-radius: 8;
-    -fx-font-size: 13px;
-    -fx-padding: 8 12 8 12;
-}
-.dialog-search:focused {
-    -fx-border-color: #4F46E5;
-    -fx-effect: dropshadow(gaussian, rgba(79,70,229,0.20), 4, 0, 0, 0);
+    -fx-text-fill: -app-text-primary;
 }
 
 .dialog-counter {
-    -fx-font-size: 11px;
-    -fx-text-fill: #64748B;
+    -fx-font-size: 12px;
+    -fx-text-fill: -app-text-secondary;
 }
 
 /* ============================================================
-   TABELA
+   CAMPO DE BUSCA
    ============================================================ */
+
+.dialog-search {
+    -fx-min-height: 38px;
+    -fx-pref-height: 38px;
+    -fx-padding: 0 14px;
+    -fx-background-color: -app-surface;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-border-color: -app-border;
+    -fx-border-width: 1px;
+    -fx-font-family: -app-font-family;
+    -fx-font-size: 13px;
+    -fx-text-fill: -app-text-primary;
+    -fx-prompt-text-fill: -app-text-disabled;
+}
+
+.dialog-search:hover {
+    -fx-border-color: -app-border-strong;
+}
+
+.dialog-search:focused {
+    -fx-border-color: -app-blue-600;
+    -fx-border-width: 1.5px;
+    -fx-effect: dropshadow(gaussian, rgba(50, 107, 197, 0.15), 5, 0, 0, 0);
+}
+
+/* ============================================================
+   TABELA (center)
+   ============================================================ */
+
 .table-view-dialog {
-    -fx-background-color: #FFFFFF;
+    -fx-background-color: -app-surface;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.table-view-dialog .column-header-background {
+    -fx-background-color: -app-neutral-50;
+}
+
+.table-view-dialog .column-header,
+.table-view-dialog .filler {
+    -fx-size: 38px;
+    -fx-background-color: -app-neutral-50;
+    -fx-border-color: transparent transparent -app-border transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.table-view-dialog .column-header .label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -app-text-secondary;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 0 12px;
+}
+
+.table-view-dialog .table-row-cell {
+    -fx-cell-size: 40px;
+    -fx-background-color: -app-surface;
+    -fx-border-color: transparent transparent -app-divider transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-cursor: hand;
+}
+
+.table-view-dialog .table-row-cell:odd {
+    -fx-background-color: -app-neutral-50;
+}
+
+.table-view-dialog .table-row-cell:hover {
+    -fx-background-color: -app-blue-50;
+}
+
+.table-view-dialog .table-row-cell:selected {
+    -fx-background-color: -app-blue-100;
+}
+
+.table-view-dialog .table-row-cell:selected .table-cell {
+    -fx-text-fill: -app-blue-700;
+    -fx-font-weight: bold;
+}
+
+.table-view-dialog .table-cell {
+    -fx-padding: 0 12px;
+    -fx-font-size: 13px;
+    -fx-text-fill: -app-text-primary;
+    -fx-alignment: CENTER_LEFT;
     -fx-border-color: transparent;
 }
-.table-view-dialog .column-header-background {
-    -fx-background-color: #F1F5F9;
-}
-.table-view-dialog .column-header {
-    -fx-background-color: transparent;
-    -fx-border-color: transparent transparent #E2E8F0 transparent;
-    -fx-padding: 10 8 10 8;
-}
-.table-view-dialog .column-header .label {
-    -fx-text-fill: #475569;
-    -fx-font-weight: bold;
-    -fx-font-size: 12px;
-}
-.table-view-dialog .table-row-cell {
-    -fx-background-color: #FFFFFF;
-    -fx-border-color: transparent transparent #F1F5F9 transparent;
-    -fx-cell-size: 34px;
-}
-.table-view-dialog .table-row-cell:odd {
-    -fx-background-color: #FAFBFC;
-}
-.table-view-dialog .table-row-cell:selected {
-    -fx-background-color: #EEF2FF;
-    -fx-text-fill: #1E293B;
-}
-.table-view-dialog .table-cell {
-    -fx-text-fill: #334155;
-    -fx-font-size: 12px;
-    -fx-padding: 6 10 6 10;
-    -fx-alignment: CENTER_LEFT;
-}
+
+/* Placeholder */
 .table-view-dialog .placeholder .label {
-    -fx-text-fill: #94A3B8;
-    -fx-font-size: 12px;
+    -fx-font-size: 13px;
+    -fx-text-fill: -app-text-secondary;
 }
 
 /* ============================================================
-   RODAPÉ
+   FOOTER (bottom)
    ============================================================ */
+
 .dialog-footer {
-    -fx-background-color: #F8FAFC;
-    -fx-border-color: #E2E8F0 transparent transparent transparent;
+    -fx-background-color: -app-neutral-50;
+    -fx-border-color: -app-border transparent transparent transparent;
     -fx-border-width: 1 0 0 0;
+    -fx-padding: 15px 20px;
+    -fx-spacing: 15px;
 }
 
 /* ============================================================
    BOTÕES
    ============================================================ */
-.btn-primary {
-    -fx-background-color: linear-gradient(to bottom right, #4F46E5, #4338CA);
-    -fx-text-fill: #FFFFFF;
-    -fx-font-size: 12px;
-    -fx-font-weight: bold;
-    -fx-padding: 8 14 8 14;
-    -fx-background-radius: 8;
-    -fx-cursor: hand;
-}
-.btn-primary:hover {
-    -fx-background-color: linear-gradient(to bottom right, #4338CA, #3730A3);
-}
-.btn-primary:pressed {
-    -fx-background-color: #3730A3;
-}
 
-.btn-secondary {
-    -fx-background-color: #FFFFFF;
-    -fx-text-fill: #334155;
-    -fx-font-size: 12px;
-    -fx-font-weight: 600;
-    -fx-padding: 8 16 8 16;
-    -fx-background-radius: 8;
-    -fx-border-color: #CBD5E1;
-    -fx-border-radius: 8;
-    -fx-cursor: hand;
-}
-.btn-secondary:hover {
-    -fx-background-color: #F1F5F9;
-    -fx-border-color: #94A3B8;
-}
-
+.btn-primary,
+.btn-secondary,
 .btn-success {
-    -fx-background-color: linear-gradient(to bottom right, #22C55E, #16A34A);
-    -fx-text-fill: #FFFFFF;
-    -fx-font-size: 12px;
+    -fx-font-family: -app-font-family;
+    -fx-font-size: 13px;
     -fx-font-weight: bold;
-    -fx-padding: 8 16 8 16;
-    -fx-background-radius: 8;
+    -fx-min-height: 36px;
+    -fx-padding: 0 18px;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-border-width: 1px;
+    -fx-border-color: transparent;
     -fx-cursor: hand;
+    -fx-graphic-text-gap: 8px;
 }
-.btn-success:hover {
-    -fx-background-color: linear-gradient(to bottom right, #16A34A, #15803D);
+
+.btn-primary:focused,
+.btn-secondary:focused,
+.btn-success:focused {
+    -fx-effect: dropshadow(gaussian, -app-focus-ring, 4, 0, 0, 0);
 }
-.btn-success:pressed {
-    -fx-background-color: #15803D;
-}
+
+.btn-primary:disabled,
+.btn-secondary:disabled,
 .btn-success:disabled {
-    -fx-opacity: 0.5;
+    -fx-opacity: 0.55;
     -fx-cursor: default;
+}
+
+/* --- Primary (Buscar) --- */
+.btn-primary {
+    -fx-background-color: -app-blue-700;
+    -fx-text-fill: -app-text-on-primary;
+    -fx-border-color: -app-blue-700;
+}
+
+.btn-primary:hover {
+    -fx-background-color: -app-blue-800;
+    -fx-border-color: -app-blue-800;
+}
+
+.btn-primary:pressed {
+    -fx-background-color: -app-blue-900;
+    -fx-border-color: -app-blue-900;
+}
+
+/* --- Secondary (Cancelar) --- */
+.btn-secondary {
+    -fx-background-color: -app-surface;
+    -fx-text-fill: -app-text-primary;
+    -fx-border-color: -app-border;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: -app-blue-50;
+    -fx-border-color: -app-blue-600;
+    -fx-text-fill: -app-blue-700;
+}
+
+.btn-secondary:pressed {
+    -fx-background-color: -app-blue-100;
+}
+
+/* --- Success (Selecionar) --- */
+.btn-success {
+    -fx-background-color: -app-green-600;
+    -fx-text-fill: -app-text-on-primary;
+    -fx-border-color: -app-green-600;
+}
+
+.btn-success:hover {
+    -fx-background-color: -app-green-700;
+    -fx-border-color: -app-green-700;
+}
+
+.btn-success:pressed {
+    -fx-background-color: -app-green-700;
 }
 
 /* ============================================================
    SCROLLBAR
    ============================================================ */
-.scroll-bar:vertical .thumb,
-.scroll-bar:horizontal .thumb {
-    -fx-background-color: #CBD5E1;
-    -fx-background-radius: 4;
-}
-.scroll-bar:vertical .thumb:hover,
-.scroll-bar:horizontal .thumb:hover {
-    -fx-background-color: #94A3B8;
+
+.scroll-bar:vertical,
+.scroll-bar:horizontal {
+    -fx-background-color: transparent;
 }
 
-/* ============================================================
-   TOOLTIP
-   ============================================================ */
-.tooltip {
-    -fx-background-color: #1E293B;
-    -fx-text-fill: #F8FAFC;
-    -fx-font-size: 11px;
-    -fx-background-radius: 6;
-    -fx-padding: 6 10 6 10;
+.scroll-bar:vertical {
+    -fx-pref-width: 10;
+}
+
+.scroll-bar:horizontal {
+    -fx-pref-height: 10;
+}
+
+.scroll-bar .track {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: -app-border-strong;
+    -fx-background-radius: 5;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: -app-text-disabled;
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-pref-height: 0;
+    -fx-pref-width: 0;
+    -fx-opacity: 0;
 }

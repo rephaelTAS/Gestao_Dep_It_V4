@@ -46,8 +46,7 @@ import java.lang.System.Logger.Level;
         title = "Login - Gestão de TI",
         centered = true,
         resizable = false,
-        primaryCss = "/META-INF/gestaoDepIt/css/login/login.css"
-)
+        primaryCss = "/META-INF/gestaoDepIt/css/login/login.css")
 public class LoginController implements WinterFXController {
 
     private static final Logger LOGGER = System.getLogger(LoginController.class.getName());

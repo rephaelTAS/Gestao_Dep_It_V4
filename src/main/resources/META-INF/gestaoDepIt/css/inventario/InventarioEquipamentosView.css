@@ -1,189 +1,524 @@
+/*
+ * Packt Inventário — Inventário de Equipamentos
+ * File: inventario.css
+ * JavaFX 21+
+ *
+ * AUTOSSUFICIENTE — não depende de outros CSS.
+ * Inclui a paleta oficial do catálogo §1.
+ *
+ * ATENÇÃO: paleta duplicada. Se mudares aqui, muda em TODOS os CSS de ecrã.
+ */
+
 /* ============================================================
-   InventarioEquipamentosView.css
-   Tela de listagem do inventário — tema claro, harmônico com o catálogo.
+   PALETA OFICIAL — Catálogo §1
    ============================================================ */
 
 .root {
-    -fx-background-color: #ffffff;
-    -fx-font-family: "Segoe UI", "Helvetica Neue", sans-serif;
-    -fx-font-size: 13px;
+    /* Azuis */
+    -app-blue-900: #142B4A;
+    -app-blue-800: #1E3A5F;
+    -app-blue-700: #2457A7;
+    -app-blue-600: #326BC5;
+    -app-blue-100: #E8F0FC;
+    -app-blue-50:  #F4F8FE;
+
+    /* Semânticas */
+    -app-red-700:    #A8303C;
+    -app-red-600:    #C83E4D;
+    -app-red-100:    #FDECEF;
+
+    -app-green-700:  #0F6949;
+    -app-green-600:  #16845B;
+    -app-green-100:  #E8F6EF;
+
+    -app-orange-600: #B7791F;
+    -app-orange-100: #FFF4DF;
+
+    -app-info-600:   #2874C8;
+    -app-info-100:   #EAF3FE;
+
+    /* Neutros */
+    -app-neutral-50:  #F8FAFC;
+    -app-neutral-100: #EDF1F5;
+    -app-neutral-200: #E1E7EF;
+    -app-neutral-300: #C8D2E0;
+
+    /* Superfícies */
+    -app-background:     #F5F7FA;
+    -app-surface:        #FFFFFF;
+    -app-border:         #E1E7EF;
+    -app-border-strong:  #C8D2E0;
+    -app-divider:        #E8EDF3;
+
+    /* Texto */
+    -app-text-primary:    #172334;
+    -app-text-secondary:  #68778B;
+    -app-text-disabled:   #98A2B3;
+    -app-text-on-primary: #FFFFFF;
+
+    /* Foco */
+    -app-focus-ring: rgba(50, 107, 197, 0.45);
+
+    /* Fonte */
+    -app-font-family: "Inter", "Segoe UI", sans-serif;
+
+    /* Base */
+    -fx-background-color: -app-background;
+    -fx-font-family: -app-font-family;
 }
 
-/* ===== Header ===== */
+/* ============================================================
+   CONTAINER PRINCIPAL
+   ============================================================ */
+
+.anchor-pane,
+.root > .vbox {
+    -fx-background-color: -app-background;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
 .list-header {
-    -fx-background-color: #ffffff;
-    -fx-border-color: transparent transparent #e5e7eb transparent;
+    -fx-background-color: -app-surface;
+    -fx-border-color: transparent transparent -app-border transparent;
     -fx-border-width: 0 0 1 0;
 }
 
 .list-title {
-    -fx-font-size: 20px;
+    -fx-font-size: 22px;
     -fx-font-weight: bold;
-    -fx-text-fill: #111827;
+    -fx-text-fill: -app-text-primary;
 }
 
-/* ===== Card de filtros ===== */
+/* ============================================================
+   CARD DE FILTROS
+   ============================================================ */
+
 .list-card {
-    -fx-background-color: #f9fafb;
-    -fx-background-radius: 8;
-    -fx-border-radius: 8;
-    -fx-border-color: #e5e7eb;
-    -fx-border-width: 1;
+    -fx-background-color: -app-surface;
+    -fx-background-radius: 12px;
+    -fx-border-radius: 12px;
+    -fx-border-color: -app-border;
+    -fx-border-width: 1px;
+    -fx-padding: 16px 20px;
+    -fx-spacing: 10px;
+    /* O VBox do FXML tem padding por dentro, então aqui é o wrapper */
 }
 
 .list-card-header {
-    -fx-font-size: 13px;
+    -fx-font-size: 15px;
     -fx-font-weight: bold;
-    -fx-text-fill: #374151;
+    -fx-text-fill: -app-text-primary;
 }
 
+/* Labels de filtro (aquisição, instalação, verificação) */
 .filter-label {
-    -fx-text-fill: #6b7280;
-    -fx-font-size: 12px;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -app-text-primary;
 }
 
 .filter-separator {
-    -fx-text-fill: #9ca3af;
+    -fx-font-size: 13px;
+    -fx-text-fill: -app-text-secondary;
+    -fx-padding: 0 4px;
+}
+
+/* ============================================================
+   INPUTS (TextField, ComboBox, DatePicker)
+   ============================================================ */
+
+.text-field,
+.combo-box,
+.date-picker {
+    -fx-min-height: 36px;
+    -fx-pref-height: 36px;
+    -fx-padding: 0 10px;
+    -fx-background-color: -app-surface;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-border-color: -app-border;
+    -fx-border-width: 1px;
+    -fx-font-family: -app-font-family;
+    -fx-font-size: 13px;
+    -fx-text-fill: -app-text-primary;
+    -fx-prompt-text-fill: -app-text-disabled;
+}
+
+.text-field:hover,
+.combo-box:hover,
+.date-picker:hover {
+    -fx-border-color: -app-border-strong;
+}
+
+.text-field:focused,
+.combo-box:focused,
+.date-picker:focused {
+    -fx-border-color: -app-blue-600;
+    -fx-border-width: 1.5px;
+    -fx-effect: dropshadow(gaussian, rgba(50, 107, 197, 0.15), 5, 0, 0, 0);
+}
+
+/* ComboBox — seta */
+.combo-box .arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 6px;
+}
+
+.combo-box .arrow {
+    -fx-background-color: -app-text-secondary;
+    -fx-padding: 3px;
+}
+
+.combo-box:hover .arrow {
+    -fx-background-color: -app-blue-700;
+}
+
+/* DatePicker — seta e ícone do calendário */
+.date-picker .arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 6px;
+}
+
+.date-picker .arrow-button .arrow {
+    -fx-background-color: -app-text-secondary;
+}
+
+/* ComboBox popup */
+.combo-box-popup .list-view {
+    -fx-background-color: -app-surface;
+    -fx-border-color: -app-border;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.12), 10, 0, 0, 3);
+    -fx-padding: 4px;
+}
+
+.combo-box-popup .list-view .list-cell {
+    -fx-padding: 8px 12px;
+    -fx-text-fill: -app-text-primary;
+    -fx-background-color: transparent;
+    -fx-background-radius: 4px;
+    -fx-font-size: 13px;
+}
+
+.combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: -app-blue-50;
+}
+
+.combo-box-popup .list-view .list-cell:filled:selected {
+    -fx-background-color: -app-blue-100;
+    -fx-text-fill: -app-blue-700;
+    -fx-font-weight: bold;
+}
+
+/* ============================================================
+   BOTÕES
+   ============================================================ */
+
+.btn-primary,
+.btn-secondary,
+.btn-pagination {
+    -fx-font-family: -app-font-family;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-min-height: 36px;
+    -fx-padding: 0 16px;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-border-width: 1px;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+    -fx-graphic-text-gap: 8px;
+}
+
+.btn-primary:focused,
+.btn-secondary:focused,
+.btn-pagination:focused {
+    -fx-effect: dropshadow(gaussian, -app-focus-ring, 4, 0, 0, 0);
+}
+
+.btn-primary:disabled,
+.btn-secondary:disabled,
+.btn-pagination:disabled {
+    -fx-opacity: 0.55;
+    -fx-cursor: default;
+}
+
+/* --- Primary --- */
+.btn-primary {
+    -fx-background-color: -app-blue-700;
+    -fx-text-fill: -app-text-on-primary;
+    -fx-border-color: -app-blue-700;
+}
+
+.btn-primary:hover {
+    -fx-background-color: -app-blue-800;
+    -fx-border-color: -app-blue-800;
+}
+
+.btn-primary:pressed {
+    -fx-background-color: -app-blue-900;
+    -fx-border-color: -app-blue-900;
+}
+
+/* --- Secondary --- */
+.btn-secondary {
+    -fx-background-color: -app-surface;
+    -fx-text-fill: -app-text-primary;
+    -fx-border-color: -app-border;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: -app-blue-50;
+    -fx-border-color: -app-blue-600;
+    -fx-text-fill: -app-blue-700;
+}
+
+.btn-secondary:pressed {
+    -fx-background-color: -app-blue-100;
+}
+
+/* --- Paginação --- */
+.btn-pagination {
+    -fx-min-width: 36px;
+    -fx-pref-width: 36px;
+    -fx-padding: 0;
+    -fx-background-color: -app-surface;
+    -fx-text-fill: -app-text-primary;
+    -fx-border-color: -app-border;
     -fx-font-size: 12px;
 }
 
-/* ===== Stats ===== */
-.stats-bar {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #e5e7eb transparent #e5e7eb transparent;
-    -fx-border-width: 1 0 1 0;
+.btn-pagination:hover {
+    -fx-background-color: -app-blue-50;
+    -fx-border-color: -app-blue-600;
+    -fx-text-fill: -app-blue-700;
 }
 
-.stat-label          { -fx-text-fill: #6b7280; -fx-font-size: 11px; }
-.stat-value          { -fx-text-fill: #111827; -fx-font-size: 16px; -fx-font-weight: bold; }
-.stat-label-active   { -fx-text-fill: #059669; -fx-font-size: 11px; }
-.stat-value-active   { -fx-text-fill: #10b981; -fx-font-size: 16px; -fx-font-weight: bold; }
-.stat-label-warning  { -fx-text-fill: #d97706; -fx-font-size: 11px; }
-.stat-value-warning  { -fx-text-fill: #f59e0b; -fx-font-size: 16px; -fx-font-weight: bold; }
-.stat-label-danger   { -fx-text-fill: #dc2626; -fx-font-size: 11px; }
-.stat-value-danger   { -fx-text-fill: #ef4444; -fx-font-size: 16px; -fx-font-weight: bold; }
-.stat-label-muted    { -fx-text-fill: #6b7280; -fx-font-size: 11px; }
-.stat-value-muted    { -fx-text-fill: #9ca3af; -fx-font-size: 16px; -fx-font-weight: bold; }
+.btn-pagination:pressed {
+    -fx-background-color: -app-blue-100;
+}
 
-/* ===== Tabela ===== */
+.btn-pagination:disabled {
+    -fx-opacity: 0.40;
+}
+
+/* ============================================================
+   ESTATÍSTICAS
+   ============================================================ */
+
+.stats-bar {
+    -fx-background-color: -app-surface;
+    -fx-background-radius: 12px;
+    -fx-border-radius: 12px;
+    -fx-border-color: -app-border;
+    -fx-border-width: 1px;
+    -fx-padding: 12px 20px;
+}
+
+.stat-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: -app-text-secondary;
+}
+
+.stat-value {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -app-text-primary;
+}
+
+.stat-label-active {
+    -fx-font-size: 12px;
+    -fx-text-fill: -app-green-700;
+}
+
+.stat-value-active {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -app-green-600;
+}
+
+.stat-label-warning {
+    -fx-font-size: 12px;
+    -fx-text-fill: -app-orange-600;
+}
+
+.stat-value-warning {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -app-orange-600;
+}
+
+.stat-label-danger {
+    -fx-font-size: 12px;
+    -fx-text-fill: -app-red-600;
+}
+
+.stat-value-danger {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -app-red-600;
+}
+
+.stat-label-muted {
+    -fx-font-size: 12px;
+    -fx-text-fill: -app-text-disabled;
+}
+
+.stat-value-muted {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -app-text-disabled;
+}
+
+/* ============================================================
+   TABELA
+   ============================================================ */
+
 .table-view {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #e5e7eb;
-    -fx-border-width: 1;
-    -fx-border-radius: 8;
-    -fx-background-radius: 8;
+    -fx-background-color: -app-surface;
+    -fx-border-color: -app-border;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-table-cell-border-color: -app-divider;
+    -fx-padding: 0;
 }
 
 .table-view .column-header-background {
-    -fx-background-color: #f3f4f6;
-    -fx-background-radius: 8 8 0 0;
+    -fx-background-color: -app-neutral-50;
 }
 
-.table-view .column-header {
-    -fx-background-color: transparent;
-    -fx-font-weight: bold;
-    -fx-text-fill: #374151;
-    -fx-padding: 10 8 10 8;
-    -fx-border-color: transparent transparent #e5e7eb transparent;
+.table-view .column-header,
+.table-view .filler {
+    -fx-size: 42px;
+    -fx-background-color: -app-neutral-50;
+    -fx-border-color: transparent transparent -app-border transparent;
     -fx-border-width: 0 0 1 0;
 }
 
-.table-view .table-row-cell {
-    -fx-background-color: #ffffff;
-    -fx-border-color: transparent transparent #f3f4f6 transparent;
-    -fx-border-width: 0 0 1 0;
-    -fx-cell-size: 36px;
-}
-
-.table-view .table-row-cell:odd {
-    -fx-background-color: #fafafa;
-}
-
-.table-view .table-row-cell:selected {
-    -fx-background-color: #dbeafe;
-}
-
-.table-view .table-cell {
-    -fx-text-fill: #1f2937;
-    -fx-padding: 0 8 0 8;
-}
-
-/* ===== Paginação ===== */
-.pagination-bar { -fx-padding: 10 0 10 0; }
-
-.btn-pagination {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #d1d5db;
-    -fx-border-width: 1;
-    -fx-border-radius: 4;
-    -fx-background-radius: 4;
-    -fx-min-width: 36px;
-    -fx-padding: 4 8 4 8;
-    -fx-cursor: hand;
-    -fx-text-fill: #374151;
-}
-
-.btn-pagination:hover { -fx-background-color: #f3f4f6; }
-.btn-pagination:disabled { -fx-opacity: 0.4; }
-
-.pagination-label { -fx-text-fill: #6b7280; -fx-font-size: 12px; }
-
-/* ===== Status bar ===== */
-.status-bar {
-    -fx-background-color: #f9fafb;
-    -fx-border-color: #e5e7eb transparent transparent transparent;
-    -fx-border-width: 1 0 0 0;
-    -fx-padding: 8 20 8 20;
-}
-
-.status-text { -fx-text-fill: #6b7280; -fx-font-size: 12px; }
-
-/* ===== Botões ===== */
-.btn-primary {
-    -fx-background-color: #3b82f6;
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-background-radius: 6;
-    -fx-padding: 6 14 6 14;
-    -fx-cursor: hand;
-}
-.btn-primary:hover { -fx-background-color: #2563eb; }
-
-.btn-secondary {
-    -fx-background-color: #ffffff;
-    -fx-text-fill: #374151;
-    -fx-border-color: #d1d5db;
-    -fx-border-width: 1;
-    -fx-border-radius: 6;
-    -fx-background-radius: 6;
-    -fx-padding: 6 14 6 14;
-    -fx-cursor: hand;
-}
-.btn-secondary:hover { -fx-background-color: #f3f4f6; }
-
-.btn-danger {
-    -fx-background-color: #ef4444;
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-background-radius: 6;
-    -fx-padding: 6 14 6 14;
-    -fx-cursor: hand;
-}
-.btn-danger:hover { -fx-background-color: #dc2626; }
-
-/* ===== Coluna de ações ===== */
-.action-btn-view,
-.action-btn-edit,
-.action-btn-history {
-    -fx-background-color: transparent;
-    -fx-cursor: hand;
-    -fx-padding: 2 6 2 6;
+.table-view .column-header .label {
     -fx-font-size: 12px;
-    -fx-text-fill: #374151;
+    -fx-font-weight: bold;
+    -fx-text-fill: -app-text-secondary;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 0 8px;
 }
-.action-btn-view:hover,
-.action-btn-edit:hover,
-.action-btn-history:hover {
-    -fx-background-color: #e5e7eb;
-    -fx-background-radius: 4;
+
+.table-row-cell {
+    -fx-cell-size: 42px;
+    -fx-background-color: -app-surface;
+    -fx-border-color: transparent transparent -app-divider transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-cursor: hand;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: -app-neutral-50;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: -app-blue-50;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: -app-blue-100;
+}
+
+.table-row-cell:selected .table-cell {
+    -fx-text-fill: -app-blue-700;
+}
+
+.table-cell {
+    -fx-padding: 0 8px;
+    -fx-font-size: 12px;
+    -fx-text-fill: -app-text-primary;
+    -fx-alignment: CENTER_LEFT;
+    -fx-border-color: transparent;
+}
+
+/* Empty state da tabela */
+.table-view .placeholder .label {
+    -fx-font-size: 13px;
+    -fx-text-fill: -app-text-secondary;
+}
+
+/* ============================================================
+   PAGINAÇÃO
+   ============================================================ */
+
+.pagination-bar {
+    -fx-padding: 12px 0 8px 0;
+}
+
+.pagination-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: -app-text-secondary;
+    -fx-padding: 0 8px;
+}
+
+/* ============================================================
+   STATUS BAR
+   ============================================================ */
+
+.status-bar {
+    -fx-background-color: -app-surface;
+    -fx-padding: 8px 20px;
+    -fx-border-color: -app-border transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+.status-text {
+    -fx-font-size: 12px;
+    -fx-text-fill: -app-text-secondary;
+}
+
+/* Progress Indicator */
+.progress-indicator {
+    -fx-progress-color: -app-blue-600;
+    -fx-pref-width: 20px;
+    -fx-pref-height: 20px;
+}
+
+.progress-indicator .percentage {
+    -fx-fill: transparent;
+}
+
+/* ============================================================
+   SCROLLBAR GLOBAL
+   ============================================================ */
+
+.scroll-bar:vertical,
+.scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar:vertical {
+    -fx-pref-width: 10;
+}
+
+.scroll-bar:horizontal {
+    -fx-pref-height: 10;
+}
+
+.scroll-bar .track {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: -app-border-strong;
+    -fx-background-radius: 5;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: -app-text-disabled;
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-pref-height: 0;
+    -fx-pref-width: 0;
+    -fx-opacity: 0;
 }

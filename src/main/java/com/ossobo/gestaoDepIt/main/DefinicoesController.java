@@ -39,7 +39,12 @@ import java.util.ResourceBundle;
         height = 700,
         centered = true,
         primaryCss = "/css/main/definicoes.css",
-        viewType = ViewType.STATIC
+        viewType = ViewType.STATIC,
+        additionalCss   = {
+                "/META-INF/gestaoDepIt/css/global/tokens.css",
+                "/META-INF/gestaoDepIt/css/global/components.css",
+                "/META-INF/gestaoDepIt/css/main/servidor_list.css"
+        }
 )
 public class DefinicoesController implements Initializable, WinterFXController {
 

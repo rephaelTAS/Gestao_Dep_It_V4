@@ -20,5 +20,5 @@ public final class GuestConstants {
     // Dados do usuário
     public static final String GUEST_NAME = "Guest";
     public static final String GUEST_EMAIL = "guest@localhost";
-    public static final String GUEST_LEVEL = "READONLY";
+    public static final String GUEST_LEVEL = "ADMIN";
 }
